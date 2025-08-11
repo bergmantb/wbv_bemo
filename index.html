@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WBV_BeMo – Offizielle Informationsseite</title>
+  <meta name="description" content="Dummy-Webseite für den Passive Provider WBV_BeMo mit Informationen zur Stadt und zum Glasfaserausbau (FTTH)." />
+  <style>
+    :root {
+      --brand: #042F57; /* dunkelblau */
+      --brand-2: #3A9D23; /* grün */
+      --bg: #f7fafc;
+      --text: #1f2937;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji"; color: var(--text); background: var(--bg); }
+    a { color: var(--brand); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 1rem; }
+    header { background: #fff; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; z-index: 10; }
+    .nav { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .75rem 0; }
+    .nav a { font-weight: 600; }
+    .brand { display: flex; align-items: center; gap: .75rem; }
+    .logo { width: 139px; height: 69.5px; display: inline-block; }
+    .cta { display: inline-block; background: var(--brand); color: #fff; padding: .6rem 1rem; border-radius: .6rem; font-weight: 700; }
+    .cta:hover { filter: brightness(1.05); text-decoration: none; }
+    .hero { padding: 3rem 0 2rem; background: linear-gradient(180deg, #fff 0%, #f9fbff 100%); border-bottom: 1px solid #e5e7eb; }
+    .hero h1 { font-size: clamp(1.8rem, 3.2vw, 2.6rem); margin: 0 0 .5rem; color: var(--brand); }
+    .hero p { font-size: 1.05rem; max-width: 65ch; }
+    .grid { display: grid; gap: 1rem; grid-template-columns: repeat(12, 1fr); }
+    .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 1rem; padding: 1rem; }
+    .card h3 { margin-top: 0; color: var(--brand); }
+    section { padding: 2rem 0; }
+    h2 { color: var(--brand); margin-top: 0; }
+    .cols-3 > * { grid-column: span 12; }
+    @media (min-width: 800px) { .cols-3 > * { grid-column: span 4; } }
+    .list { margin: .5rem 0 0 1rem; }
+    .pill { display: inline-block; padding: .25rem .6rem; border-radius: 9999px; background: #eff6ff; color: var(--brand); border: 1px solid #dbeafe; font-size: .85rem; margin-right: .4rem; }
+    details { background: #fff; border: 1px solid #e5e7eb; border-radius: .8rem; padding: .75rem 1rem; }
+    summary { cursor: pointer; font-weight: 600; color: var(--brand); }
+    footer { border-top: 1px solid #e5e7eb; background: #fff; padding: 1.25rem 0; font-size: .95rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <div class="brand" aria-label="WBV_BeMo Startseite">
+        <!-- Inline-SVG-Logo (echte Vektordarstellung, 278x139 skaliert) -->
+        <svg class="logo" viewBox="0 0 278 139" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logo WBV_BeMo">
+          <title>Logo WBV_BeMo</title>
+          <rect width="278" height="139" fill="white"/>
+          <text x="15" y="85" font-family="Arial, sans-serif" font-weight="bold" font-size="36" fill="#042F57">WBV_BeMo</text>
+          <g fill="#3A9D23">
+            <polygon points="210,139 278,139 278,71" />
+          </g>
+          <g stroke="#042F57" stroke-width="5" stroke-linecap="round" fill="none">
+            <path d="M210 135 C220 110 225 95 235 80"/>
+            <path d="M220 135 C230 110 235 95 245 80"/>
+            <path d="M230 135 C240 110 245 95 255 80"/>
+            <path d="M240 135 C250 110 255 95 265 80"/>
+          </g>
+          <g fill="#042F57">
+            <circle cx="235" cy="80" r="6"/>
+            <circle cx="245" cy="80" r="6"/>
+            <circle cx="255" cy="80" r="6"/>
+            <circle cx="265" cy="80" r="6"/>
+          </g>
+        </svg>
+        <strong>WBV_BeMo</strong>
+      </div>
+      <nav aria-label="Hauptnavigation">
+        <a href="#stadt">Stadt</a>
+        <a href="#ausbau">Glasfaserausbau</a>
+        <a href="#faq">FAQ</a>
+        <a href="#kontakt">Kontakt</a>
+        <a class="cta" href="#ausbau">Jetzt informieren</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <h1>Willkommen in WBV – Ihre Stadt. Ihre Zukunft. Ihre Glasfaser.</h1>
+        <p>
+          WBV_BeMo begleitet die Planung und Koordination des Glasfaserausbaus (FTTH) in WBV. Auf dieser Seite finden Sie Informationen zur Stadt WBV,
+          zu Ausbaugebieten, Bauphasen, Terminen sowie hilfreiche Links – unter anderem zur Glasfaser-Seite der Telekom.
+        </p>
+      </div>
+    </section>
+
+    <section id="stadt">
+      <div class="container">
+        <h2>Die Stadt WBV</h2>
+        <div class="grid cols-3">
+          <article class="card">
+            <h3>Porträt</h3>
+            <p>WBV ist eine moderne Kommune mit starkem Fokus auf digitale Infrastruktur, nachhaltige Mobilität und bürgernahe Services.</p>
+            <p><span class="pill">Lebenswert</span><span class="pill">Digital</span><span class="pill">Nachhaltig</span></p>
+          </article>
+          <article class="card">
+            <h3>Wirtschaft & Bildung</h3>
+            <p>Ein diverser Branchenmix und gute Ausbildungsangebote bilden die Grundlage für Innovation und Wachstum – erweitert durch hohe Konnektivität.</p>
+          </article>
+          <article class="card">
+            <h3>Freizeit & Kultur</h3>
+            <p>Grünflächen, Sportangebote und Kulturveranstaltungen sorgen für hohe Lebensqualität – vernetzt durch moderne digitale Angebote.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="ausbau">
+      <div class="container">
+        <h2>Glasfaserausbau in WBV</h2>
+        <div class="grid cols-3">
+          <article class="card">
+            <h3>Ausbaugebiete</h3>
+            <p>Die Planung erfolgt abschnittsweise (Clusters/PoP-Bereiche). Priorisierte Gebiete werden nach Anschlussdichte und Synergien festgelegt.</p>
+            <ul class="list">
+              <li>Cluster Nord – Vorvermarktung</li>
+              <li>Cluster Mitte – Bauphase</li>
+              <li>Cluster Süd – Inbetriebnahme</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Bauphasen</h3>
+            <ol class="list">
+              <li>Feinplanung & Trassierung</li>
+              <li>Tiefbau & Leerrohrverlegung</li>
+              <li>Einblasen & Spleißen</li>
+              <li>Aktivierung & Übergabe</li>
+            </ol>
+          </article>
+          <article class="card">
+            <h3>Termine & Karten</h3>
+            <p>Übersichten zu Baustart, Meilensteinen und voraussichtlicher Fertigstellung folgen hier. Interaktive Karten können hier eingebettet werden.</p>
+          </article>
+        </div>
+
+        <div class="card" style="margin-top:1rem">
+          <h3>Verfügbarkeit prüfen & weitere Informationen</h3>
+          <p>
+            Prüfen Sie die Glasfaser-Verfügbarkeit und informieren Sie sich zu Tarifen, Buchung und Bauabläufen direkt bei der Telekom:
+          </p>
+          <p>
+            <a class="cta" href="https://www.telekom.de/glasfaser" target="_blank" rel="noopener">Zur Telekom-Glasfaser-Seite</a>
+          </p>
+          <p style="font-size:.9rem;color:#6b7280">Externer Link öffnet in einem neuen Tab.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <div class="container">
+        <h2>Häufige Fragen (FAQ)</h2>
+        <div class="grid" style="grid-template-columns: 1fr; gap: .75rem;">
+          <details>
+            <summary>Warum Glasfaser (FTTH)?</summary>
+            <p>FTTH ermöglicht stabile Gigabit-Bandbreiten, niedrige Latenz und ist zukunftssicher gegenüber steigenden Anforderungen.</p>
+          </details>
+          <details>
+            <summary>Benötige ich während der Bauphase Zugang zu meinem Grundstück?</summary>
+            <p>Ja, für die Hauseinführung und die Verlegung auf Privatgrund ist eine Terminabstimmung notwendig.</p>
+          </details>
+          <details>
+            <summary>Wer ist Ansprechpartner?</summary>
+            <p>WBV_BeMo koordiniert die Ausbauplanung. Für Tarife, Verträge und Buchungen wenden Sie sich an die Telekom über den oben verlinkten Service.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section id="kontakt">
+      <div class="container">
+        <h2>Kontakt</h2>
+        <div class="card">
+          <p><strong>WBV_BeMo – Passive Provider & Rollout-Partner</strong></p>
+          <p>E-Mail: <a href="mailto:info@wbv-bemo.example">info@wbv-bemo.example</a></p>
+          <p>Adresse: Hohenfuhrstraße 13, 12345 WBV, Deutschland</p>
+          <p>Telefon: +49 (0) 1234 567890</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:center;">
+        <p>© <span id="year"></span> WBV_BeMo. Alle Rechte vorbehalten.</p>
+        <p><a href="#stadt">Stadt</a> · <a href="#ausbau">Glasfaserausbau</a> · <a href="#faq">FAQ</a> · <a href="#kontakt">Kontakt</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
