@@ -1,0 +1,1175 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pfau QA - GBGS-Funktionen Klickdummy</title>
+  <style>
+:root {
+  --brand-green: #008a4b;
+  --brand-green-dark: #007a42;
+  --magenta: #e20074;
+  --blue: #003cff;
+  --ink: #111;
+  --muted: #5c6673;
+  --line: #d8dce3;
+  --soft: #f5f6f8;
+  --panel: #fff;
+  --warning: #ffdfc9;
+  --shadow: 0 12px 36px rgba(23, 32, 42, 0.18);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background: #f4f5f7;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.brand-bar {
+  height: 68px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 10px;
+  color: #fff;
+  background: var(--brand-green);
+}
+
+.brand-mark {
+  width: 31px;
+  font-size: 38px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.brand-copy {
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+.app-bar {
+  height: 63px;
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  padding: 0 22px;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+}
+
+.menu-button,
+.link-button {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.menu-button {
+  font-size: 20px;
+}
+
+.app-bar strong {
+  color: var(--brand-green-dark);
+}
+
+.user-box {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.user-icon {
+  color: #000;
+  font-size: 22px;
+}
+
+.page-shell {
+  padding: 10px;
+}
+
+.breadcrumb {
+  color: #59616f;
+  font-size: 11px;
+  margin: 4px 0 28px;
+}
+
+.env-warning {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 38px;
+  padding: 0 14px;
+  border-radius: 4px;
+  background: var(--warning);
+  font-size: 14px;
+}
+
+.env-warning span {
+  width: 18px;
+  height: 18px;
+  display: inline-grid;
+  place-items: center;
+  color: #c64f00;
+  border: 1px solid #c64f00;
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+h1 {
+  margin: 40px 0 28px;
+  font-size: 36px;
+  line-height: 1.1;
+}
+
+.tranche-card {
+  overflow: visible;
+  background: var(--panel);
+  border: 1px solid #e4e7eb;
+  border-radius: 6px;
+  box-shadow: 0 1px 8px rgba(17, 24, 39, 0.08);
+}
+
+.tranche-header {
+  min-height: 70px;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.tranche-header p {
+  margin: 6px 0 0;
+  color: #48515e;
+}
+
+.process-actions {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.process-menu-wrap {
+  position: relative;
+}
+
+.process-button {
+  min-height: 34px;
+  padding: 0 13px;
+  color: var(--blue);
+  background: white;
+  border: 1px solid var(--blue);
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.process-menu {
+  position: absolute;
+  top: 33px;
+  right: -49px;
+  width: 220px;
+  padding: 8px 0;
+  background: white;
+  border: 1px solid #e0e3e8;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  z-index: 4;
+}
+
+.process-menu::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  right: 82px;
+  width: 14px;
+  height: 14px;
+  background: white;
+  border-left: 1px solid #e0e3e8;
+  border-top: 1px solid #e0e3e8;
+  transform: rotate(45deg);
+}
+
+.process-menu button {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 18px;
+  text-align: left;
+  border: 0;
+  background: white;
+  cursor: pointer;
+}
+
+.process-menu button:hover:not(:disabled) {
+  background: #f2f6ff;
+  color: var(--blue);
+}
+
+.process-menu .disabled,
+.process-menu button:disabled {
+  color: #9aa1aa;
+  cursor: not-allowed;
+}
+
+.link-button {
+  min-height: 34px;
+  color: var(--blue);
+}
+
+.wfmt-status {
+  padding: 9px 16px;
+  color: #735100;
+  background: #fff8df;
+  border-bottom: 1px solid var(--line);
+  font-size: 13px;
+}
+
+.wfmt-status.ready {
+  color: #0b6b3a;
+  background: #e7f6ee;
+}
+
+.tabs {
+  height: 32px;
+  display: flex;
+  border-bottom: 1px solid var(--line);
+}
+
+.tabs button {
+  min-width: 108px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: white;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.tabs .active {
+  color: var(--brand-green);
+  border-color: var(--brand-green);
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: minmax(760px, 1fr) 360px;
+}
+
+.address-panel {
+  margin: 18px 18px 20px;
+  border: 1px solid #8c929c;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.address-panel h2,
+.comments h2 {
+  margin: 0;
+  padding: 13px 10px;
+  font-size: 18px;
+}
+
+.filter-row {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+
+.filter-chip {
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 9px;
+  color: #69707d;
+  border: 1px solid #aeb3bd;
+  border-radius: 6px;
+  background: white;
+}
+
+.filter-chip b {
+  color: #111;
+}
+
+.filter-chip button,
+.icon-button,
+.close-button {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.filter-chip button {
+  color: var(--blue);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.icon-button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #9aa0aa;
+  border-radius: 6px;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+}
+
+.table-toolbar button {
+  min-height: 32px;
+  padding: 0 14px;
+  border: 1px solid #cfd4dc;
+  border-radius: 6px;
+  background: white;
+  color: #9aa1aa;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.address-table,
+.kls-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.address-table th,
+.address-table td,
+.kls-table th,
+.kls-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #e1e4e8;
+  white-space: nowrap;
+}
+
+.address-table th,
+.kls-table th {
+  background: #e9eaec;
+  font-weight: 700;
+}
+
+.address-table a {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.pager {
+  min-height: 58px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  padding: 10px;
+}
+
+.pager button,
+.pager span {
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid #d6dbe2;
+  background: white;
+  display: inline-flex;
+  align-items: center;
+}
+
+.pager button:first-child {
+  border-radius: 6px 0 0 6px;
+}
+
+.pager button:last-child {
+  border-radius: 0 6px 6px 0;
+}
+
+.pager button:disabled {
+  color: #b7bdc6;
+}
+
+.comments {
+  border-left: 1px solid var(--line);
+}
+
+.comments label {
+  display: block;
+  margin: 8px 16px;
+  color: #606a78;
+  font-size: 12px;
+}
+
+.comments textarea {
+  width: calc(100% - 32px);
+  min-height: 90px;
+  margin: 0 16px 20px;
+  padding: 10px;
+  border: 1px solid #9ca3ad;
+  border-radius: 6px;
+  resize: vertical;
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(17, 24, 39, 0.38);
+  z-index: 10;
+}
+
+.modal {
+  width: min(940px, 100%);
+  max-height: min(860px, calc(100vh - 48px));
+  overflow: auto;
+  background: white;
+  border: 1px solid #d5d9e0;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.choice-modal {
+  width: min(760px, 100%);
+}
+
+.modal-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 20px 22px;
+  border-bottom: 1px solid var(--line);
+}
+
+.modal-head h2 {
+  margin: 2px 0 0;
+  font-size: 24px;
+}
+
+.modal-kicker {
+  margin: 0;
+  color: var(--magenta);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.close-button {
+  width: 36px;
+  height: 36px;
+  border: 1px solid #aeb3bd;
+  border-radius: 6px;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  padding: 22px;
+}
+
+.choice-tile {
+  min-height: 138px;
+  padding: 18px;
+  text-align: left;
+  background: var(--soft);
+  border: 1px solid #cbd0d8;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.choice-tile:hover {
+  border-color: var(--brand-green);
+  background: #f2fbf6;
+}
+
+.choice-tile strong,
+.choice-tile span {
+  display: block;
+}
+
+.choice-tile strong {
+  margin-bottom: 12px;
+  font-size: 18px;
+}
+
+.choice-tile span,
+.hint {
+  color: #4c5564;
+  line-height: 1.45;
+}
+
+.wizard-form {
+  padding: 22px;
+}
+
+.form-grid,
+.kls-intro {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.form-grid label,
+.kls-intro label {
+  display: grid;
+  gap: 7px;
+  color: #303846;
+  font-weight: 700;
+}
+
+.form-grid input,
+.form-grid select,
+.kls-intro input,
+.kls-intro select {
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid #aeb3bd;
+  border-radius: 6px;
+  background: white;
+  color: #151a22;
+}
+
+.form-grid input[readonly],
+.kls-intro input[readonly] {
+  background: #f1f3f6;
+  color: #5b6471;
+}
+
+.id-explainer {
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid #cbd0d8;
+  border-radius: 8px;
+  background: #fbfcfd;
+}
+
+.id-explainer p {
+  margin: 10px 0 0;
+}
+
+.id-format {
+  margin-top: 10px;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.contract-part {
+  color: #168244;
+}
+
+.section-part {
+  color: #d71920;
+}
+
+.tech-part {
+  color: #064fd6;
+}
+
+.id-legend {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+  color: #48515f;
+  font-size: 13px;
+}
+
+.id-legend span {
+  display: flex;
+  gap: 7px;
+  align-items: flex-start;
+}
+
+.id-legend i {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 12px;
+  margin-top: 2px;
+  border-radius: 2px;
+}
+
+.contract-swatch {
+  background: #168244;
+}
+
+.section-swatch {
+  background: #d71920;
+}
+
+.tech-swatch {
+  background: #064fd6;
+}
+
+.validation-message {
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: #fde8e8;
+  color: #9b1c1c;
+}
+
+.kls-modal {
+  width: min(820px, 100%);
+}
+
+.kls-intro,
+.kls-modal .hint,
+.kls-table {
+  margin: 18px 22px 0;
+}
+
+.wizard-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+  padding: 16px 22px 22px;
+  border-top: 1px solid var(--line);
+}
+
+.wizard-form .wizard-footer {
+  margin-left: -22px;
+  margin-right: -22px;
+  margin-bottom: -22px;
+}
+
+.primary,
+.secondary {
+  min-height: 40px;
+  padding: 0 18px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.primary {
+  border: 1px solid var(--magenta);
+  background: var(--magenta);
+  color: white;
+  font-weight: 700;
+}
+
+.secondary {
+  border: 1px solid #aeb3bd;
+  background: white;
+  color: #1c2430;
+}
+
+.toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  max-width: 420px;
+  padding: 13px 16px;
+  color: white;
+  background: #1f7a48;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+  z-index: 20;
+}
+
+@media (max-width: 980px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .comments {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .form-grid,
+  .kls-intro,
+  .choice-grid,
+  .id-legend {
+    grid-template-columns: 1fr;
+  }
+}
+
+</style>
+</head>
+<body>
+  <header class="brand-bar">
+    <div class="brand-mark">T</div>
+    <div class="brand-copy">Erleben<br>was verbindet.</div>
+  </header>
+
+  <nav class="app-bar" aria-label="App Navigation">
+    <button class="menu-button" type="button" aria-label="Menue">☰</button>
+    <strong>PFAU-QA</strong>
+    <div class="user-box" aria-label="Angemeldeter Nutzer">
+      <span class="user-icon" aria-hidden="true">♟</span>
+      <span>Thorsten Bergmann</span>
+    </div>
+  </nav>
+
+  <main class="page-shell">
+    <div class="breadcrumb">Home › Bautranchen › <strong>Bautranche ansehen</strong></div>
+
+    <div class="env-warning" role="status">
+      <span aria-hidden="true">!</span>
+      Achtung: Hier bitte keine produktiven Daten pflegen! Auf dieser Testumgebung eingetragene Information und Daten koennen geloescht oder veraendert werden
+    </div>
+
+    <h1>Bautranche</h1>
+
+    <section class="tranche-card">
+      <header class="tranche-header">
+        <div>
+          <strong>Test for Samuel</strong>
+          <p>5005300021</p>
+        </div>
+        <div class="process-actions">
+          <div class="process-menu-wrap">
+            <button class="process-button" type="button" data-process-toggle>
+              Prozess <span aria-hidden="true">⌄</span>
+            </button>
+            <div class="process-menu" hidden data-process-menu>
+              <button type="button" data-create-wfmt>WFMT-Auftrag erzeugen</button>
+              <button class="disabled" type="button" data-open-gbgs disabled title="GBGS-Funktionen sind erst verfuegbar, nachdem der WFMT-Auftrag erzeugt wurde.">GBGS-Funktionen</button>
+            </div>
+          </div>
+          <button class="link-button" type="button">Bearbeiten</button>
+        </div>
+      </header>
+
+      <div class="wfmt-status" data-wfmt-status>
+        WFMT-Auftrag noch nicht erzeugt. GBGS-Funktionen sind deaktiviert.
+      </div>
+
+      <nav class="tabs" aria-label="Bautranchenbereiche">
+        <button type="button">Stammdaten</button>
+        <button class="active" type="button">Adressen</button>
+        <button type="button">Anlagen</button>
+      </nav>
+
+      <section class="content-grid">
+        <section class="address-panel" aria-label="Adressen">
+          <h2>Adressen</h2>
+          <div class="filter-row">
+            <strong>Filter:</strong>
+            <span class="filter-chip"><b>Id =</b> bitte eingeben <button type="button" aria-label="Filter Id entfernen">×</button></span>
+            <span class="filter-chip"><b>ONKZ =</b> bitte eingeben <button type="button" aria-label="Filter ONKZ entfernen">×</button></span>
+            <span class="filter-chip"><b>ASB =</b> bitte eingeben <button type="button" aria-label="Filter ASB entfernen">×</button></span>
+            <button class="icon-button" type="button" aria-label="Filter hinzufuegen">+</button>
+          </div>
+
+          <div class="table-toolbar">
+            <button type="button" disabled>Adressen zu Bautranche hinzufuegen</button>
+            <button type="button" disabled>Zuordnung aufheben</button>
+            <span>0 Adressen ausgewaehlt</span>
+          </div>
+
+          <div class="table-scroll">
+            <table class="address-table">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" aria-label="Alle Adressen auswaehlen"></th>
+                  <th>Id</th>
+                  <th>Lfd. Nr.</th>
+                  <th>KLS-Id</th>
+                  <th>OId</th>
+                  <th>Strasse</th>
+                  <th>Haus-Nr.</th>
+                  <th>Zusatz</th>
+                  <th>PLZ</th>
+                  <th>Ort</th>
+                  <th>Aktionen</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><input type="checkbox" aria-label="Adresse 441121 auswaehlen"></td>
+                  <td>441121</td>
+                  <td>820</td>
+                  <td>23696071</td>
+                  <td>DEBWhk01000dblp8</td>
+                  <td>Hauptstrasse</td>
+                  <td>2</td>
+                  <td></td>
+                  <td>88276</td>
+                  <td>Berg</td>
+                  <td><a href="#">Bearbeiten</a></td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" aria-label="Adresse 441124 auswaehlen"></td>
+                  <td>441124</td>
+                  <td>823</td>
+                  <td>11792181</td>
+                  <td>DEBWhk01000dbltA</td>
+                  <td>Im Schorren</td>
+                  <td>8</td>
+                  <td></td>
+                  <td>88276</td>
+                  <td>Berg</td>
+                  <td><a href="#">Bearbeiten</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <footer class="pager" aria-label="Seitennavigation">
+            <button type="button" disabled>‹‹</button>
+            <button type="button" disabled>‹</button>
+            <span>1 - 2 / 2</span>
+            <button type="button">20 pro Seite <span aria-hidden="true">⌄</span></button>
+            <button type="button" disabled>›</button>
+            <button type="button" disabled>››</button>
+          </footer>
+        </section>
+
+        <aside class="comments">
+          <h2>Kommentare</h2>
+          <label for="comment">Wichtige Hinweise fuer die Auftragsbearbeitung</label>
+          <textarea id="comment" placeholder="Kommentieren ..."></textarea>
+        </aside>
+      </section>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" hidden data-choice-backdrop>
+    <section class="modal choice-modal" role="dialog" aria-modal="true" aria-labelledby="choice-title">
+      <div class="modal-head">
+        <div>
+          <p class="modal-kicker">GBGS-Funktionen</p>
+          <h2 id="choice-title">Funktion auswaehlen</h2>
+        </div>
+        <button class="close-button" type="button" aria-label="Dialog schliessen" data-close-choice>×</button>
+      </div>
+      <div class="choice-grid">
+        <button class="choice-tile" type="button" data-start-area>
+          <strong>Gebietsdaten fuer Adressabgleich erfassen</strong>
+          <span>Reduzierte Gebietsdaten erfassen und Gebiets-ID je Ausbautreiber validieren.</span>
+        </button>
+        <button class="choice-tile" type="button" data-start-kls>
+          <strong>KLS-BT-Liste fuer PST vorschlagen</strong>
+          <span>KLS aus der aktuellen Bautranche als Vorschlagsliste fuer PST bereitstellen.</span>
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" hidden data-area-backdrop>
+    <section class="modal area-modal" role="dialog" aria-modal="true" aria-labelledby="area-title">
+      <div class="modal-head">
+        <div>
+          <p class="modal-kicker">Adressabgleich Pfau GBGS</p>
+          <h2 id="area-title">Gebietsdaten erfassen</h2>
+        </div>
+        <button class="close-button" type="button" aria-label="Dialog schliessen" data-close-area>×</button>
+      </div>
+      <form class="wizard-form" data-area-form>
+        <div class="form-grid">
+          <label>Ausbautreiber / Gebietstyp
+            <select name="areaType" data-area-type required>
+              <option value="bemo" selected>Betreibermodell</option>
+              <option value="dl">Deckungsluecke</option>
+              <option value="gfp">GlasfaserPlus</option>
+            </select>
+          </label>
+          <label>Gebiets-ID
+            <input name="areaId" data-area-id value="BEMO_1312200021" required>
+          </label>
+          <label>Beginn Vorvermarktung
+            <input name="vvmStart" type="date" required>
+          </label>
+          <label>Ende Vorvermarktung
+            <input name="vvmEnd" type="date" required>
+          </label>
+          <label>Beginn Ausbau
+            <input name="buildStart" type="date" required>
+          </label>
+          <label>Ende Ausbau
+            <input name="buildEnd" type="date" required>
+          </label>
+        </div>
+
+        <div class="id-explainer" data-rule-box>
+          <strong data-rule-title>Gebiets-ID-Regel Betreibermodell</strong>
+          <p data-rule-text>Format: BEMO_&lt;10-stellige Vertragsnummer&gt;, zum Beispiel BEMO_1312200021.</p>
+          <div class="id-format" data-bemo-format>
+            <span>BEMO_</span><span class="contract-part">13122</span><span class="section-part">0002</span><span class="tech-part">1</span>
+          </div>
+          <div class="id-legend" data-bemo-legend>
+            <span><i class="contract-swatch"></i>Vertrag bzw. Untervertrag</span>
+            <span><i class="section-swatch"></i>Fortlaufende Nummer Bauabschnitt/Ausbaugebiet/Bautranche</span>
+            <span><i class="tech-swatch"></i>Beauftragte Technikvariante</span>
+          </div>
+        </div>
+
+        <p class="validation-message" hidden data-validation-message></p>
+
+        <div class="wizard-footer">
+          <button class="secondary" type="button" data-close-area>Abbrechen</button>
+          <button class="primary" type="submit">Speichern</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" hidden data-kls-backdrop>
+    <section class="modal kls-modal" role="dialog" aria-modal="true" aria-labelledby="kls-title">
+      <div class="modal-head">
+        <div>
+          <p class="modal-kicker">PST-Vorbereitung</p>
+          <h2 id="kls-title">KLS-BT-Liste fuer PST vorschlagen</h2>
+        </div>
+        <button class="close-button" type="button" aria-label="Dialog schliessen" data-close-kls>×</button>
+      </div>
+      <div class="kls-intro">
+        <label>Bautranche
+          <input value="5005300021 - Test for Samuel" readonly>
+        </label>
+        <label>Exportformat
+          <select>
+            <option selected>CSV</option>
+            <option>XLSX</option>
+          </select>
+        </label>
+      </div>
+      <p class="hint">Pfau erzeugt nur den KLS-Anteil aus der Bautranche. Die echte Liste 1 wird anschliessend in PST erzeugt.</p>
+      <table class="kls-table">
+        <thead>
+          <tr>
+            <th>KLS-ID</th>
+            <th>Bautranche</th>
+            <th>Gebiets-ID</th>
+            <th>Quelle</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>23696071</td>
+            <td>5005300021</td>
+            <td data-kls-area-id>BEMO_1312200021</td>
+            <td>Pfau</td>
+          </tr>
+          <tr>
+            <td>11792181</td>
+            <td>5005300021</td>
+            <td data-kls-area-id>BEMO_1312200021</td>
+            <td>Pfau</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="wizard-footer">
+        <button class="secondary" type="button" data-close-kls>Abbrechen</button>
+        <button class="primary" type="button" data-kls-export>KLS-BT-Liste exportieren</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" hidden data-toast></div>
+
+  <script>
+const processToggle = document.querySelector("[data-process-toggle]");
+const processMenu = document.querySelector("[data-process-menu]");
+const createWfmtButton = document.querySelector("[data-create-wfmt]");
+const openGbgsButton = document.querySelector("[data-open-gbgs]");
+const wfmtStatus = document.querySelector("[data-wfmt-status]");
+const choiceBackdrop = document.querySelector("[data-choice-backdrop]");
+const areaBackdrop = document.querySelector("[data-area-backdrop]");
+const klsBackdrop = document.querySelector("[data-kls-backdrop]");
+const areaForm = document.querySelector("[data-area-form]");
+const areaType = document.querySelector("[data-area-type]");
+const areaId = document.querySelector("[data-area-id]");
+const ruleTitle = document.querySelector("[data-rule-title]");
+const ruleText = document.querySelector("[data-rule-text]");
+const bemoFormat = document.querySelector("[data-bemo-format]");
+const bemoLegend = document.querySelector("[data-bemo-legend]");
+const validationMessage = document.querySelector("[data-validation-message]");
+const toast = document.querySelector("[data-toast]");
+let wfmtCreated = false;
+let savedAreaId = "BEMO_1312200021";
+
+const rules = {
+  bemo: {
+    title: "Gebiets-ID-Regel Betreibermodell",
+    text: "Format: BEMO_<10-stellige Vertragsnummer>, zum Beispiel BEMO_1312200021.",
+    example: "BEMO_1312200021",
+    pattern: /^BEMO_[0-9]{10}$/
+  },
+  dl: {
+    title: "Gebiets-ID-Regel Deckungsluecke",
+    text: "Format: DL_<Regel gemaess Fachvorgabe>. Die Detailregel ist fachlich noch zu bestaetigen.",
+    example: "DL_5005300021",
+    pattern: /^DL_.+/
+  },
+  gfp: {
+    title: "Gebiets-ID-Regel GlasfaserPlus",
+    text: "Format: GFP_<Regel gemaess Fachvorgabe>. Die Detailregel ist fachlich noch zu bestaetigen.",
+    example: "GFP_5005300021",
+    pattern: /^GFP_.+/
+  }
+};
+
+function show(element) {
+  element.hidden = false;
+}
+
+function hide(element) {
+  element.hidden = true;
+}
+
+function showToast(message) {
+  toast.textContent = message;
+  show(toast);
+  window.setTimeout(() => hide(toast), 3200);
+}
+
+function setWfmtCreated(value) {
+  wfmtCreated = value;
+  openGbgsButton.disabled = !value;
+  openGbgsButton.classList.toggle("disabled", !value);
+  createWfmtButton.textContent = value ? "WFMT-Auftrag erzeugt" : "WFMT-Auftrag erzeugen";
+  createWfmtButton.disabled = value;
+  wfmtStatus.classList.toggle("ready", value);
+  wfmtStatus.textContent = value
+    ? "WFMT-Auftrag erzeugt. GBGS-Funktionen sind jetzt aktiv."
+    : "WFMT-Auftrag noch nicht erzeugt. GBGS-Funktionen sind deaktiviert.";
+}
+
+function updateRule() {
+  const rule = rules[areaType.value];
+  ruleTitle.textContent = rule.title;
+  ruleText.textContent = rule.text;
+  areaId.value = rule.example;
+  const showBemo = areaType.value === "bemo";
+  bemoFormat.hidden = !showBemo;
+  bemoLegend.hidden = !showBemo;
+  hide(validationMessage);
+}
+
+function validateAreaId() {
+  const rule = rules[areaType.value];
+  const valid = rule.pattern.test(areaId.value.trim());
+  validationMessage.hidden = valid;
+  if (!valid) {
+    validationMessage.textContent = `Die Gebiets-ID passt nicht zur Regel: ${rule.text}`;
+  }
+  return valid;
+}
+
+function closeAllModals() {
+  hide(choiceBackdrop);
+  hide(areaBackdrop);
+  hide(klsBackdrop);
+}
+
+processToggle.addEventListener("click", () => {
+  processMenu.hidden = !processMenu.hidden;
+});
+
+createWfmtButton.addEventListener("click", () => {
+  setWfmtCreated(true);
+  hide(processMenu);
+  showToast("WFMT-Auftrag wurde im Klickdummy erzeugt.");
+});
+
+openGbgsButton.addEventListener("click", () => {
+  if (!wfmtCreated) return;
+  hide(processMenu);
+  show(choiceBackdrop);
+});
+
+document.querySelector("[data-start-area]").addEventListener("click", () => {
+  hide(choiceBackdrop);
+  show(areaBackdrop);
+});
+
+document.querySelector("[data-start-kls]").addEventListener("click", () => {
+  hide(choiceBackdrop);
+  show(klsBackdrop);
+});
+
+document.querySelectorAll("[data-close-choice]").forEach((button) => {
+  button.addEventListener("click", () => hide(choiceBackdrop));
+});
+
+document.querySelectorAll("[data-close-area]").forEach((button) => {
+  button.addEventListener("click", () => hide(areaBackdrop));
+});
+
+document.querySelectorAll("[data-close-kls]").forEach((button) => {
+  button.addEventListener("click", () => hide(klsBackdrop));
+});
+
+[choiceBackdrop, areaBackdrop, klsBackdrop].forEach((backdrop) => {
+  backdrop.addEventListener("click", (event) => {
+    if (event.target === backdrop) hide(backdrop);
+  });
+});
+
+areaType.addEventListener("change", updateRule);
+areaId.addEventListener("input", validateAreaId);
+
+areaForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  if (!validateAreaId()) return;
+  savedAreaId = areaId.value.trim();
+  document.querySelectorAll("[data-kls-area-id]").forEach((cell) => {
+    cell.textContent = savedAreaId;
+  });
+  hide(areaBackdrop);
+  showToast(`Gebietsdaten fuer ${savedAreaId} gespeichert.`);
+});
+
+document.querySelector("[data-kls-export]").addEventListener("click", (event) => {
+  event.currentTarget.textContent = "KLS-BT-Liste exportiert";
+  event.currentTarget.disabled = true;
+  showToast("KLS-BT-Liste wurde fuer PST vorbereitet.");
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeAllModals();
+    hide(processMenu);
+  }
+});
+
+const today = new Date();
+const plusDays = (days) => {
+  const date = new Date(today);
+  date.setDate(date.getDate() + days);
+  return date.toISOString().slice(0, 10);
+};
+
+areaForm.elements.vvmStart.value = plusDays(17);
+areaForm.elements.vvmEnd.value = plusDays(77);
+areaForm.elements.buildStart.value = plusDays(94);
+areaForm.elements.buildEnd.value = plusDays(274);
+setWfmtCreated(false);
+
+</script>
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pfau QA - GBGS-Funktionen Klickdummy</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="brand-bar">
+    <div class="brand-mark">T</div>
+    <div class="brand-copy">Erleben<br>was verbindet.</div>
+  </header>
+
+  <nav class="app-bar" aria-label="App Navigation">
+    <button class="menu-button" type="button" aria-label="Menue">☰</button>
+    <strong>PFAU-QA</strong>
+    <div class="user-box" aria-label="Angemeldeter Nutzer">
+      <span class="user-icon" aria-hidden="true">♟</span>
+      <span>Thorsten Bergmann</span>
+    </div>
+  </nav>
+
+  <main class="page-shell">
+    <div class="breadcrumb">Home › Bautranchen › <strong>Bautranche ansehen</strong></div>
+
+    <div class="env-warning" role="status">
+      <span aria-hidden="true">!</span>
+      Achtung: Hier bitte keine produktiven Daten pflegen! Auf dieser Testumgebung eingetragene Information und Daten koennen geloescht oder veraendert werden
+    </div>
+
+    <h1>Bautranche</h1>
+
+    <section class="tranche-card">
+      <header class="tranche-header">
+        <div>
+          <strong>Test for Samuel</strong>
+          <p>5005300021</p>
+        </div>
+        <div class="process-actions">
+          <div class="process-menu-wrap">
+            <button class="process-button" type="button" data-process-toggle>
+              Prozess <span aria-hidden="true">⌄</span>
+            </button>
+            <div class="process-menu" hidden data-process-menu>
+              <button type="button" data-create-wfmt>WFMT-Auftrag erzeugen</button>
+              <button class="disabled" type="button" data-open-gbgs disabled title="GBGS-Funktionen sind erst verfuegbar, nachdem der WFMT-Auftrag erzeugt wurde.">GBGS-Funktionen</button>
+            </div>
+          </div>
+          <button class="link-button" type="button">Bearbeiten</button>
+        </div>
+      </header>
+
+      <div class="wfmt-status" data-wfmt-status>
+        WFMT-Auftrag noch nicht erzeugt. GBGS-Funktionen sind deaktiviert.
+      </div>
+
+      <nav class="tabs" aria-label="Bautranchenbereiche">
+        <button type="button">Stammdaten</button>
+        <button class="active" type="button">Adressen</button>
+        <button type="button">Anlagen</button>
+      </nav>
+
+      <section class="content-grid">
+        <section class="address-panel" aria-label="Adressen">
+          <h2>Adressen</h2>
+          <div class="filter-row">
+            <strong>Filter:</strong>
+            <span class="filter-chip"><b>Id =</b> bitte eingeben <button type="button" aria-label="Filter Id entfernen">×</button></span>
+            <span class="filter-chip"><b>ONKZ =</b> bitte eingeben <button type="button" aria-label="Filter ONKZ entfernen">×</button></span>
+            <span class="filter-chip"><b>ASB =</b> bitte eingeben <button type="button" aria-label="Filter ASB entfernen">×</button></span>
+            <button class="icon-button" type="button" aria-label="Filter hinzufuegen">+</button>
+          </div>
+
+          <div class="table-toolbar">
+            <button type="button" disabled>Adressen zu Bautranche hinzufuegen</button>
+            <button type="button" disabled>Zuordnung aufheben</button>
+            <span>0 Adressen ausgewaehlt</span>
+          </div>
+
+          <div class="table-scroll">
+            <table class="address-table">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" aria-label="Alle Adressen auswaehlen"></th>
+                  <th>Id</th>
+                  <th>Lfd. Nr.</th>
+                  <th>KLS-Id</th>
+                  <th>OId</th>
+                  <th>Strasse</th>
+                  <th>Haus-Nr.</th>
+                  <th>Zusatz</th>
+                  <th>PLZ</th>
+                  <th>Ort</th>
+                  <th>Aktionen</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><input type="checkbox" aria-label="Adresse 441121 auswaehlen"></td>
+                  <td>441121</td>
+                  <td>820</td>
+                  <td>23696071</td>
+                  <td>DEBWhk01000dblp8</td>
+                  <td>Hauptstrasse</td>
+                  <td>2</td>
+                  <td></td>
+                  <td>88276</td>
+                  <td>Berg</td>
+                  <td><a href="#">Bearbeiten</a></td>
+                </tr>
+                <tr>
+                  <td><input type="checkbox" aria-label="Adresse 441124 auswaehlen"></td>
+                  <td>441124</td>
+                  <td>823</td>
+                  <td>11792181</td>
+                  <td>DEBWhk01000dbltA</td>
+                  <td>Im Schorren</td>
+                  <td>8</td>
+                  <td></td>
+                  <td>88276</td>
+                  <td>Berg</td>
+                  <td><a href="#">Bearbeiten</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <footer class="pager" aria-label="Seitennavigation">
+            <button type="button" disabled>‹‹</button>
+            <button type="button" disabled>‹</button>
+            <span>1 - 2 / 2</span>
+            <button type="button">20 pro Seite <span aria-hidden="true">⌄</span></button>
+            <button type="button" disabled>›</button>
+            <button type="button" disabled>››</button>
+          </footer>
+        </section>
+
+        <aside class="comments">
+          <h2>Kommentare</h2>
+          <label for="comment">Wichtige Hinweise fuer die Auftragsbearbeitung</label>
+          <textarea id="comment" placeholder="Kommentieren ..."></textarea>
+        </aside>
+      </section>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" hidden data-choice-backdrop>
+    <section class="modal choice-modal" role="dialog" aria-modal="true" aria-labelledby="choice-title">
+      <div class="modal-head">
+        <div>
+          <p class="modal-kicker">GBGS-Funktionen</p>
+          <h2 id="choice-title">Funktion auswaehlen</h2>
+        </div>
+        <button class="close-button" type="button" aria-label="Dialog schliessen" data-close-choice>×</button>
+      </div>
+      <div class="choice-grid">
+        <button class="choice-tile" type="button" data-start-area>
+          <strong>Gebietsdaten fuer Adressabgleich erfassen</strong>
+          <span>Reduzierte Gebietsdaten erfassen und Gebiets-ID je Ausbautreiber validieren.</span>
+        </button>
+        <button class="choice-tile" type="button" data-start-kls>
+          <strong>KLS-BT-Liste fuer PST vorschlagen</strong>
+          <span>KLS aus der aktuellen Bautranche als Vorschlagsliste fuer PST bereitstellen.</span>
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" hidden data-area-backdrop>
+    <section class="modal area-modal" role="dialog" aria-modal="true" aria-labelledby="area-title">
+      <div class="modal-head">
+        <div>
+          <p class="modal-kicker">Adressabgleich Pfau GBGS</p>
+          <h2 id="area-title">Gebietsdaten erfassen</h2>
+        </div>
+        <button class="close-button" type="button" aria-label="Dialog schliessen" data-close-area>×</button>
+      </div>
+      <form class="wizard-form" data-area-form>
+        <div class="form-grid">
+          <label>Ausbautreiber / Gebietstyp
+            <select name="areaType" data-area-type required>
+              <option value="bemo" selected>Betreibermodell</option>
+              <option value="dl">Deckungsluecke</option>
+              <option value="gfp">GlasfaserPlus</option>
+            </select>
+          </label>
+          <label>Gebiets-ID
+            <input name="areaId" data-area-id value="BEMO_1312200021" required>
+          </label>
+          <label>Beginn Vorvermarktung
+            <input name="vvmStart" type="date" required>
+          </label>
+          <label>Ende Vorvermarktung
+            <input name="vvmEnd" type="date" required>
+          </label>
+          <label>Beginn Ausbau
+            <input name="buildStart" type="date" required>
+          </label>
+          <label>Ende Ausbau
+            <input name="buildEnd" type="date" required>
+          </label>
+        </div>
+
+        <div class="id-explainer" data-rule-box>
+          <strong data-rule-title>Gebiets-ID-Regel Betreibermodell</strong>
+          <p data-rule-text>Format: BEMO_&lt;10-stellige Vertragsnummer&gt;, zum Beispiel BEMO_1312200021.</p>
+          <div class="id-format" data-bemo-format>
+            <span>BEMO_</span><span class="contract-part">13122</span><span class="section-part">0002</span><span class="tech-part">1</span>
+          </div>
+          <div class="id-legend" data-bemo-legend>
+            <span><i class="contract-swatch"></i>Vertrag bzw. Untervertrag</span>
+            <span><i class="section-swatch"></i>Fortlaufende Nummer Bauabschnitt/Ausbaugebiet/Bautranche</span>
+            <span><i class="tech-swatch"></i>Beauftragte Technikvariante</span>
+          </div>
+        </div>
+
+        <p class="validation-message" hidden data-validation-message></p>
+
+        <div class="wizard-footer">
+          <button class="secondary" type="button" data-close-area>Abbrechen</button>
+          <button class="primary" type="submit">Speichern</button>
+        </div>
+      </form>
+    </section>
+  </div>
+
+  <div class="modal-backdrop" hidden data-kls-backdrop>
+    <section class="modal kls-modal" role="dialog" aria-modal="true" aria-labelledby="kls-title">
+      <div class="modal-head">
+        <div>
+          <p class="modal-kicker">PST-Vorbereitung</p>
+          <h2 id="kls-title">KLS-BT-Liste fuer PST vorschlagen</h2>
+        </div>
+        <button class="close-button" type="button" aria-label="Dialog schliessen" data-close-kls>×</button>
+      </div>
+      <div class="kls-intro">
+        <label>Bautranche
+          <input value="5005300021 - Test for Samuel" readonly>
+        </label>
+        <label>Exportformat
+          <select>
+            <option selected>CSV</option>
+            <option>XLSX</option>
+          </select>
+        </label>
+      </div>
+      <p class="hint">Pfau erzeugt nur den KLS-Anteil aus der Bautranche. Die echte Liste 1 wird anschliessend in PST erzeugt.</p>
+      <table class="kls-table">
+        <thead>
+          <tr>
+            <th>KLS-ID</th>
+            <th>Bautranche</th>
+            <th>Gebiets-ID</th>
+            <th>Quelle</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>23696071</td>
+            <td>5005300021</td>
+            <td data-kls-area-id>BEMO_1312200021</td>
+            <td>Pfau</td>
+          </tr>
+          <tr>
+            <td>11792181</td>
+            <td>5005300021</td>
+            <td data-kls-area-id>BEMO_1312200021</td>
+            <td>Pfau</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="wizard-footer">
+        <button class="secondary" type="button" data-close-kls>Abbrechen</button>
+        <button class="primary" type="button" data-kls-export>KLS-BT-Liste exportieren</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="toast" hidden data-toast></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
