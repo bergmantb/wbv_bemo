@@ -1,0 +1,1019 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solutiondesign: Adressabgleich Pfau GBGS</title>
+<style>
+:root{--ink:#17202a;--muted:#5d6b7a;--line:#d9dee7;--soft:#f6f8fb;--brand:#e20074;--green:#008a4b}body{margin:0;background:#eef1f5;color:var(--ink);font:15px/1.55 Arial,Helvetica,sans-serif}main{max-width:1180px;margin:0 auto;padding:36px 28px 56px;background:#fff;min-height:100vh}h1{margin:0 0 22px;padding-bottom:16px;border-bottom:4px solid var(--brand);font-size:34px;line-height:1.15}h2{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);font-size:24px}h3{margin-top:26px;font-size:19px}h4{margin-top:20px;font-size:16px}p{margin:10px 0}ul,ol{margin:10px 0 16px 24px;padding:0}li{margin:4px 0}a{color:#04f}code{padding:2px 5px;border-radius:4px;background:#eef2f7;font-family:Consolas,"Courier New",monospace;font-size:.94em}pre{overflow:auto;padding:14px;border:1px solid var(--line);border-radius:8px;background:#111827;color:#f7f7f7}pre code{padding:0;background:transparent;color:inherit}table{width:100%;border-collapse:collapse;margin:14px 0 22px;font-size:14px}th,td{padding:9px 11px;border:1px solid var(--line);vertical-align:top;text-align:left}th{background:var(--soft);font-weight:700}tr:nth-child(even) td{background:#fbfcfe}.diagram-shell{margin:18px 0 12px;padding:16px;border:1px solid var(--line);border-left:4px solid var(--green);border-radius:8px;background:#fbfcfd;overflow-x:auto}.mermaid{min-width:720px;text-align:center}.mermaid-source{margin:0 0 26px;padding:12px 14px;border:1px solid var(--line);border-radius:8px;background:#fff}.mermaid-source summary{cursor:pointer;font-weight:700;color:var(--brand)}.mermaid-source pre{margin:10px 0 0;background:#f7f9fc;color:#17202a}.mermaid-source pre code{white-space:pre}@media print{body{background:#fff}main{padding:0}}
+</style>
+</head>
+<body>
+<main>
+<h1>Solutiondesign: Adressabgleich Pfau GBGS</h1>
+<h2>1. Management Summary</h2>
+<p>Dieses Dokument beschreibt das vollstaendige Solutiondesign fuer den Use Case <code>Adressabgleich Pfau GBGS</code>.</p>
+<p>Der Use Case wird in der Pfau-Bautranchensicht angeboten und dient dazu, die fuer den Adressabgleich relevanten Gebietsdaten strukturiert zu erfassen, die Gebiets-ID nach Ausbautreiber zu validieren und fuer die Weiterverarbeitung in PST eine KLS-BT-Liste vorzuschlagen.</p>
+<p>Die aktuelle Designdiskussion hat drei zentrale Entscheidungen ergeben:</p>
+<ol><li>Die Gebietserfassung in Pfau ist keine vollstaendige GBGS-Gebietsanlage mehr.</li><li>Die bisherige VVM-Importlisten-Funktion wird auf einen KLS-BT-Listenvorschlag fuer PST reduziert.</li><li>Der Einstieg erfolgt nicht ueber einen separaten Button, sondern ueber das Prozess-Dropdown in der Pfau-Bautranchensicht.</li></ol>
+<p>Der neue Prozess-Dropdown-Eintrag heisst:</p>
+<pre><code>GBGS-Funktionen</code></pre>
+<p>Er wird unterhalb von <code>WFMT-Auftrag</code> angezeigt und ist erst aktiv, wenn der WFMT-Auftrag erzeugt wurde. Vorher ist der Eintrag sichtbar, aber deaktiviert/grau.</p>
+<h2>2. Zielbild</h2>
+<p>Der PTI Nutzer arbeitet in der Pfau-Bautranchensicht. Sobald der WFMT-Auftrag erzeugt wurde, kann der Nutzer ueber das Prozess-Dropdown <code>GBGS-Funktionen</code> aufrufen.</p>
+<p>Der Dialog <code>GBGS-Funktionen</code> bietet zwei fachliche Teilfunktionen:</p>
+<table><tr><th>Funktion</th><th>Ziel</th></tr>
+<tr><td><code>Gebietsdaten fuer Adressabgleich erfassen</code></td><td>Erfassung der minimal benoetigten Gebietsdaten und Validierung der Gebiets-ID</td></tr>
+<tr><td><code>KLS-BT-Liste fuer PST vorschlagen</code></td><td>Bereitstellung des KLS-Anteils aus der Bautranche fuer die spaetere Liste-1-Erzeugung in PST</td></tr></table>
+<p>Die Loesung entkoppelt damit klar:</p>
+<ul><li>Pfau: Erfassung und Vorbereitung fuer den Adressabgleich.</li><li>PST: Erzeugung der echten <code>Liste 1</code>.</li><li>GBGS: Zielsystem bzw. Referenzkontext fuer Gebietsdaten und Adressabgleich.</li></ul>
+<h2>3. Fachlicher Hintergrund</h2>
+<h3>3.1 Pfau Bautranchensicht</h3>
+<p>Pfau zeigt Bautranchen mit Stammdaten, Adressen, Anlagen, Kommentaren und Prozessaktionen. Die neue Funktion soll in den bestehenden Prozesskontext integriert werden.</p>
+<p>Der relevante Einstiegspunkt ist das Prozess-Dropdown rechts oben in der Bautranchensicht. Der Screenshot <code>GBGS Wizzard 1946 5</code> zeigt die neue Grund-GUI.</p>
+<h3>3.2 GBGS-Gebietsdaten</h3>
+<p>Die urspruengliche Annahme war, dass Pfau eine gefuehrte GBGS-Gebietsanlage abbildet. Nach der Designklaerung ist klar, dass fuer <code>Adressabgleich Pfau GBGS</code> nicht alle Felder benoetigt werden.</p>
+<p>Pfau muss daher nur noch die Daten erfassen, die fuer den Adressabgleich relevant sind:</p>
+<ul><li>Ausbautreiber bzw. Gebietstyp</li><li>Gebiets-ID</li><li>relevante Terminangaben</li></ul>
+<p>Nicht mehr erforderlich sind unter anderem Initiative, Gebietseigner, Regelwerk, Partnerdaten und CSV-Import.</p>
+<h3>3.3 KLS-Anteil der Liste 1</h3>
+<p>Die bisherige Funktion <code>VVM-Importliste erzeugen</code> soll nicht mehr die echte VVM-Importliste bzw. echte <code>Liste 1</code> erzeugen. Fuer diesen Use Case ist nur der KLS-Anteil relevant.</p>
+<p>Pfau soll daher eine KLS-BT-Liste vorschlagen:</p>
+<ul><li>Quelle: aktuelle Bautranche in Pfau</li><li>Inhalt: KLS aus dieser Bautranche</li><li>Ziel: Weiterverwendung in PST</li><li>Nicht-Ziel: finale Liste-1-Erzeugung</li></ul>
+<h2>4. Scope</h2>
+<h3>4.1 Im Scope</h3>
+<p>Im Scope dieses Solutiondesigns sind:</p>
+<p>- Deckungsluecke - GlasfaserPlus - Betreibermodelle</p>
+<ul><li>Anzeige von <code>GBGS-Funktionen</code> im Prozess-Dropdown.</li><li>Aktivierung von <code>GBGS-Funktionen</code> erst nach erzeugtem WFMT-Auftrag.</li><li>Dialog mit Auswahl der GBGS-Funktionen.</li><li>Reduzierter Wizard zur Erfassung von Gebietsdaten fuer den Adressabgleich.</li><li>Kontext-sensitive Gebiets-ID-Bildungsregeln fuer:</li><li>Frontend- und Backend-Validierung der Gebiets-ID.</li><li>Speicherung der reduzierten Gebietsdaten je Bautranche.</li><li>Vorschlag einer KLS-BT-Liste aus den KLS der aktuellen Bautranche.</li><li>Export oder technische Bereitstellung der KLS-BT-Liste fuer PST.</li><li>Auditierbarkeit relevanter Nutzeraktionen.</li><li>Jira-Arbeitspakete fuer IT-Umsetzung.</li></ul>
+<h3>4.2 Nicht im Scope</h3>
+<p>Nicht im Scope sind:</p>
+<p>- Mandant - Betreiber aktives Netz - Betreiber passives Netzwerk - ROP initial - ROP lokal - ROP Regelausbau - Beschwerdemanagement</p>
+<ul><li>Vollstaendige GBGS-Gebietsanlage in Pfau.</li><li>CSV-Import eines Giga-Gebiets aus Pfau nach GBGS.</li><li>Nachbau der GBGS-Importmaske in Pfau.</li><li>Erfassung von GBGS-Partnerdaten:</li><li>Erzeugung der echten <code>Liste 1</code> in Pfau.</li><li>Ersatz von PST.</li><li>Fachliche Klaerung der finalen DL-/GFP-ID-Regex, sofern diese noch nicht verbindlich vorliegt.</li></ul>
+<h2>5. Rollen, Systeme und Verantwortlichkeiten</h2>
+<table><tr><th>Rolle/System</th><th>Verantwortung</th></tr>
+<tr><td>PTI Nutzer</td><td>Startet Prozess in Pfau, erfasst Gebietsdaten, erzeugt KLS-BT-Listenvorschlag</td></tr>
+<tr><td>Pfau Frontend</td><td>Darstellung Bautranchensicht, Prozess-Dropdown, Dialoge und Validierungshinweise</td></tr>
+<tr><td>Pfau Backend</td><td>Prozessstatus, Persistenz, Gebiets-ID-Validierung, KLS-BT-Liste</td></tr>
+<tr><td>WFMT</td><td>Prozessuale Vorbedingung fuer Aktivierung von <code>GBGS-Funktionen</code></td></tr>
+<tr><td>GBGS</td><td>Fachlicher Zielkontext fuer Gebiet und Adressabgleich</td></tr>
+<tr><td>PST</td><td>Erzeugung der echten <code>Liste 1</code> auf Basis geeigneter Inputs</td></tr>
+<tr><td>Audit/Logging</td><td>Nachvollziehbarkeit von Speicherung, Export und Fehlerfaellen</td></tr></table>
+<h2>6. Fachliche Anforderungen</h2>
+<h3>6.1 Einstieg und Aktivierung</h3>
+<table><tr><th>ID</th><th>Anforderung</th></tr>
+<tr><td>FA-01</td><td>In der Bautranchensicht wird im Prozess-Dropdown unterhalb von <code>WFMT-Auftrag</code> ein neuer Eintrag <code>GBGS-Funktionen</code> angezeigt.</td></tr>
+<tr><td>FA-02</td><td><code>GBGS-Funktionen</code> ist deaktiviert/grau, solange der WFMT-Auftrag noch nicht erzeugt wurde.</td></tr>
+<tr><td>FA-03</td><td><code>GBGS-Funktionen</code> wird aktiv, sobald der WFMT-Auftrag erzeugt wurde.</td></tr>
+<tr><td>FA-04</td><td>Es wird kein separater Button fuer die Funktion angezeigt.</td></tr>
+<tr><td>FA-05</td><td>Die Aktivierung erfolgt serverseitig anhand eines Prozessstatus, nicht nur clientseitig.</td></tr></table>
+<h3>6.2 Gebietsdaten fuer Adressabgleich</h3>
+<table><tr><th>ID</th><th>Anforderung</th></tr>
+<tr><td>FA-10</td><td>Der Wizard erfasst nur die fuer den Adressabgleich benoetigten Gebietsdaten.</td></tr>
+<tr><td>FA-11</td><td>Nicht benoetigte GBGS-Felder werden nicht angezeigt.</td></tr>
+<tr><td>FA-12</td><td>Der Nutzer waehlt einen Ausbautreiber/Gebietstyp.</td></tr>
+<tr><td>FA-13</td><td>Die Gebiets-ID wird verpflichtend erfasst.</td></tr>
+<tr><td>FA-14</td><td>Die Bildungsregel der Gebiets-ID wird kontextsensitiv zum Ausbautreiber angezeigt.</td></tr>
+<tr><td>FA-15</td><td>Die Gebiets-ID wird im Frontend und Backend validiert.</td></tr>
+<tr><td>FA-16</td><td>Gueltige Gebietsdaten werden pro Bautranche gespeichert.</td></tr></table>
+<h3>6.3 KLS-BT-Liste fuer PST</h3>
+<table><tr><th>ID</th><th>Anforderung</th></tr>
+<tr><td>FA-20</td><td>Die bisherige VVM-Importlisten-Funktion wird fachlich in eine KLS-BT-Listenfunktion umgewandelt.</td></tr>
+<tr><td>FA-21</td><td>Pfau erzeugt nicht die echte <code>Liste 1</code>.</td></tr>
+<tr><td>FA-22</td><td>Pfau schlaegt nur KLS aus der aktuellen Bautranche vor.</td></tr>
+<tr><td>FA-23</td><td>Die KLS-BT-Liste ist als Input fuer PST gedacht.</td></tr>
+<tr><td>FA-24</td><td>WE-/GE-Pruefung entfaellt in diesem Wizard.</td></tr>
+<tr><td>FA-25</td><td>Die UI-Texte muessen klar machen, dass PST die finale Liste erzeugt.</td></tr></table>
+<h3>6.4 Adressabgleich und VVM-ONGOING</h3>
+<p>Die zuvor formulierte Regel zum verpflichtenden Adressabgleich vor <code>VVM-ONGOING</code> bleibt als fachliche Rahmenbedingung bestehen, wird aber in der aktualisierten Loesung aus Pfau-Sicht umgesetzt.</p>
+<table><tr><th>ID</th><th>Anforderung</th></tr>
+<tr><td>FA-30</td><td>Vor <code>VVM-ONGOING</code> muss ein Adressabgleich mit konfigurierbarem Vorlauf erzwungen werden.</td></tr>
+<tr><td>FA-31</td><td>Der Default-Vorlauf betraegt <code>10 Arbeitstage vor VVM-ONGOING</code>.</td></tr>
+<tr><td>FA-32</td><td>Die Arbeitstagsberechnung beruecksichtigt Wochenenden und perspektivisch Feiertage.</td></tr>
+<tr><td>FA-33</td><td>Die Pfau-Daten dienen als vorbereitende Datenbasis fuer diesen Adressabgleich.</td></tr>
+<tr><td>FA-34</td><td>Ob die harte VVM-Blockade in Pfau, GBGS oder einem uebergeordneten Prozessservice erfolgt, ist technisch zu entscheiden.</td></tr></table>
+<p>Berechnungsregel:</p>
+<pre><code>adressabgleichFaelligAb = VVM_ONGOING - konfigurierterVorlaufInArbeitstagen</code></pre>
+<h2>7. UX- und UI-Design</h2>
+<h3>7.1 Bautranchensicht</h3>
+<p>Die Funktion wird in der Pfau-Bautranchensicht angeboten.</p>
+<p>UI-Regeln:</p>
+<ul><li><code>GBGS-Funktionen</code> erscheint im Prozess-Dropdown.</li><li>Position: unterhalb von <code>WFMT-Auftrag</code>.</li><li>Kein zusaetzlicher CTA-Button.</li><li>Im deaktivierten Zustand ist der Eintrag grau.</li><li>Im aktiven Zustand ist der Eintrag normal auswählbar.</li><li>Bei Hover auf deaktiviertem Eintrag soll optional ein Tooltip anzeigen:</li></ul>
+<pre><code>GBGS-Funktionen sind erst verfuegbar, nachdem der WFMT-Auftrag erzeugt wurde.</code></pre>
+<h3>7.2 Dialog <code>GBGS-Funktionen</code></h3>
+<p>Der Dialog bietet zwei klar getrennte Aktionen:</p>
+<table><tr><th>Aktion</th><th>UI-Text</th><th>Beschreibung</th></tr>
+<tr><td>Gebietsdaten</td><td><code>Gebietsdaten fuer Adressabgleich erfassen</code></td><td>Reduzierter Wizard fuer Gebietsdaten</td></tr>
+<tr><td>KLS-Liste</td><td><code>KLS-BT-Liste fuer PST vorschlagen</code></td><td>KLS aus Bautranche anzeigen/exportieren</td></tr></table>
+<h3>7.3 Gebietsdaten-Wizard</h3>
+<p>Der bisherige mehrstufige GBGS-Wizard wird fachlich reduziert. Statt der Schritte <code>Basis</code>, <code>Termine</code>, <code>Partner</code>, <code>Import</code> wird nur noch eine kompakte Erfassung benoetigt.</p>
+<p>Moegliche UI-Struktur:</p>
+<ol><li>Abschnitt <code>Gebietskontext</code></li><li>Abschnitt <code>Gebiets-ID</code></li><li>Abschnitt <code>Termine</code></li><li>Abschnitt <code>Speichern / Pruefen</code></li></ol>
+<h3>7.4 KLS-BT-Listen-Wizard</h3>
+<p>Der bisherige Titel <code>VVM-Importliste erzeugen</code> ist irrefuehrend und wird ersetzt.</p>
+<p>Empfohlene Titel:</p>
+<pre><code>KLS-BT-Liste fuer PST vorschlagen</code></pre>
+<p>oder kurz:</p>
+<pre><code>KLS-BT-Liste</code></pre>
+<p>Die Aktion heisst:</p>
+<pre><code>KLS-BT-Liste exportieren</code></pre>
+<p>oder, falls technische Uebergabe an PST umgesetzt wird:</p>
+<pre><code>KLS-BT-Liste fuer PST bereitstellen</code></pre>
+<h2>8. Use Case 1: Gebietsdaten fuer Adressabgleich erfassen</h2>
+<h3>8.1 Ziel</h3>
+<p>Der Nutzer erfasst die fuer den Adressabgleich notwendigen Gebietsdaten. Die Anwendung verhindert, dass eine Gebiets-ID gespeichert wird, die nicht zur Bildungsregel des gewaehlten Ausbautreibers passt.</p>
+<h3>8.2 Ausloeser</h3>
+<p>Der Use Case startet, wenn:</p>
+<ol><li>Der Nutzer eine Bautranche in Pfau geoeffnet hat.</li><li>Der WFMT-Auftrag erzeugt wurde.</li><li>Der Nutzer im Prozess-Dropdown <code>GBGS-Funktionen</code> auswaehlt.</li><li>Der Nutzer im Dialog <code>Gebietsdaten fuer Adressabgleich erfassen</code> auswaehlt.</li></ol>
+<h3>8.3 Vorbedingungen</h3>
+<ul><li>Nutzer ist fuer die Bautranche berechtigt.</li><li>Bautranche existiert.</li><li>WFMT-Auftrag wurde erzeugt.</li><li>Prozessstatus kann gelesen werden.</li></ul>
+<h3>8.4 Nachbedingungen</h3>
+<p>Bei Erfolg:</p>
+<ul><li>Reduzierte Gebietsdaten sind gespeichert.</li><li>Gebiets-ID ist validiert.</li><li>Daten koennen vom Adressabgleich genutzt werden.</li></ul>
+<p>Bei Fehler:</p>
+<ul><li>Keine ungueltigen Gebietsdaten werden gespeichert.</li><li>Nutzer erhaelt eine fachliche Fehlermeldung.</li></ul>
+<h3>8.5 Entfallende Felder</h3>
+<p>Die folgenden Felder/Funktionen aus dem urspruenglichen GBGS-Wizard entfallen:</p>
+<table><tr><th>Feld/Funktion</th><th>Grund</th></tr>
+<tr><td><code>Initiative</code></td><td>Fuer Adressabgleich nicht erforderlich</td></tr>
+<tr><td><code>Gebietseigner</code></td><td>Fuer Adressabgleich nicht erforderlich</td></tr>
+<tr><td><code>Regelwerk fuer alle Bedarfspunkte</code></td><td>Fuer Adressabgleich nicht erforderlich</td></tr>
+<tr><td><code>Gebietsname aus Upload-Liste</code></td><td>Fuer diesen Use Case nicht erforderlich</td></tr>
+<tr><td><code>Kommunikativen Gebietsnamen aendern</code></td><td>Kein Bedarf fuer Adressabgleich</td></tr>
+<tr><td><code>Schwellwert</code></td><td>Nicht relevant fuer Adressabgleich</td></tr>
+<tr><td>Schritt <code>Partner</code></td><td>Keine Partnerpflege in Pfau</td></tr>
+<tr><td>Schritt <code>Import</code></td><td>Kein CSV-Import aus Pfau</td></tr>
+<tr><td>CSV-Dateiauswahl</td><td>Keine Gebietsanlage per CSV</td></tr>
+<tr><td>Upload-Ergebnis</td><td>Kein GBGS-Upload</td></tr></table>
+<h3>8.6 Benoetigte Felder</h3>
+<table><tr><th>Feld</th><th>Typ</th><th>Pflicht</th><th>Validierung</th><th>Beschreibung</th></tr>
+<tr><td><code>Ausbautreiber / Gebietstyp</code></td><td>Select</td><td>ja</td><td>erlaubte Werte</td><td>Steuert Bildungsregel</td></tr>
+<tr><td><code>Gebiets-ID</code></td><td>Text</td><td>ja</td><td>je Ausbautreiber</td><td>Fachliche Gebietserkennung</td></tr>
+<tr><td><code>Beginn Vorvermarktung</code></td><td>Datum</td><td>ja</td><td>Datum plausibel</td><td>Start VVM-Kontext</td></tr>
+<tr><td><code>Ende Vorvermarktung</code></td><td>Datum</td><td>ja</td><td>nach Beginn VVM</td><td>Ende VVM-Kontext</td></tr>
+<tr><td><code>Beginn Ausbau</code></td><td>Datum</td><td>ja</td><td>Datum plausibel</td><td>Start Baukontext</td></tr>
+<tr><td><code>Ende Ausbau</code></td><td>Datum</td><td>ja</td><td>nach Beginn Ausbau</td><td>Ende Baukontext</td></tr></table>
+<h3>8.7 Ablauf</h3>
+<ol><li>Nutzer oeffnet den Wizard.</li><li>System laedt vorhandene Gebietsdaten, falls bereits gespeichert.</li><li>Nutzer waehlt Ausbautreiber/Gebietstyp.</li><li>System zeigt passende Bildungsregel fuer Gebiets-ID.</li><li>Nutzer gibt Gebiets-ID ein.</li><li>Frontend validiert Format direkt.</li><li>Nutzer gibt Terminwerte ein.</li><li>Nutzer speichert.</li><li>Backend validiert Gebiets-ID erneut.</li><li>Backend speichert Gebietsdaten.</li><li>System zeigt Erfolgsmeldung.</li></ol>
+<h3>8.8 Fehlerfaelle</h3>
+<table><tr><th>Fehlerfall</th><th>Verhalten</th></tr>
+<tr><td>WFMT-Auftrag fehlt</td><td>Funktion nicht startbar</td></tr>
+<tr><td>Ausbautreiber fehlt</td><td>Pflichtfeldmeldung</td></tr>
+<tr><td>Gebiets-ID passt nicht zur Regel</td><td>Feldfehler mit Regelhinweis</td></tr>
+<tr><td>Backend-Validierung lehnt ab</td><td>Speichern verhindern und Fehlermeldung anzeigen</td></tr>
+<tr><td>Termine unplausibel</td><td>Speichern verhindern</td></tr>
+<tr><td>Persistenzfehler</td><td>Technische Fehlermeldung mit Korrelations-ID</td></tr></table>
+<h2>9. Gebiets-ID-Bildungsregeln</h2>
+<h3>9.1 Grundprinzip</h3>
+<p>Die Bildungsregeln werden kontextsensitiv angezeigt. Der Nutzer sieht nur die Regel, die zum gewaehlten Ausbautreiber passt.</p>
+<p>Unterstuetzte Ausbautreiber:</p>
+<ul><li><code>Deckungsluecke</code></li><li><code>GlasfaserPlus</code></li><li><code>Betreibermodell</code></li></ul>
+<h3>9.2 Deckungsluecke</h3>
+<p>Regelhinweis:</p>
+<pre><code>Format fuer Deckungsluecke: DL_&lt;Regel gemaess Fachvorgabe&gt;</code></pre>
+<p>Vorlaeufige Validierung:</p>
+<pre><code>^DL_.+$</code></pre>
+<p>Hinweis:</p>
+<p>Die exakte Struktur ist fachlich noch zu klaeren. Sobald diese vorliegt, wird die Regex konkretisiert.</p>
+<h3>9.3 GlasfaserPlus</h3>
+<p>Regelhinweis:</p>
+<pre><code>Format fuer GlasfaserPlus: GFP_&lt;Regel gemaess Fachvorgabe&gt;</code></pre>
+<p>Vorlaeufige Validierung:</p>
+<pre><code>^GFP_.+$</code></pre>
+<p>Hinweis:</p>
+<p>Die exakte Struktur ist fachlich noch zu klaeren. Sobald diese vorliegt, wird die Regex konkretisiert.</p>
+<h3>9.4 Betreibermodelle</h3>
+<p>Regel:</p>
+<pre><code>BEMO_&lt;10-stellige Vertragsnummer&gt;</code></pre>
+<p>Beispiel:</p>
+<pre><code>BEMO_1312200021</code></pre>
+<p>Aufbau der 10-stelligen Vertragsnummer:</p>
+<pre><code>13122 0002 1</code></pre>
+<table><tr><th>Anteil</th><th>Farbe in UI</th><th>Bedeutung</th></tr>
+<tr><td><code>13122</code></td><td>gruen</td><td>Vertrag bzw. Untervertrag</td></tr>
+<tr><td><code>0002</code></td><td>rot</td><td>fortlaufende Nummer fuer Bauabschnitt/Ausbaugebiet/Bautranche</td></tr>
+<tr><td><code>1</code></td><td>blau</td><td>beauftragte Technikvariante</td></tr></table>
+<p>Validierung:</p>
+<pre><code>^BEMO_[0-9]{10}$</code></pre>
+<p>Weitere fachliche Plausibilisierungen koennen spaeter ergaenzt werden:</p>
+<ul><li>Existiert der Vertragsanteil?</li><li>Ist die fortlaufende Nummer innerhalb des Vertrags eindeutig?</li><li>Ist die Technikvariante zulaessig?</li></ul>
+<p>Diese Plausibilisierungen sind nicht Voraussetzung fuer die erste Umsetzungsstufe, sofern die Datenquelle dafuer nicht verfuegbar ist.</p>
+<h2>10. Use Case 2: KLS-BT-Liste fuer PST vorschlagen</h2>
+<h3>10.1 Ziel</h3>
+<p>Pfau stellt die KLS aus der aktuellen Bautranche als Vorschlagsliste bereit. Die Liste ist ein Input fuer PST.</p>
+<h3>10.2 Abgrenzung zur alten VVM-Importliste</h3>
+<table><tr><th>Alter Ansatz</th><th>Neuer Ansatz</th></tr>
+<tr><td>Pfau erzeugt VVM-Importliste</td><td>Pfau erzeugt nur KLS-BT-Listenvorschlag</td></tr>
+<tr><td>WE/GE-Pruefung im Wizard</td><td>WE/GE entfaellt</td></tr>
+<tr><td>Button <code>Importliste erzeugen</code></td><td>Aktion <code>KLS-BT-Liste exportieren</code></td></tr>
+<tr><td>Pfau erzeugt echte Liste 1</td><td>PST erzeugt echte Liste 1</td></tr></table>
+<h3>10.3 Vorbedingungen</h3>
+<ul><li>Bautranche ist geoeffnet.</li><li>Nutzer ist berechtigt.</li><li>WFMT-Auftrag wurde erzeugt.</li><li>KLS-Daten der Bautranche sind verfuegbar.</li></ul>
+<h3>10.4 Nachbedingungen</h3>
+<p>Bei Erfolg:</p>
+<ul><li>KLS-BT-Liste wird angezeigt.</li><li>Nutzer kann Liste exportieren oder fuer PST bereitstellen.</li><li>Aktion wird auditierbar protokolliert.</li></ul>
+<p>Bei Fehler:</p>
+<ul><li>Keine oder unvollstaendige Liste wird nicht als erfolgreich bereitgestellt.</li><li>Nutzer sieht eine konkrete Fehlermeldung.</li></ul>
+<h3>10.5 Inhalt der KLS-BT-Liste</h3>
+<p>Mindestspalten:</p>
+<table><tr><th>Spalte</th><th>Pflicht</th><th>Beschreibung</th></tr>
+<tr><td><code>KLS-ID</code></td><td>ja</td><td>KLS aus der Bautranche</td></tr>
+<tr><td><code>Bautranche</code></td><td>ja</td><td>ID/Name der Bautranche</td></tr>
+<tr><td><code>Gebiets-ID</code></td><td>nein</td><td>validierte Gebiets-ID, falls vorhanden</td></tr>
+<tr><td><code>Quelle</code></td><td>ja</td><td><code>Pfau</code></td></tr></table>
+<p>Optionale Spalten:</p>
+<table><tr><th>Spalte</th><th>Beschreibung</th></tr>
+<tr><td><code>Adresse</code></td><td>Strasse/Hausnummer, falls verfuegbar</td></tr>
+<tr><td><code>PLZ</code></td><td>Postleitzahl</td></tr>
+<tr><td><code>Ort</code></td><td>Ort</td></tr>
+<tr><td><code>OID</code></td><td>technische Referenz</td></tr>
+<tr><td><code>Adressstatus</code></td><td>optionaler Status aus Pfau</td></tr></table>
+<h3>10.6 Ablauf</h3>
+<ol><li>Nutzer waehlt <code>KLS-BT-Liste fuer PST vorschlagen</code>.</li><li>System liest KLS der aktuellen Bautranche.</li><li>System zeigt Vorschlagsliste.</li><li>Nutzer prueft Liste.</li><li>Nutzer waehlt Export oder Bereitstellung.</li><li>System erzeugt KLS-BT-Listenartefakt.</li><li>System protokolliert Aktion.</li><li>PST erzeugt ausserhalb dieses Use Cases die echte <code>Liste 1</code>.</li></ol>
+<h3>10.7 Fehlerfaelle</h3>
+<table><tr><th>Fehlerfall</th><th>Verhalten</th></tr>
+<tr><td>Keine KLS in Bautranche</td><td>Leere Liste mit Hinweis</td></tr>
+<tr><td>KLS-Service nicht erreichbar</td><td>Fehler mit Retry</td></tr>
+<tr><td>Exportfehler</td><td>Fehler mit Korrelations-ID</td></tr>
+<tr><td>PST-Uebergabe nicht konfiguriert</td><td>Nur Download anbieten</td></tr></table>
+<h2>11. Use Case 3: Verpflichtender Adressabgleich vor VVM-ONGOING</h2>
+<h3>11.1 Ziel</h3>
+<p>Vor dem Erreichen von <code>VVM-ONGOING</code> soll sichergestellt werden, dass der Adressabgleich rechtzeitig erfolgt.</p>
+<h3>11.2 Regel</h3>
+<p>Der Pflichtzeitpunkt wird anhand eines konfigurierbaren Vorlaufs berechnet.</p>
+<p>Default:</p>
+<pre><code>10 Arbeitstage vor VVM-ONGOING</code></pre>
+<p>Berechnung:</p>
+<pre><code>adressabgleichFaelligAb = VVM_ONGOING - konfigurierterVorlaufInArbeitstagen</code></pre>
+<h3>11.3 Technische Einordnung</h3>
+<p>Die aktualisierte Pfau-Funktion liefert die notwendigen Daten und Prozessartefakte fuer den Adressabgleich. Die harte Blockade des VVM-Uebergangs kann technisch an verschiedenen Stellen umgesetzt werden:</p>
+<table><tr><th>Option</th><th>Beschreibung</th></tr>
+<tr><td>Pfau</td><td>Blockiert Pfau-seitige Prozessaktion</td></tr>
+<tr><td>GBGS</td><td>Blockiert GBGS-seitigen VVM-Uebergang</td></tr>
+<tr><td>Prozessservice</td><td>Zentraler Validator fuer Prozessstatus</td></tr></table>
+<p>Empfehlung:</p>
+<ul><li>Backend-seitige Validierung ist verpflichtend.</li><li>Frontend darf nur visualisieren, nicht allein entscheiden.</li><li>Die finale Systemverantwortung fuer die harte VVM-Blockade ist fachlich/architektonisch zu entscheiden.</li></ul>
+<h2>12. Fachlicher Gesamtprozess</h2>
+<ol><li>Nutzer oeffnet Bautranche in Pfau.</li><li>Pfau laedt Prozessstatus.</li><li>Prozess-Dropdown zeigt <code>WFMT-Auftrag</code>.</li><li>Prozess-Dropdown zeigt darunter <code>GBGS-Funktionen</code>.</li><li>Wenn WFMT-Auftrag fehlt: <code>GBGS-Funktionen</code> ist deaktiviert.</li><li>Wenn WFMT-Auftrag vorhanden: <code>GBGS-Funktionen</code> ist aktiv.</li><li>Nutzer oeffnet <code>GBGS-Funktionen</code>.</li><li>Nutzer erfasst reduzierte Gebietsdaten.</li><li>System validiert Gebiets-ID kontextsensitiv.</li><li>System speichert Gebietsdaten.</li><li>Nutzer erzeugt KLS-BT-Listenvorschlag.</li><li>Pfau stellt KLS aus Bautranche bereit.</li><li>PST erzeugt echte <code>Liste 1</code>.</li><li>Adressabgleich Pfau GBGS kann auf Basis der Daten erfolgen.</li><li>Vor <code>VVM-ONGOING</code> wird der Adressabgleich gemaess konfiguriertem Vorlauf erzwungen.</li></ol>
+<h2>13. UML-Diagramme</h2>
+<h3>13.1 Use Case Diagramm</h3>
+<div class="diagram-shell"><div class="mermaid">
+flowchart LR
+  User[&quot;PTI Nutzer&quot;]
+  Pfau[&quot;Pfau Bautranchensicht&quot;]
+  ProcessMenu[&quot;Prozess-Dropdown&quot;]
+  Wfmt[&quot;WFMT-Auftrag&quot;]
+  GbgsFunctions[&quot;GBGS-Funktionen&quot;]
+  AreaWizard[&quot;Gebietsdaten erfassen&quot;]
+  IdRules[&quot;Gebiets-ID-Regeln&quot;]
+  KlsWizard[&quot;KLS-BT-Liste vorschlagen&quot;]
+  Pst[&quot;PST erzeugt echte Liste 1&quot;]
+  Reconcile[&quot;Adressabgleich Pfau GBGS&quot;]
+  Vvm[&quot;VVM-ONGOING&quot;]
+
+  User --&gt; Pfau
+  Pfau --&gt; ProcessMenu
+  ProcessMenu --&gt; Wfmt
+  Wfmt --&gt;|&quot;erzeugt&quot;| GbgsFunctions
+  ProcessMenu --&gt; GbgsFunctions
+  GbgsFunctions --&gt; AreaWizard
+  AreaWizard --&gt; IdRules
+  GbgsFunctions --&gt; KlsWizard
+  KlsWizard --&gt; Pst
+  AreaWizard --&gt; Reconcile
+  Pst --&gt; Reconcile
+  Reconcile --&gt; Vvm
+</div></div>
+<details class="mermaid-source" open><summary>Mermaid-Markdown fuer Confluence: Use Case Diagramm</summary><p><a href="uml-diagramme/13-1-use-case-diagramm.md">13-1-use-case-diagramm.md</a></p><pre><code>```mermaid
+flowchart LR
+  User[&quot;PTI Nutzer&quot;]
+  Pfau[&quot;Pfau Bautranchensicht&quot;]
+  ProcessMenu[&quot;Prozess-Dropdown&quot;]
+  Wfmt[&quot;WFMT-Auftrag&quot;]
+  GbgsFunctions[&quot;GBGS-Funktionen&quot;]
+  AreaWizard[&quot;Gebietsdaten erfassen&quot;]
+  IdRules[&quot;Gebiets-ID-Regeln&quot;]
+  KlsWizard[&quot;KLS-BT-Liste vorschlagen&quot;]
+  Pst[&quot;PST erzeugt echte Liste 1&quot;]
+  Reconcile[&quot;Adressabgleich Pfau GBGS&quot;]
+  Vvm[&quot;VVM-ONGOING&quot;]
+
+  User --&gt; Pfau
+  Pfau --&gt; ProcessMenu
+  ProcessMenu --&gt; Wfmt
+  Wfmt --&gt;|&quot;erzeugt&quot;| GbgsFunctions
+  ProcessMenu --&gt; GbgsFunctions
+  GbgsFunctions --&gt; AreaWizard
+  AreaWizard --&gt; IdRules
+  GbgsFunctions --&gt; KlsWizard
+  KlsWizard --&gt; Pst
+  AreaWizard --&gt; Reconcile
+  Pst --&gt; Reconcile
+  Reconcile --&gt; Vvm
+```</code></pre></details>
+<h3>13.2 Aktivitaetsdiagramm: Einstieg und Funktionsauswahl</h3>
+<div class="diagram-shell"><div class="mermaid">
+flowchart TD
+  A[&quot;Bautranche in Pfau geoeffnet&quot;] --&gt; B[&quot;Prozessstatus laden&quot;]
+  B --&gt; C{&quot;WFMT-Auftrag erzeugt?&quot;}
+  C -- &quot;Nein&quot; --&gt; D[&quot;GBGS-Funktionen deaktiviert/grau anzeigen&quot;]
+  D --&gt; E[&quot;Nutzer erzeugt WFMT-Auftrag&quot;]
+  E --&gt; B
+  C -- &quot;Ja&quot; --&gt; F[&quot;GBGS-Funktionen aktiv anzeigen&quot;]
+  F --&gt; G[&quot;Nutzer waehlt GBGS-Funktionen&quot;]
+  G --&gt; H{&quot;Teilfunktion auswaehlen&quot;}
+  H -- &quot;Gebietsdaten&quot; --&gt; I[&quot;Gebietsdaten-Wizard starten&quot;]
+  H -- &quot;KLS-BT-Liste&quot; --&gt; J[&quot;KLS-BT-Listen-Wizard starten&quot;]
+</div></div>
+<details class="mermaid-source" open><summary>Mermaid-Markdown fuer Confluence: Aktivitaetsdiagramm Einstieg und Funktionsauswahl</summary><p><a href="uml-diagramme/13-2-aktivitaetsdiagramm-einstieg-und-funktionsauswahl.md">13-2-aktivitaetsdiagramm-einstieg-und-funktionsauswahl.md</a></p><pre><code>```mermaid
+flowchart TD
+  A[&quot;Bautranche in Pfau geoeffnet&quot;] --&gt; B[&quot;Prozessstatus laden&quot;]
+  B --&gt; C{&quot;WFMT-Auftrag erzeugt?&quot;}
+  C -- &quot;Nein&quot; --&gt; D[&quot;GBGS-Funktionen deaktiviert/grau anzeigen&quot;]
+  D --&gt; E[&quot;Nutzer erzeugt WFMT-Auftrag&quot;]
+  E --&gt; B
+  C -- &quot;Ja&quot; --&gt; F[&quot;GBGS-Funktionen aktiv anzeigen&quot;]
+  F --&gt; G[&quot;Nutzer waehlt GBGS-Funktionen&quot;]
+  G --&gt; H{&quot;Teilfunktion auswaehlen&quot;}
+  H -- &quot;Gebietsdaten&quot; --&gt; I[&quot;Gebietsdaten-Wizard starten&quot;]
+  H -- &quot;KLS-BT-Liste&quot; --&gt; J[&quot;KLS-BT-Listen-Wizard starten&quot;]
+```</code></pre></details>
+<h3>13.3 Aktivitaetsdiagramm: Gebietsdaten</h3>
+<div class="diagram-shell"><div class="mermaid">
+flowchart TD
+  A[&quot;Gebietsdaten-Wizard gestartet&quot;] --&gt; B[&quot;Ausbautreiber waehlen&quot;]
+  B --&gt; C[&quot;Kontextsensitive ID-Regel anzeigen&quot;]
+  C --&gt; D[&quot;Gebiets-ID eingeben&quot;]
+  D --&gt; E{&quot;Frontend-Format gueltig?&quot;}
+  E -- &quot;Nein&quot; --&gt; F[&quot;Feldfehler mit Regelhinweis anzeigen&quot;]
+  F --&gt; D
+  E -- &quot;Ja&quot; --&gt; G[&quot;Termine eingeben&quot;]
+  G --&gt; H{&quot;Termine plausibel?&quot;}
+  H -- &quot;Nein&quot; --&gt; I[&quot;Terminfehler anzeigen&quot;]
+  I --&gt; G
+  H -- &quot;Ja&quot; --&gt; J[&quot;Speichern ausloesen&quot;]
+  J --&gt; K[&quot;Backend validiert Gebiets-ID&quot;]
+  K --&gt; L{&quot;Backend gueltig?&quot;}
+  L -- &quot;Nein&quot; --&gt; M[&quot;Speichern ablehnen&quot;]
+  M --&gt; D
+  L -- &quot;Ja&quot; --&gt; N[&quot;Gebietsdaten speichern&quot;]
+  N --&gt; O[&quot;Erfolg anzeigen&quot;]
+</div></div>
+<details class="mermaid-source" open><summary>Mermaid-Markdown fuer Confluence: Aktivitaetsdiagramm Gebietsdaten</summary><p><a href="uml-diagramme/13-3-aktivitaetsdiagramm-gebietsdaten.md">13-3-aktivitaetsdiagramm-gebietsdaten.md</a></p><pre><code>```mermaid
+flowchart TD
+  A[&quot;Gebietsdaten-Wizard gestartet&quot;] --&gt; B[&quot;Ausbautreiber waehlen&quot;]
+  B --&gt; C[&quot;Kontextsensitive ID-Regel anzeigen&quot;]
+  C --&gt; D[&quot;Gebiets-ID eingeben&quot;]
+  D --&gt; E{&quot;Frontend-Format gueltig?&quot;}
+  E -- &quot;Nein&quot; --&gt; F[&quot;Feldfehler mit Regelhinweis anzeigen&quot;]
+  F --&gt; D
+  E -- &quot;Ja&quot; --&gt; G[&quot;Termine eingeben&quot;]
+  G --&gt; H{&quot;Termine plausibel?&quot;}
+  H -- &quot;Nein&quot; --&gt; I[&quot;Terminfehler anzeigen&quot;]
+  I --&gt; G
+  H -- &quot;Ja&quot; --&gt; J[&quot;Speichern ausloesen&quot;]
+  J --&gt; K[&quot;Backend validiert Gebiets-ID&quot;]
+  K --&gt; L{&quot;Backend gueltig?&quot;}
+  L -- &quot;Nein&quot; --&gt; M[&quot;Speichern ablehnen&quot;]
+  M --&gt; D
+  L -- &quot;Ja&quot; --&gt; N[&quot;Gebietsdaten speichern&quot;]
+  N --&gt; O[&quot;Erfolg anzeigen&quot;]
+```</code></pre></details>
+<h3>13.4 Aktivitaetsdiagramm: KLS-BT-Liste</h3>
+<div class="diagram-shell"><div class="mermaid">
+flowchart TD
+  A[&quot;KLS-BT-Listen-Wizard gestartet&quot;] --&gt; B[&quot;Bautranche ermitteln&quot;]
+  B --&gt; C[&quot;KLS aus Bautranche laden&quot;]
+  C --&gt; D{&quot;KLS vorhanden?&quot;}
+  D -- &quot;Nein&quot; --&gt; E[&quot;Leere Liste mit Hinweis anzeigen&quot;]
+  D -- &quot;Ja&quot; --&gt; F[&quot;KLS-BT-Liste anzeigen&quot;]
+  F --&gt; G{&quot;Nutzeraktion&quot;}
+  G -- &quot;Export&quot; --&gt; H[&quot;CSV/XLSX erzeugen&quot;]
+  G -- &quot;PST bereitstellen&quot; --&gt; I[&quot;Uebergabe an PST vorbereiten&quot;]
+  H --&gt; J[&quot;Aktion protokollieren&quot;]
+  I --&gt; J
+</div></div>
+<details class="mermaid-source" open><summary>Mermaid-Markdown fuer Confluence: Aktivitaetsdiagramm KLS-BT-Liste</summary><p><a href="uml-diagramme/13-4-aktivitaetsdiagramm-kls-bt-liste.md">13-4-aktivitaetsdiagramm-kls-bt-liste.md</a></p><pre><code>```mermaid
+flowchart TD
+  A[&quot;KLS-BT-Listen-Wizard gestartet&quot;] --&gt; B[&quot;Bautranche ermitteln&quot;]
+  B --&gt; C[&quot;KLS aus Bautranche laden&quot;]
+  C --&gt; D{&quot;KLS vorhanden?&quot;}
+  D -- &quot;Nein&quot; --&gt; E[&quot;Leere Liste mit Hinweis anzeigen&quot;]
+  D -- &quot;Ja&quot; --&gt; F[&quot;KLS-BT-Liste anzeigen&quot;]
+  F --&gt; G{&quot;Nutzeraktion&quot;}
+  G -- &quot;Export&quot; --&gt; H[&quot;CSV/XLSX erzeugen&quot;]
+  G -- &quot;PST bereitstellen&quot; --&gt; I[&quot;Uebergabe an PST vorbereiten&quot;]
+  H --&gt; J[&quot;Aktion protokollieren&quot;]
+  I --&gt; J
+```</code></pre></details>
+<h3>13.5 Sequenzdiagramm: Prozess-Dropdown</h3>
+<div class="diagram-shell"><div class="mermaid">
+sequenceDiagram
+  actor User as PTI Nutzer
+  participant UI as Pfau UI
+  participant PROC as Prozessstatus API
+
+  User-&gt;&gt;UI: Oeffnet Bautranche
+  UI-&gt;&gt;PROC: GET /process-state
+  PROC--&gt;&gt;UI: wfmtOrderCreated, gbgsFunctionsEnabled
+  alt WFMT-Auftrag fehlt
+    UI--&gt;&gt;User: GBGS-Funktionen deaktiviert anzeigen
+  else WFMT-Auftrag vorhanden
+    UI--&gt;&gt;User: GBGS-Funktionen aktiv anzeigen
+  end
+</div></div>
+<details class="mermaid-source" open><summary>Mermaid-Markdown fuer Confluence: Sequenzdiagramm Prozess-Dropdown</summary><p><a href="uml-diagramme/13-5-sequenzdiagramm-prozess-dropdown.md">13-5-sequenzdiagramm-prozess-dropdown.md</a></p><pre><code>```mermaid
+sequenceDiagram
+  actor User as PTI Nutzer
+  participant UI as Pfau UI
+  participant PROC as Prozessstatus API
+
+  User-&gt;&gt;UI: Oeffnet Bautranche
+  UI-&gt;&gt;PROC: GET /process-state
+  PROC--&gt;&gt;UI: wfmtOrderCreated, gbgsFunctionsEnabled
+  alt WFMT-Auftrag fehlt
+    UI--&gt;&gt;User: GBGS-Funktionen deaktiviert anzeigen
+  else WFMT-Auftrag vorhanden
+    UI--&gt;&gt;User: GBGS-Funktionen aktiv anzeigen
+  end
+```</code></pre></details>
+<h3>13.6 Sequenzdiagramm: Gebietsdaten speichern</h3>
+<div class="diagram-shell"><div class="mermaid">
+sequenceDiagram
+  actor User as PTI Nutzer
+  participant UI as Pfau UI
+  participant VAL as Gebiets-ID Validator
+  participant API as GBGS-Funktionen API
+  participant DB as Pfau Persistenz
+
+  User-&gt;&gt;UI: Waehlt Gebietsdaten erfassen
+  UI--&gt;&gt;User: Zeigt reduzierte Felder
+  User-&gt;&gt;UI: Waehlt Ausbautreiber
+  UI--&gt;&gt;User: Zeigt passende Bildungsregel
+  User-&gt;&gt;UI: Gibt Gebiets-ID und Termine ein
+  UI-&gt;&gt;VAL: validate(areaType, gebietsId)
+  VAL--&gt;&gt;UI: valid/invalid
+  alt ungueltig
+    UI--&gt;&gt;User: Feldfehler anzeigen
+  else gueltig
+    UI-&gt;&gt;API: POST /area-data
+    API-&gt;&gt;VAL: validate(areaType, gebietsId)
+    VAL--&gt;&gt;API: valid
+    API-&gt;&gt;DB: save(areaData)
+    DB--&gt;&gt;API: saved
+    API--&gt;&gt;UI: Erfolg
+    UI--&gt;&gt;User: Speichern bestaetigen
+  end
+</div></div>
+<details class="mermaid-source" open><summary>Mermaid-Markdown fuer Confluence: Sequenzdiagramm Gebietsdaten speichern</summary><p><a href="uml-diagramme/13-6-sequenzdiagramm-gebietsdaten-speichern.md">13-6-sequenzdiagramm-gebietsdaten-speichern.md</a></p><pre><code>```mermaid
+sequenceDiagram
+  actor User as PTI Nutzer
+  participant UI as Pfau UI
+  participant VAL as Gebiets-ID Validator
+  participant API as GBGS-Funktionen API
+  participant DB as Pfau Persistenz
+
+  User-&gt;&gt;UI: Waehlt Gebietsdaten erfassen
+  UI--&gt;&gt;User: Zeigt reduzierte Felder
+  User-&gt;&gt;UI: Waehlt Ausbautreiber
+  UI--&gt;&gt;User: Zeigt passende Bildungsregel
+  User-&gt;&gt;UI: Gibt Gebiets-ID und Termine ein
+  UI-&gt;&gt;VAL: validate(areaType, gebietsId)
+  VAL--&gt;&gt;UI: valid/invalid
+  alt ungueltig
+    UI--&gt;&gt;User: Feldfehler anzeigen
+  else gueltig
+    UI-&gt;&gt;API: POST /area-data
+    API-&gt;&gt;VAL: validate(areaType, gebietsId)
+    VAL--&gt;&gt;API: valid
+    API-&gt;&gt;DB: save(areaData)
+    DB--&gt;&gt;API: saved
+    API--&gt;&gt;UI: Erfolg
+    UI--&gt;&gt;User: Speichern bestaetigen
+  end
+```</code></pre></details>
+<h3>13.7 Sequenzdiagramm: KLS-BT-Liste</h3>
+<div class="diagram-shell"><div class="mermaid">
+sequenceDiagram
+  actor User as PTI Nutzer
+  participant UI as Pfau UI
+  participant API as GBGS-Funktionen API
+  participant KLS as Bautranchen/KLS Service
+  participant AUD as Audit Log
+  participant PST as PST
+
+  User-&gt;&gt;UI: Waehlt KLS-BT-Liste fuer PST
+  UI-&gt;&gt;API: GET /kls-list
+  API-&gt;&gt;KLS: getKlsForBautranche(bautrancheId)
+  KLS--&gt;&gt;API: KLS-Liste
+  API--&gt;&gt;UI: KLS-BT-Listenvorschlag
+  UI--&gt;&gt;User: Liste anzeigen
+  User-&gt;&gt;UI: Exportieren/Bereitstellen
+  UI-&gt;&gt;API: createKlsBtListArtifact()
+  API-&gt;&gt;AUD: log action
+  opt PST-Schnittstelle vorhanden
+    API-&gt;&gt;PST: provideKlsBtList()
+    PST--&gt;&gt;API: accepted
+  end
+  API--&gt;&gt;UI: Ergebnis
+</div></div>
+<details class="mermaid-source" open><summary>Mermaid-Markdown fuer Confluence: Sequenzdiagramm KLS-BT-Liste</summary><p><a href="uml-diagramme/13-7-sequenzdiagramm-kls-bt-liste.md">13-7-sequenzdiagramm-kls-bt-liste.md</a></p><pre><code>```mermaid
+sequenceDiagram
+  actor User as PTI Nutzer
+  participant UI as Pfau UI
+  participant API as GBGS-Funktionen API
+  participant KLS as Bautranchen/KLS Service
+  participant AUD as Audit Log
+  participant PST as PST
+
+  User-&gt;&gt;UI: Waehlt KLS-BT-Liste fuer PST
+  UI-&gt;&gt;API: GET /kls-list
+  API-&gt;&gt;KLS: getKlsForBautranche(bautrancheId)
+  KLS--&gt;&gt;API: KLS-Liste
+  API--&gt;&gt;UI: KLS-BT-Listenvorschlag
+  UI--&gt;&gt;User: Liste anzeigen
+  User-&gt;&gt;UI: Exportieren/Bereitstellen
+  UI-&gt;&gt;API: createKlsBtListArtifact()
+  API-&gt;&gt;AUD: log action
+  opt PST-Schnittstelle vorhanden
+    API-&gt;&gt;PST: provideKlsBtList()
+    PST--&gt;&gt;API: accepted
+  end
+  API--&gt;&gt;UI: Ergebnis
+```</code></pre></details>
+<h3>13.8 Komponentendiagramm</h3>
+<div class="diagram-shell"><div class="mermaid">
+flowchart TB
+  subgraph Frontend[&quot;Pfau Frontend&quot;]
+    PD[&quot;Prozess-Dropdown&quot;]
+    DIS[&quot;Disabled State GBGS-Funktionen&quot;]
+    MOD[&quot;GBGS-Funktionen Dialog&quot;]
+    AREA[&quot;Gebietsdaten-Wizard&quot;]
+    RULE[&quot;Kontextsensitive ID-Regeln&quot;]
+    KLSUI[&quot;KLS-BT-Listen-Wizard&quot;]
+  end
+
+  subgraph Backend[&quot;Pfau Backend&quot;]
+    PROC[&quot;Prozessstatus API&quot;]
+    FAPI[&quot;GBGS-Funktionen API&quot;]
+    VALID[&quot;Gebiets-ID Validator&quot;]
+    DATA[&quot;Gebietsdaten Persistenz&quot;]
+    KLSAPI[&quot;Bautranchen/KLS API&quot;]
+    EXPORT[&quot;Export/Bereitstellung&quot;]
+    AUD[&quot;Audit Logging&quot;]
+  end
+
+  subgraph External[&quot;Umsysteme&quot;]
+    WFMT[&quot;WFMT&quot;]
+    PST[&quot;PST&quot;]
+    GBGS[&quot;GBGS&quot;]
+  end
+
+  PD --&gt; PROC
+  PROC --&gt; WFMT
+  PROC --&gt; DIS
+  PD --&gt; MOD
+  MOD --&gt; AREA
+  AREA --&gt; RULE
+  RULE --&gt; VALID
+  AREA --&gt; FAPI
+  FAPI --&gt; DATA
+  MOD --&gt; KLSUI
+  KLSUI --&gt; KLSAPI
+  KLSAPI --&gt; EXPORT
+  EXPORT --&gt; PST
+  FAPI --&gt; AUD
+  EXPORT --&gt; AUD
+  FAPI --&gt; GBGS
+</div></div>
+<details class="mermaid-source" open><summary>Mermaid-Markdown fuer Confluence: Komponentendiagramm</summary><p><a href="uml-diagramme/13-8-komponentendiagramm.md">13-8-komponentendiagramm.md</a></p><pre><code>```mermaid
+flowchart TB
+  subgraph Frontend[&quot;Pfau Frontend&quot;]
+    PD[&quot;Prozess-Dropdown&quot;]
+    DIS[&quot;Disabled State GBGS-Funktionen&quot;]
+    MOD[&quot;GBGS-Funktionen Dialog&quot;]
+    AREA[&quot;Gebietsdaten-Wizard&quot;]
+    RULE[&quot;Kontextsensitive ID-Regeln&quot;]
+    KLSUI[&quot;KLS-BT-Listen-Wizard&quot;]
+  end
+
+  subgraph Backend[&quot;Pfau Backend&quot;]
+    PROC[&quot;Prozessstatus API&quot;]
+    FAPI[&quot;GBGS-Funktionen API&quot;]
+    VALID[&quot;Gebiets-ID Validator&quot;]
+    DATA[&quot;Gebietsdaten Persistenz&quot;]
+    KLSAPI[&quot;Bautranchen/KLS API&quot;]
+    EXPORT[&quot;Export/Bereitstellung&quot;]
+    AUD[&quot;Audit Logging&quot;]
+  end
+
+  subgraph External[&quot;Umsysteme&quot;]
+    WFMT[&quot;WFMT&quot;]
+    PST[&quot;PST&quot;]
+    GBGS[&quot;GBGS&quot;]
+  end
+
+  PD --&gt; PROC
+  PROC --&gt; WFMT
+  PROC --&gt; DIS
+  PD --&gt; MOD
+  MOD --&gt; AREA
+  AREA --&gt; RULE
+  RULE --&gt; VALID
+  AREA --&gt; FAPI
+  FAPI --&gt; DATA
+  MOD --&gt; KLSUI
+  KLSUI --&gt; KLSAPI
+  KLSAPI --&gt; EXPORT
+  EXPORT --&gt; PST
+  FAPI --&gt; AUD
+  EXPORT --&gt; AUD
+  FAPI --&gt; GBGS
+```</code></pre></details>
+<h3>13.9 Statusmodell</h3>
+<div class="diagram-shell"><div class="mermaid">
+stateDiagram-v2
+  [*] --&gt; WFMT_FEHLT
+  WFMT_FEHLT: GBGS-Funktionen deaktiviert
+  WFMT_FEHLT --&gt; WFMT_ERZEUGT: WFMT-Auftrag erzeugt
+  WFMT_ERZEUGT: GBGS-Funktionen aktiv
+  WFMT_ERZEUGT --&gt; GEBIETSDATEN_ERFASST: Gebietsdaten gespeichert
+  GEBIETSDATEN_ERFASST --&gt; KLS_LISTE_ERSTELLT: KLS-BT-Liste exportiert/bereitgestellt
+  KLS_LISTE_ERSTELLT --&gt; ADRESSABGLEICH_BEREIT: Input fuer Adressabgleich vorhanden
+  ADRESSABGLEICH_BEREIT --&gt; [*]
+</div></div>
+<details class="mermaid-source" open><summary>Mermaid-Markdown fuer Confluence: Statusmodell</summary><p><a href="uml-diagramme/13-9-statusmodell.md">13-9-statusmodell.md</a></p><pre><code>```mermaid
+stateDiagram-v2
+  [*] --&gt; WFMT_FEHLT
+  WFMT_FEHLT: GBGS-Funktionen deaktiviert
+  WFMT_FEHLT --&gt; WFMT_ERZEUGT: WFMT-Auftrag erzeugt
+  WFMT_ERZEUGT: GBGS-Funktionen aktiv
+  WFMT_ERZEUGT --&gt; GEBIETSDATEN_ERFASST: Gebietsdaten gespeichert
+  GEBIETSDATEN_ERFASST --&gt; KLS_LISTE_ERSTELLT: KLS-BT-Liste exportiert/bereitgestellt
+  KLS_LISTE_ERSTELLT --&gt; ADRESSABGLEICH_BEREIT: Input fuer Adressabgleich vorhanden
+  ADRESSABGLEICH_BEREIT --&gt; [*]
+```</code></pre></details>
+<h2>14. Architektur und Komponenten</h2>
+<h3>14.1 Frontend-Komponenten</h3>
+<table><tr><th>Komponente</th><th>Verantwortung</th><th>Hinweise</th></tr>
+<tr><td>Prozess-Dropdown</td><td>Anzeige und Aktivierung von <code>GBGS-Funktionen</code></td><td>Eintrag unterhalb <code>WFMT-Auftrag</code></td></tr>
+<tr><td>GBGS-Funktionen Dialog</td><td>Auswahl der Teilfunktionen</td><td>Startpunkt fuer Wizards</td></tr>
+<tr><td>Gebietsdaten-Wizard</td><td>Reduzierte Datenerfassung</td><td>Keine Partner-/Import-Schritte</td></tr>
+<tr><td>Gebiets-ID-Hilfe</td><td>Kontextsensitiver Regeltext</td><td>DL, GFP, BEMO getrennt</td></tr>
+<tr><td>Gebiets-ID-Frontend-Validator</td><td>Sofortfeedback im Formular</td><td>Backend bleibt fuehrend</td></tr>
+<tr><td>KLS-BT-Listen-Wizard</td><td>KLS anzeigen/exportieren</td><td>Keine WE/GE-Pruefung</td></tr>
+<tr><td>Fehler-/Hinweiskomponente</td><td>Fachliche und technische Fehler</td><td>Mit Korrelations-ID bei technischen Fehlern</td></tr></table>
+<h3>14.2 Backend-Komponenten</h3>
+<table><tr><th>Komponente</th><th>Verantwortung</th><th>Hinweise</th></tr>
+<tr><td>Prozessstatus API</td><td>Ermittelt WFMT-Status und Feature-Aktivierung</td><td>Serverseitig fuehrend</td></tr>
+<tr><td>GBGS-Funktionen API</td><td>Kapselt Speichern, Laden, Export</td><td>Fachliche Boundary</td></tr>
+<tr><td>Gebiets-ID Validator</td><td>Validiert ID nach Ausbautreiber</td><td>Reusable fuer Frontend-Kontrakt</td></tr>
+<tr><td>Gebietsdaten Persistenz</td><td>Speichert reduzierte Gebietsdaten</td><td>Auditierbar</td></tr>
+<tr><td>KLS API</td><td>Liefert KLS der Bautranche</td><td>Quelle fuer KLS-BT-Liste</td></tr>
+<tr><td>Export/Bereitstellung</td><td>Erzeugt CSV/XLSX oder Uebergabe an PST</td><td>Zielbild offen</td></tr>
+<tr><td>Audit Logging</td><td>Protokolliert relevante Aktionen</td><td>Security/Compliance</td></tr></table>
+<h3>14.3 Umsysteme</h3>
+<table><tr><th>System</th><th>Integration</th><th>Bemerkung</th></tr>
+<tr><td>WFMT</td><td>Prozessstatus</td><td>Liefert oder beeinflusst Status <code>WFMT-Auftrag erzeugt</code></td></tr>
+<tr><td>PST</td><td>Datei/Schnittstelle</td><td>Erzeugt echte <code>Liste 1</code></td></tr>
+<tr><td>GBGS</td><td>Referenz/Zielkontext</td><td>Kein vollstaendiger Import aus Pfau</td></tr></table>
+<h2>15. Schnittstellenentwurf</h2>
+<h3>15.1 Prozessstatus fuer Dropdown</h3>
+<pre><code>GET /api/pfau/bautranchen/{bautrancheId}/process-state</code></pre>
+<p>Antwort:</p>
+<pre><code>{
+  &quot;bautrancheId&quot;: &quot;5005300021&quot;,
+  &quot;wfmtOrderCreated&quot;: true,
+  &quot;gbgsFunctionsVisible&quot;: true,
+  &quot;gbgsFunctionsEnabled&quot;: true,
+  &quot;disabledReason&quot;: null
+}</code></pre>
+<p>Fehlende WFMT-Voraussetzung:</p>
+<pre><code>{
+  &quot;bautrancheId&quot;: &quot;5005300021&quot;,
+  &quot;wfmtOrderCreated&quot;: false,
+  &quot;gbgsFunctionsVisible&quot;: true,
+  &quot;gbgsFunctionsEnabled&quot;: false,
+  &quot;disabledReason&quot;: &quot;WFMT-Auftrag noch nicht erzeugt&quot;
+}</code></pre>
+<h3>15.2 Gebietsdaten laden</h3>
+<pre><code>GET /api/pfau/gbgs-functions/bautranchen/{bautrancheId}/area-data</code></pre>
+<p>Antwort:</p>
+<pre><code>{
+  &quot;bautrancheId&quot;: &quot;5005300021&quot;,
+  &quot;areaType&quot;: &quot;BETREIBERMODELL&quot;,
+  &quot;gebietsId&quot;: &quot;BEMO_1312200021&quot;,
+  &quot;vvmStartDate&quot;: &quot;2026-07-03&quot;,
+  &quot;vvmEndDate&quot;: &quot;2026-09-01&quot;,
+  &quot;buildStartDate&quot;: &quot;2026-09-18&quot;,
+  &quot;buildEndDate&quot;: &quot;2027-03-17&quot;,
+  &quot;updatedAt&quot;: &quot;2026-06-15T10:30:00Z&quot;,
+  &quot;updatedBy&quot;: &quot;EMEA1\\A7577402&quot;
+}</code></pre>
+<h3>15.3 Gebietsdaten speichern</h3>
+<pre><code>POST /api/pfau/gbgs-functions/area-data</code></pre>
+<p>Payload:</p>
+<pre><code>{
+  &quot;bautrancheId&quot;: &quot;5005300021&quot;,
+  &quot;areaType&quot;: &quot;BETREIBERMODELL&quot;,
+  &quot;gebietsId&quot;: &quot;BEMO_1312200021&quot;,
+  &quot;vvmStartDate&quot;: &quot;2026-07-03&quot;,
+  &quot;vvmEndDate&quot;: &quot;2026-09-01&quot;,
+  &quot;buildStartDate&quot;: &quot;2026-09-18&quot;,
+  &quot;buildEndDate&quot;: &quot;2027-03-17&quot;
+}</code></pre>
+<p>Antwort:</p>
+<pre><code>{
+  &quot;status&quot;: &quot;SAVED&quot;,
+  &quot;bautrancheId&quot;: &quot;5005300021&quot;,
+  &quot;gebietsId&quot;: &quot;BEMO_1312200021&quot;
+}</code></pre>
+<h3>15.4 Gebiets-ID validieren</h3>
+<pre><code>POST /api/pfau/gbgs-functions/area-id/validate</code></pre>
+<p>Payload:</p>
+<pre><code>{
+  &quot;areaType&quot;: &quot;BETREIBERMODELL&quot;,
+  &quot;gebietsId&quot;: &quot;BEMO_1312200021&quot;
+}</code></pre>
+<p>Antwort gueltig:</p>
+<pre><code>{
+  &quot;valid&quot;: true,
+  &quot;ruleKey&quot;: &quot;BEMO_10_DIGIT_CONTRACT&quot;,
+  &quot;message&quot;: &quot;Gueltige BEMO-Gebiets-ID&quot;,
+  &quot;segments&quot;: [
+    {
+      &quot;name&quot;: &quot;Vertrag bzw. Untervertrag&quot;,
+      &quot;value&quot;: &quot;13122&quot;
+    },
+    {
+      &quot;name&quot;: &quot;Bauabschnitt/Ausbaugebiet/Bautranche&quot;,
+      &quot;value&quot;: &quot;0002&quot;
+    },
+    {
+      &quot;name&quot;: &quot;Technikvariante&quot;,
+      &quot;value&quot;: &quot;1&quot;
+    }
+  ]
+}</code></pre>
+<p>Antwort ungueltig:</p>
+<pre><code>{
+  &quot;valid&quot;: false,
+  &quot;ruleKey&quot;: &quot;BEMO_10_DIGIT_CONTRACT&quot;,
+  &quot;message&quot;: &quot;Die Gebiets-ID muss dem Format BEMO_&lt;10 Ziffern&gt; entsprechen.&quot;
+}</code></pre>
+<h3>15.5 KLS-BT-Liste laden</h3>
+<pre><code>GET /api/pfau/gbgs-functions/bautranchen/{bautrancheId}/kls-list</code></pre>
+<p>Antwort:</p>
+<pre><code>{
+  &quot;bautrancheId&quot;: &quot;5005300021&quot;,
+  &quot;gebietsId&quot;: &quot;BEMO_1312200021&quot;,
+  &quot;targetTool&quot;: &quot;PST&quot;,
+  &quot;items&quot;: [
+    {
+      &quot;klsId&quot;: &quot;23696071&quot;,
+      &quot;bautrancheId&quot;: &quot;5005300021&quot;,
+      &quot;source&quot;: &quot;Pfau&quot;,
+      &quot;oid&quot;: &quot;DEBWhk01000dblp8&quot;
+    },
+    {
+      &quot;klsId&quot;: &quot;11792181&quot;,
+      &quot;bautrancheId&quot;: &quot;5005300021&quot;,
+      &quot;source&quot;: &quot;Pfau&quot;,
+      &quot;oid&quot;: &quot;DEBWhk01000dbltA&quot;
+    }
+  ]
+}</code></pre>
+<h3>15.6 KLS-BT-Liste exportieren</h3>
+<pre><code>POST /api/pfau/gbgs-functions/bautranchen/{bautrancheId}/kls-list/export</code></pre>
+<p>Payload:</p>
+<pre><code>{
+  &quot;format&quot;: &quot;CSV&quot;,
+  &quot;includeOptionalAddressColumns&quot;: true
+}</code></pre>
+<p>Antwort:</p>
+<pre><code>{
+  &quot;status&quot;: &quot;CREATED&quot;,
+  &quot;downloadUrl&quot;: &quot;/api/pfau/downloads/abc123&quot;,
+  &quot;fileName&quot;: &quot;kls-bt-liste-5005300021.csv&quot;
+}</code></pre>
+<h3>15.7 PST-Bereitstellung, optionales Zielbild</h3>
+<p>Falls eine direkte technische Uebergabe an PST umgesetzt wird:</p>
+<pre><code>POST /api/pfau/gbgs-functions/bautranchen/{bautrancheId}/kls-list/provide-to-pst</code></pre>
+<p>Die konkrete Schnittstelle ist mit PST abzustimmen.</p>
+<h2>16. Datenmodell</h2>
+<h3>16.1 Entity <code>GbgsAreaData</code></h3>
+<table><tr><th>Attribut</th><th>Typ</th><th>Pflicht</th><th>Beschreibung</th></tr>
+<tr><td><code>id</code></td><td>UUID</td><td>ja</td><td>Technische ID</td></tr>
+<tr><td><code>bautrancheId</code></td><td>String</td><td>ja</td><td>Pfau Bautranche</td></tr>
+<tr><td><code>areaType</code></td><td>Enum</td><td>ja</td><td><code>DECKUNGSLUECKE</code>, <code>GLASFASERPLUS</code>, <code>BETREIBERMODELL</code></td></tr>
+<tr><td><code>gebietsId</code></td><td>String</td><td>ja</td><td>Validierte Gebiets-ID</td></tr>
+<tr><td><code>vvmStartDate</code></td><td>Date</td><td>ja</td><td>Beginn Vorvermarktung</td></tr>
+<tr><td><code>vvmEndDate</code></td><td>Date</td><td>ja</td><td>Ende Vorvermarktung</td></tr>
+<tr><td><code>buildStartDate</code></td><td>Date</td><td>ja</td><td>Beginn Ausbau</td></tr>
+<tr><td><code>buildEndDate</code></td><td>Date</td><td>ja</td><td>Ende Ausbau</td></tr>
+<tr><td><code>validationRuleKey</code></td><td>String</td><td>ja</td><td>Verwendete Regel</td></tr>
+<tr><td><code>createdBy</code></td><td>String</td><td>ja</td><td>Nutzerkennung</td></tr>
+<tr><td><code>createdAt</code></td><td>DateTime</td><td>ja</td><td>Anlagezeitpunkt</td></tr>
+<tr><td><code>updatedBy</code></td><td>String</td><td>nein</td><td>Letzter Bearbeiter</td></tr>
+<tr><td><code>updatedAt</code></td><td>DateTime</td><td>nein</td><td>Letzte Aenderung</td></tr></table>
+<h3>16.2 Entity <code>KlsBtListExport</code></h3>
+<table><tr><th>Attribut</th><th>Typ</th><th>Pflicht</th><th>Beschreibung</th></tr>
+<tr><td><code>id</code></td><td>UUID</td><td>ja</td><td>Export-ID</td></tr>
+<tr><td><code>bautrancheId</code></td><td>String</td><td>ja</td><td>Bautranche</td></tr>
+<tr><td><code>gebietsId</code></td><td>String</td><td>nein</td><td>Gebiets-ID zum Zeitpunkt des Exports</td></tr>
+<tr><td><code>format</code></td><td>Enum</td><td>ja</td><td><code>CSV</code>, spaeter optional <code>XLSX</code></td></tr>
+<tr><td><code>targetTool</code></td><td>String</td><td>ja</td><td><code>PST</code></td></tr>
+<tr><td><code>itemCount</code></td><td>Integer</td><td>ja</td><td>Anzahl KLS</td></tr>
+<tr><td><code>createdBy</code></td><td>String</td><td>ja</td><td>Nutzer</td></tr>
+<tr><td><code>createdAt</code></td><td>DateTime</td><td>ja</td><td>Zeitpunkt</td></tr>
+<tr><td><code>status</code></td><td>Enum</td><td>ja</td><td><code>CREATED</code>, <code>FAILED</code>, <code>PROVIDED_TO_PST</code></td></tr></table>
+<h3>16.3 Enum <code>AreaType</code></h3>
+<table><tr><th>Wert</th><th>Beschreibung</th></tr>
+<tr><td><code>DECKUNGSLUECKE</code></td><td>Deckungsluecke</td></tr>
+<tr><td><code>GLASFASERPLUS</code></td><td>GlasfaserPlus</td></tr>
+<tr><td><code>BETREIBERMODELL</code></td><td>Betreibermodell</td></tr></table>
+<h3>16.4 Enum <code>ValidationRuleKey</code></h3>
+<table><tr><th>Wert</th><th>Beschreibung</th></tr>
+<tr><td><code>DL_PREFIX_RULE</code></td><td>Vorlaeufige DL-Regel</td></tr>
+<tr><td><code>GFP_PREFIX_RULE</code></td><td>Vorlaeufige GFP-Regel</td></tr>
+<tr><td><code>BEMO_10_DIGIT_CONTRACT</code></td><td>BEMO-Regel mit 10 Ziffern</td></tr></table>
+<h2>17. Validierung</h2>
+<h3>17.1 Prozessstatus</h3>
+<table><tr><th>Situation</th><th>Verhalten</th></tr>
+<tr><td>WFMT-Auftrag fehlt</td><td>Dropdown-Eintrag deaktiviert</td></tr>
+<tr><td>WFMT-Auftrag vorhanden</td><td>Dropdown-Eintrag aktiv</td></tr>
+<tr><td>Status nicht lesbar</td><td>Dropdown-Eintrag deaktiviert, technische Meldung</td></tr></table>
+<h3>17.2 Gebietsdaten</h3>
+<table><tr><th>Feld</th><th>Validierung</th></tr>
+<tr><td><code>Ausbautreiber / Gebietstyp</code></td><td>Pflicht, erlaubter Enum-Wert</td></tr>
+<tr><td><code>Gebiets-ID</code></td><td>Pflicht, Regex je Ausbautreiber</td></tr>
+<tr><td><code>Beginn Vorvermarktung</code></td><td>Pflicht, gueltiges Datum</td></tr>
+<tr><td><code>Ende Vorvermarktung</code></td><td>Pflicht, nach oder gleich Beginn Vorvermarktung</td></tr>
+<tr><td><code>Beginn Ausbau</code></td><td>Pflicht, gueltiges Datum</td></tr>
+<tr><td><code>Ende Ausbau</code></td><td>Pflicht, nach oder gleich Beginn Ausbau</td></tr></table>
+<h3>17.3 KLS-BT-Liste</h3>
+<table><tr><th>Regel</th><th>Beschreibung</th></tr>
+<tr><td>KLS nur aus aktueller Bautranche</td><td>Keine KLS aus anderen Bautranchen</td></tr>
+<tr><td>Quelle <code>Pfau</code></td><td>Export kennzeichnet Datenquelle</td></tr>
+<tr><td>Gebiets-ID optional</td><td>Wird uebernommen, wenn gueltig gespeichert</td></tr>
+<tr><td>Keine WE/GE-Pruefung</td><td>Nicht Teil des Use Cases</td></tr></table>
+<h2>18. Fehlerbehandlung</h2>
+<table><tr><th>Fehler</th><th>Ursache</th><th>Verhalten</th></tr>
+<tr><td><code>PROCESS_STATE_UNAVAILABLE</code></td><td>Prozessstatus nicht lesbar</td><td>GBGS-Funktionen deaktivieren, Retry anbieten</td></tr>
+<tr><td><code>WFMT_REQUIRED</code></td><td>WFMT-Auftrag fehlt</td><td>Tooltip/Hinweis anzeigen</td></tr>
+<tr><td><code>AREA_ID_INVALID</code></td><td>Gebiets-ID verletzt Regel</td><td>Feldfehler anzeigen</td></tr>
+<tr><td><code>AREA_DATA_SAVE_FAILED</code></td><td>Persistenzfehler</td><td>Speichern abbrechen, Korrelations-ID anzeigen</td></tr>
+<tr><td><code>KLS_LIST_EMPTY</code></td><td>Keine KLS vorhanden</td><td>Leere Liste mit Hinweis</td></tr>
+<tr><td><code>KLS_SERVICE_UNAVAILABLE</code></td><td>KLS-Service nicht erreichbar</td><td>Fehler und Retry</td></tr>
+<tr><td><code>EXPORT_FAILED</code></td><td>Export konnte nicht erzeugt werden</td><td>Fehler mit Korrelations-ID</td></tr>
+<tr><td><code>PST_HANDOVER_FAILED</code></td><td>PST-Uebergabe fehlgeschlagen</td><td>Export lokal anbieten, Fehler protokollieren</td></tr></table>
+<h2>19. Security, Berechtigungen und Audit</h2>
+<h3>19.1 Berechtigungen</h3>
+<p>- Laden Prozessstatus - Speichern Gebietsdaten - Laden KLS-BT-Liste - Export/Bereitstellung</p>
+<ul><li>Nutzer muss Zugriff auf die Bautranche haben.</li><li>Nutzer muss Prozessaktionen in Pfau ausfuehren duerfen.</li><li>Backend prueft Berechtigung fuer:</li></ul>
+<h3>19.2 Audit</h3>
+<p>Auditpflichtige Aktionen:</p>
+<table><tr><th>Aktion</th><th>Auditdaten</th></tr>
+<tr><td>Gebietsdaten gespeichert</td><td>Nutzer, Bautranche, Gebiets-ID, Zeitpunkt</td></tr>
+<tr><td>Gebiets-ID ungueltig abgelehnt</td><td>Nutzer, Bautranche, Regel, Zeitpunkt</td></tr>
+<tr><td>KLS-BT-Liste exportiert</td><td>Nutzer, Bautranche, Anzahl KLS, Format, Zeitpunkt</td></tr>
+<tr><td>KLS-BT-Liste an PST bereitgestellt</td><td>Nutzer, Bautranche, PST-Referenz, Zeitpunkt</td></tr>
+<tr><td>Fehler bei Export/Uebergabe</td><td>Korrelations-ID, Fehlercode, Zeitpunkt</td></tr></table>
+<h3>19.3 Datenschutz</h3>
+<ul><li>KLS-ID und technische Referenzen duerfen nur im erforderlichen Umfang exportiert werden.</li><li>Optionale Adressspalten sind fachlich zu bestaetigen.</li><li>Personenbezogene Daten werden nicht unnoetig in Auditlogs geschrieben.</li></ul>
+<h2>20. Konfiguration</h2>
+<table><tr><th>Key</th><th>Default</th><th>Beschreibung</th></tr>
+<tr><td><code>pfau.gbgsFunctions.visible</code></td><td><code>true</code></td><td>Schaltet Anzeige des Dropdown-Eintrags</td></tr>
+<tr><td><code>pfau.gbgsFunctions.requireWfmtOrder</code></td><td><code>true</code></td><td>Aktivierung erst nach WFMT-Auftrag</td></tr>
+<tr><td><code>pfau.gbgsFunctions.klsExport.defaultFormat</code></td><td><code>CSV</code></td><td>Default Exportformat</td></tr>
+<tr><td><code>pfau.gbgsFunctions.areaId.rules.dl</code></td><td><code>^DL_.+$</code></td><td>Vorlaeufige DL-Regel</td></tr>
+<tr><td><code>pfau.gbgsFunctions.areaId.rules.gfp</code></td><td><code>^GFP_.+$</code></td><td>Vorlaeufige GFP-Regel</td></tr>
+<tr><td><code>pfau.gbgsFunctions.areaId.rules.bemo</code></td><td><code>^BEMO_[0-9]{10}$</code></td><td>BEMO-Regel</td></tr>
+<tr><td><code>addressReconciliation.leadTimeWorkingDays</code></td><td><code>10</code></td><td>Vorlauf vor VVM-ONGOING</td></tr></table>
+<h2>21. Testkonzept</h2>
+<h3>21.1 Unit Tests</h3>
+<table><tr><th>Testobjekt</th><th>Testfaelle</th></tr>
+<tr><td>Gebiets-ID Validator</td><td>DL/GFP Prefix, BEMO gueltig, BEMO zu kurz, BEMO nicht numerisch</td></tr>
+<tr><td>Prozessstatus Mapping</td><td>WFMT fehlt/vorhanden</td></tr>
+<tr><td>Terminvalidierung</td><td>Ende vor Beginn, gueltige Reihenfolge</td></tr>
+<tr><td>KLS-Mapper</td><td>KLS aus Bautranche in Exportmodell</td></tr></table>
+<h3>21.2 Integrationstests</h3>
+<table><tr><th>Test</th><th>Erwartung</th></tr>
+<tr><td>Prozessstatus API mit WFMT fehlt</td><td><code>gbgsFunctionsEnabled=false</code></td></tr>
+<tr><td>Prozessstatus API mit WFMT vorhanden</td><td><code>gbgsFunctionsEnabled=true</code></td></tr>
+<tr><td>Gebietsdaten speichern mit gueltigem BEMO</td><td>Erfolg</td></tr>
+<tr><td>Gebietsdaten speichern mit ungueltigem BEMO</td><td>Fehler</td></tr>
+<tr><td>KLS-BT-Liste laden</td><td>nur KLS der Bautranche</td></tr>
+<tr><td>Export CSV</td><td>Datei erzeugt</td></tr></table>
+<h3>21.3 E2E Tests</h3>
+<table><tr><th>Test</th><th>Erwartung</th></tr>
+<tr><td>Ohne WFMT-Auftrag</td><td><code>GBGS-Funktionen</code> grau/deaktiviert</td></tr>
+<tr><td>Nach WFMT-Auftrag</td><td><code>GBGS-Funktionen</code> aktiv</td></tr>
+<tr><td>Gebietsdaten erfassen BEMO</td><td>Speichern erfolgreich</td></tr>
+<tr><td>Gebietsdaten erfassen falsche BEMO-ID</td><td>Feldfehler</td></tr>
+<tr><td>Ausbautreiber wechseln</td><td>Regelhinweis wechselt</td></tr>
+<tr><td>KLS-BT-Liste anzeigen</td><td>KLS-Tabelle sichtbar</td></tr>
+<tr><td>Alter Button</td><td>nicht vorhanden</td></tr></table>
+<h3>21.4 Regressionstests</h3>
+<ul><li>Bestehender Prozess <code>WFMT-Auftrag</code> bleibt unveraendert.</li><li>Adresstabelle bleibt nutzbar.</li><li>Kommentare bleiben nutzbar.</li><li>Bestehende Navigation in Bautranchensicht bleibt unveraendert.</li></ul>
+<h2>22. Jira-Tickets und Arbeitspakete</h2>
+<h3>PFAU-GBGS-201: Prozess-Dropdown um <code>GBGS-Funktionen</code> erweitern</h3>
+<p>Komponente: Pfau Frontend</p>
+<p>Beschreibung: Der Prozess-Dropdown in der Bautranchensicht wird um den Eintrag <code>GBGS-Funktionen</code> unterhalb von <code>WFMT-Auftrag</code> erweitert.</p>
+<p>Akzeptanzkriterien:</p>
+<ul><li>Eintrag wird unterhalb <code>WFMT-Auftrag</code> angezeigt.</li><li>Eintrag ist sichtbar, aber deaktiviert, wenn WFMT-Auftrag fehlt.</li><li>Eintrag ist aktiv, wenn WFMT-Auftrag erzeugt wurde.</li><li>Alter Button <code>GBGS-Features</code> ist nicht sichtbar.</li><li>Tooltip fuer deaktivierten Zustand ist vorhanden oder fachlich bewusst weggelassen.</li></ul>
+<h3>PFAU-GBGS-202: Prozessstatus-API fuer WFMT-Abhaengigkeit bereitstellen</h3>
+<p>Komponente: Pfau Backend</p>
+<p>Beschreibung: Backend liefert den Status fuer die Aktivierung von <code>GBGS-Funktionen</code>.</p>
+<p>Akzeptanzkriterien:</p>
+<ul><li>API liefert <code>wfmtOrderCreated</code>.</li><li>API liefert <code>gbgsFunctionsVisible</code>.</li><li>API liefert <code>gbgsFunctionsEnabled</code>.</li><li>API liefert optional <code>disabledReason</code>.</li><li>Berechtigungen werden serverseitig geprueft.</li></ul>
+<h3>PFAU-GBGS-203: Dialog <code>GBGS-Funktionen</code> erstellen</h3>
+<p>Komponente: Pfau Frontend</p>
+<p>Beschreibung: Nach Auswahl des Dropdown-Eintrags oeffnet sich ein Dialog mit den zwei Teilfunktionen.</p>
+<p>Akzeptanzkriterien:</p>
+<ul><li>Dialog startet aus Prozess-Dropdown.</li><li>Dialog zeigt <code>Gebietsdaten fuer Adressabgleich erfassen</code>.</li><li>Dialog zeigt <code>KLS-BT-Liste fuer PST vorschlagen</code>.</li><li>Dialog folgt aktuellem Pfau-Design.</li><li>Dialog ist per Tastatur bedienbar.</li></ul>
+<h3>PFAU-GBGS-204: Gebietsdaten-Wizard fachlich reduzieren</h3>
+<p>Komponente: Pfau Frontend</p>
+<p>Beschreibung: Der bisherige GBGS-Wizard wird auf die fuer den Adressabgleich relevanten Felder reduziert.</p>
+<p>Akzeptanzkriterien:</p>
+<ul><li>Nicht benoetigte Felder werden nicht angezeigt.</li><li>Schritte <code>Partner</code> und <code>Import</code> entfallen.</li><li>Ausbautreiber, Gebiets-ID und Termine werden angezeigt.</li><li>Pflichtfelder sind markiert.</li><li>Fehler werden feldnah angezeigt.</li></ul>
+<h3>PFAU-GBGS-205: Kontext-sensitive Gebiets-ID-Hilfe implementieren</h3>
+<p>Komponente: Pfau Frontend</p>
+<p>Beschreibung: Die UI zeigt je Ausbautreiber die passende Bildungsregel.</p>
+<p>Akzeptanzkriterien:</p>
+<ul><li>Deckungsluecke zeigt DL-Hinweis.</li><li>GlasfaserPlus zeigt GFP-Hinweis.</li><li>Betreibermodell zeigt BEMO-Hinweis.</li><li>BEMO-Beispiel <code>BEMO_1312200021</code> ist sichtbar.</li><li>BEMO-Segmente werden visuell getrennt erklaert.</li></ul>
+<h3>PFAU-GBGS-206: Backend-Validator fuer Gebiets-ID bereitstellen</h3>
+<p>Komponente: Pfau Backend</p>
+<p>Beschreibung: Backend validiert Gebiets-ID fuehrend nach Ausbautreiber.</p>
+<p>Akzeptanzkriterien:</p>
+<ul><li>Endpoint <code>/area-id/validate</code> ist vorhanden.</li><li>BEMO Regex <code>^BEMO_[0-9]{10}$</code> wird validiert.</li><li>DL/GFP Regeln sind konfigurierbar.</li><li>Fehlercodes sind eindeutig.</li><li>Unit Tests sind vorhanden.</li></ul>
+<h3>PFAU-GBGS-207: Reduzierte Gebietsdaten speichern und laden</h3>
+<p>Komponente: Pfau Backend / Persistence</p>
+<p>Beschreibung: Reduzierte Gebietsdaten werden je Bautranche gespeichert und wieder geladen.</p>
+<p>Akzeptanzkriterien:</p>
+<ul><li>Save Endpoint ist vorhanden.</li><li>Load Endpoint ist vorhanden.</li><li>Daten werden auditierbar gespeichert.</li><li>Bestehende Bautranchen ohne Daten bleiben kompatibel.</li><li>Updates ueberschreiben kontrolliert oder versioniert.</li></ul>
+<h3>PFAU-GBGS-208: KLS-BT-Listen-Wizard erstellen</h3>
+<p>Komponente: Pfau Frontend</p>
+<p>Beschreibung: Der bisherige VVM-Importlisten-Wizard wird fachlich und textlich in einen KLS-BT-Listen-Wizard geaendert.</p>
+<p>Akzeptanzkriterien:</p>
+<ul><li>Titel spricht von KLS-BT-Liste, nicht finaler VVM-Liste.</li><li>WE-/GE-Pruefung entfaellt.</li><li>Tabelle zeigt KLS aus Bautranche.</li><li>Aktion heisst <code>KLS-BT-Liste exportieren</code> oder <code>KLS-BT-Liste fuer PST bereitstellen</code>.</li><li>Hinweis auf PST-Verantwortung ist sichtbar.</li></ul>
+<h3>PFAU-GBGS-209: KLS-BT-Liste aus Bautranche bereitstellen</h3>
+<p>Komponente: Pfau Backend</p>
+<p>Beschreibung: Backend liefert die KLS der aktuellen Bautranche fuer den Wizard.</p>
+<p>Akzeptanzkriterien:</p>
+<ul><li>API liefert alle KLS der Bautranche.</li><li>Keine KLS aus anderen Bautranchen enthalten.</li><li>Mindestspalten werden bereitgestellt.</li><li>Leere Liste wird sauber behandelt.</li><li>Integrationstest vorhanden.</li></ul>
+<h3>PFAU-GBGS-210: Export der KLS-BT-Liste implementieren</h3>
+<p>Komponente: Pfau Backend / Frontend</p>
+<p>Beschreibung: Nutzer kann KLS-BT-Liste exportieren.</p>
+<p>Akzeptanzkriterien:</p>
+<ul><li>CSV Export funktioniert.</li><li>Dateiname enthaelt Bautranche.</li><li>Export wird auditierbar protokolliert.</li><li>Fehlerfall wird mit Korrelations-ID angezeigt.</li></ul>
+<h3>PFAU-GBGS-211: PST-Uebergabekonzept abstimmen</h3>
+<p>Komponente: Integration / Fachkonzept</p>
+<p>Beschreibung: Klaerung, ob KLS-BT-Liste nur exportiert oder direkt an PST uebergeben wird.</p>
+<p>Akzeptanzkriterien:</p>
+<ul><li>Zielbild fuer PST-Uebergabe dokumentiert.</li><li>Dateiformat oder Schnittstelle entschieden.</li><li>Verantwortlichkeit fuer echte Liste 1 bei PST dokumentiert.</li><li>Fehler- und Rueckmeldeprozess beschrieben.</li></ul>
+<h3>PFAU-GBGS-212: Adressabgleich-Vorlauf vor VVM-ONGOING konzeptionell anbinden</h3>
+<p>Komponente: Prozess / Backend</p>
+<p>Beschreibung: Die bereits definierte Anforderung <code>10 AT vor VVM-ONGOING</code> wird in das Zielbild eingebunden.</p>
+<p>Akzeptanzkriterien:</p>
+<ul><li>Verantwortliches System fuer harte Blockade ist entschieden.</li><li>Konfigurationskey fuer Vorlauf ist dokumentiert.</li><li>Berechnung der Arbeitstage ist beschrieben.</li><li>Abhaengigkeit zu Pfau-Gebietsdaten ist dokumentiert.</li></ul>
+<h3>PFAU-GBGS-213: Regression und E2E-Tests</h3>
+<p>Komponente: QA / Test Automation</p>
+<p>Beschreibung: Automatisierte Tests sichern den Gesamtprozess.</p>
+<p>Akzeptanzkriterien:</p>
+<ul><li>Test fuer deaktiviertes <code>GBGS-Funktionen</code>.</li><li>Test fuer aktives <code>GBGS-Funktionen</code>.</li><li>Test fuer BEMO-ID gueltig/ungueltig.</li><li>Test fuer Regelwechsel DL/GFP/BEMO.</li><li>Test fuer KLS-BT-Liste.</li><li>Test, dass alter Button nicht mehr erscheint.</li></ul>
+<h2>23. Betrieb und Monitoring</h2>
+<p>Zu monitorende Kennzahlen:</p>
+<table><tr><th>Kennzahl</th><th>Zweck</th></tr>
+<tr><td>Anzahl Aufrufe <code>GBGS-Funktionen</code></td><td>Nutzung messen</td></tr>
+<tr><td>Anzahl gespeicherter Gebietsdaten</td><td>Prozessfortschritt</td></tr>
+<tr><td>Anzahl ungueltiger Gebiets-IDs</td><td>Datenqualitaet</td></tr>
+<tr><td>Anzahl KLS-BT-Exporte</td><td>PST-Vorbereitung</td></tr>
+<tr><td>Fehlerquote KLS-Service</td><td>Stabilitaet</td></tr>
+<tr><td>Fehlerquote Export/PST-Uebergabe</td><td>Integrationsqualitaet</td></tr></table>
+<p>Logging:</p>
+<ul><li>Technische Fehler mit Korrelations-ID.</li><li>Fachliche Ablehnungen mit Fehlercode.</li><li>Keine unnoetigen personenbezogenen Daten in Logs.</li></ul>
+<h2>24. Risiken und Massnahmen</h2>
+<table><tr><th>Risiko</th><th>Auswirkung</th><th>Massnahme</th></tr>
+<tr><td>DL/GFP Bildungsregeln nicht final</td><td>Validierung nur vorlaeufig</td><td>Offene Klaerung als Muss vor finalem Go-live</td></tr>
+<tr><td>PST-Schnittstelle unklar</td><td>Export muss spaeter angepasst werden</td><td>PST-Uebergabekonzept als eigenes Ticket</td></tr>
+<tr><td>WFMT-Status uneindeutig</td><td>Falsche Aktivierung</td><td>Eindeutige Backend-Statusquelle festlegen</td></tr>
+<tr><td>Nutzer erwartet echte Liste 1</td><td>Prozessmissverstaendnis</td><td>UI-Texte klar auf KLS-BT-Liste fuer PST ausrichten</td></tr>
+<tr><td>Frontend-only Validierung reicht nicht</td><td>Ungueltige Daten moeglich</td><td>Backend-Validator verpflichtend</td></tr>
+<tr><td>VVM-Blockade-System unklar</td><td>Regel nicht durchsetzbar</td><td>Verantwortliches System fuer harte Blockade entscheiden</td></tr></table>
+<h2>25. Offene Klaerungen</h2>
+<ul><li>Exakte Bildungsregel fuer <code>Deckungsluecke</code>.</li><li>Exakte Bildungsregel fuer <code>GlasfaserPlus</code>.</li><li>Soll der KLS-BT-Listenvorschlag nur exportiert oder direkt an PST uebergeben werden?</li><li>Welches Ziel-Datenformat erwartet PST?</li><li>Welches System setzt die harte Blockade vor <code>VVM-ONGOING</code> technisch durch?</li><li>Soll die Aktivierung von <code>GBGS-Funktionen</code> nur an WFMT-Auftrag gekoppelt sein oder zusaetzlich an weitere Prozessstatus?</li><li>Welche Rollen duerfen <code>GBGS-Funktionen</code> nutzen?</li><li>Soll der Adressabgleich automatisch nach Speicherung der Gebietsdaten gestartet werden oder manuell?</li><li>Sind optionale Adressspalten im KLS-BT-Export erlaubt?</li></ul>
+<h2>26. Entscheidungslog</h2>
+<table><tr><th>Datum</th><th>Entscheidung</th></tr>
+<tr><td>2026-06-15</td><td>Kein separater Button; Einstieg ueber Prozess-Dropdown <code>GBGS-Funktionen</code></td></tr>
+<tr><td>2026-06-15</td><td><code>GBGS-Funktionen</code> erst aktiv nach erzeugtem WFMT-Auftrag</td></tr>
+<tr><td>2026-06-15</td><td>Gebietsdaten-Wizard wird auf fuer Adressabgleich relevante Felder reduziert</td></tr>
+<tr><td>2026-06-15</td><td>Pfau erzeugt keine echte <code>Liste 1</code>; PST bleibt dafuer verantwortlich</td></tr>
+<tr><td>2026-06-15</td><td>Pfau stellt nur KLS-BT-Listenvorschlag bereit</td></tr>
+<tr><td>2026-06-15</td><td>Gebiets-ID-Bildungsregeln werden kontextsensitiv nach Ausbautreiber angezeigt</td></tr></table>
+</main>
+<script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+mermaid.initialize({startOnLoad:true,theme:"default",securityLevel:"strict"});
+</script>
+</body>
+</html>
