@@ -227,6 +227,16 @@ h1 {
   color: var(--blue);
 }
 
+.edit-tranche-button {
+  min-height: 34px;
+  padding: 0 13px;
+  color: var(--blue);
+  background: white;
+  border: 1px solid var(--blue);
+  border-radius: 5px;
+  cursor: pointer;
+}
+
 .wfmt-status {
   padding: 9px 16px;
   color: #735100;
@@ -277,6 +287,45 @@ h1 {
   margin: 0;
   padding: 13px 10px;
   font-size: 18px;
+}
+
+.kls-warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0 10px 12px;
+  padding: 12px 14px;
+  color: #733700;
+  background: #fff3d7;
+  border: 1px solid #f2b84b;
+  border-radius: 6px;
+}
+
+.kls-warning > span {
+  width: 20px;
+  height: 20px;
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 20px;
+  color: #9a4d00;
+  border: 1px solid #c56f00;
+  border-radius: 50%;
+  font-weight: 700;
+}
+
+.kls-warning p {
+  margin: 5px 0 0;
+  line-height: 1.35;
+}
+
+.kls-warning button {
+  padding: 0;
+  color: var(--blue);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  font-weight: 700;
+  text-decoration: underline;
 }
 
 .filter-row {
@@ -374,6 +423,22 @@ h1 {
 .address-table a {
   color: var(--blue);
   text-decoration: none;
+}
+
+.missing-kls-row td {
+  background: #fff8e8;
+}
+
+.missing-kls {
+  display: inline-flex;
+  min-height: 22px;
+  align-items: center;
+  padding: 0 8px;
+  color: #9a3412;
+  background: #ffedd5;
+  border: 1px solid #fdba74;
+  border-radius: 4px;
+  font-weight: 700;
 }
 
 .pager {

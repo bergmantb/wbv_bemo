@@ -2,6 +2,7 @@ const processToggle = document.querySelector("[data-process-toggle]");
 const processMenu = document.querySelector("[data-process-menu]");
 const createWfmtButton = document.querySelector("[data-create-wfmt]");
 const openGbgsButton = document.querySelector("[data-open-gbgs]");
+const editTrancheButtons = document.querySelectorAll("[data-edit-tranche]");
 const wfmtStatus = document.querySelector("[data-wfmt-status]");
 const choiceBackdrop = document.querySelector("[data-choice-backdrop]");
 const areaBackdrop = document.querySelector("[data-area-backdrop]");
@@ -154,6 +155,12 @@ document.querySelector("[data-kls-export]").addEventListener("click", (event) =>
   event.currentTarget.textContent = "KLS-BT-Liste exportiert";
   event.currentTarget.disabled = true;
   showToast("KLS-BT-Liste wurde fuer PST vorbereitet.");
+});
+
+editTrancheButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    showToast("Bautranche bearbeiten: Hier kann die fehlende KLS-ID zur Adresse gepflegt werden.");
+  });
 });
 
 document.addEventListener("keydown", (event) => {

@@ -47,7 +47,7 @@
               <button class="disabled" type="button" data-open-gbgs disabled title="GBGS-Funktionen sind erst verfuegbar, nachdem der WFMT-Auftrag erzeugt wurde.">GBGS-Funktionen</button>
             </div>
           </div>
-          <button class="link-button" type="button">Bearbeiten</button>
+          <button class="edit-tranche-button" type="button" data-edit-tranche>Bautranche bearbeiten</button>
         </div>
       </header>
 
@@ -64,6 +64,13 @@
       <section class="content-grid">
         <section class="address-panel" aria-label="Adressen">
           <h2>Adressen</h2>
+          <div class="kls-warning" role="alert">
+            <span aria-hidden="true">!</span>
+            <div>
+              <strong>In dieser Bautranche gibt es Adressen ohne KLS-ID.</strong>
+              <p>Fuer die GBGS-Funktionen muss jede Adresse eine KLS-ID besitzen. Fuegen Sie die fehlende KLS-ID ueber <button type="button" data-edit-tranche>Bautranche bearbeiten</button> hinzu.</p>
+            </div>
+          </div>
           <div class="filter-row">
             <strong>Filter:</strong>
             <span class="filter-chip"><b>Id =</b> bitte eingeben <button type="button" aria-label="Filter Id entfernen">×</button></span>
@@ -122,6 +129,19 @@
                   <td>Berg</td>
                   <td><a href="#">Bearbeiten</a></td>
                 </tr>
+                <tr class="missing-kls-row">
+                  <td><input type="checkbox" aria-label="Adresse 441130 auswaehlen"></td>
+                  <td>441130</td>
+                  <td>829</td>
+                  <td><span class="missing-kls">fehlt</span></td>
+                  <td>DEBWhk01000dbm3</td>
+                  <td>Birkenweg</td>
+                  <td>14</td>
+                  <td></td>
+                  <td>88276</td>
+                  <td>Berg</td>
+                  <td><a href="#">Bearbeiten</a></td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -129,7 +149,7 @@
           <footer class="pager" aria-label="Seitennavigation">
             <button type="button" disabled>‹‹</button>
             <button type="button" disabled>‹</button>
-            <span>1 - 2 / 2</span>
+            <span>1 - 3 / 3</span>
             <button type="button">20 pro Seite <span aria-hidden="true">⌄</span></button>
             <button type="button" disabled>›</button>
             <button type="button" disabled>››</button>
