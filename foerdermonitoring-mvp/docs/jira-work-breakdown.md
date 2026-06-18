@@ -1,55 +1,174 @@
-# Jira Work-Break-Down: E2E-Fördermonitoring MVP
+# Jira Work-Break-Down: Fördermonitoring MVP1 und MVP2
 
-## Epic 1: Datenfundament und Quellintegration
+## Epic 1: MVP1 Datenfundament PFAU/WFS
 
-Ziel: belastbare Datenbasis für Vertrag, Los, Bautranche, Adresse und Monatsscheiben schaffen.
+Ziel: automatisierte Datenbasis für den E2E Report Förderung aus PFAU und WFS schaffen.
 
-### Story 1.1: Quellsystem-Mapping PFau, GBGS und Vertragsdaten
-
-Als Fachbereich möchte ich je Attribut wissen, aus welchem System und welchem Datenobjekt es kommt, damit die IT Schnittstellen und Verantwortlichkeiten sauber schätzen kann.
+### Story 1.1: PFAU Angebots- und Losberechnungsdaten anbinden
 
 Akzeptanzkriterien:
 
-- Mapping enthält mindestens PFau, GBGS, vertragshaltende Systeme, ZRP/Bewilligung und Finanzdatenquelle.
-- Für jedes MVP-Attribut sind Quelle, Schlüssel, Aktualisierungsfrequenz und fachlicher Owner dokumentiert.
-- Fehlende Mappings sind als offene Punkte mit Klärverantwortung markiert.
+- Angebotsnummer, Projekt-/Angebotsbezeichnung, Losberechnung, Landkreis, Region, Mandant, Förderprogramm und HHUSto werden importiert.
+- PFAU-Angebotsebene und Losberechnungsebene sind getrennt verfügbar.
+- Datensatz enthält Quelle, Ladezeitpunkt und Reporting-Stichtag.
 
-### Story 1.2: Einheitliches Dimensionsmodell
-
-Als Nutzer möchte ich Daten nach Ausbautreiber, Vertrag, Los, Bautranche, GKS, Förderprogramm und Monat auswerten.
+### Story 1.2: WFS-Altfälle berücksichtigen
 
 Akzeptanzkriterien:
 
-- Dimensionen Vertrag, Los und Bautranche sind eindeutig modelliert.
-- Eine Bautranche ist genau einem Los zugeordnet.
-- Ein Los ist genau einem Hauptvertrag zugeordnet.
-- Filterlogik funktioniert konsistent über alle Reports.
+- WFS-Projekte mit Win/Loss-Status fließen in MVP1-Auswertungen ein.
+- WFS-Daten sind als Altsystemquelle gekennzeichnet.
+- Dublettenlogik zwischen WFS und PFAU ist dokumentiert.
 
-### Story 1.3: Historisierung und Stichtagslogik
-
-Als Management möchte ich Abweichungen im Zeitverlauf nachvollziehen.
+### Story 1.3: Förderaufruf und Wettbewerberfeld vorbereiten
 
 Akzeptanzkriterien:
 
-- Datenstände sind mit Stichtag und Ladezeitpunkt historisiert.
-- Monatsvergleiche können reproduziert werden.
-- Dashboard zeigt den aktuellen Stichtag sichtbar an.
+- Datenmodell enthält Felder für Förderaufruf und Wettbewerbername bei Loss.
+- Fehlende Werte werden als "noch nicht in PFAU verfügbar" markiert.
+- Rückbefüllungsbedarf wird als Datenqualitätsregel sichtbar.
 
-## Epic 2: Vertrags- und Adress-Sollmengen
+## Epic 2: MVP1 Win/Loss-Logik und Kennzahlen
+
+Ziel: fachlich stabile Win/Loss- und WinRate-Berechnung auf HHUSto-Basis.
+
+### Story 2.1: PFAU-Statusmapping auf Win/Loss definieren
+
+Akzeptanzkriterien:
+
+- Statuswerte werden mindestens auf Win, Loss, Offen, Keine Teilnahme, Ausschluss und Zurückgezogen gemappt.
+- Statusmapping ist fachlich dokumentiert und versioniert.
+- Mapping kann um BE-FIBER-800-Status erweitert werden.
+
+### Story 2.2: Entscheidungsdatum berechnen
+
+Akzeptanzkriterien:
+
+- Entscheidungsdatum ist das früheste Datum aller relevanten Win-/Loss-Statusmeldungen.
+- Spätere rechtsverbindliche Zuschläge überschreiben das frühere Entscheidungsdatum nicht.
+- Historische YTD-Auswertungen bleiben reproduzierbar.
+
+### Story 2.3: WinRate und Infrashare berechnen
+
+Akzeptanzkriterien:
+
+- WinRate = gewonnene HHUSto / (gewonnene HHUSto + verlorene HHUSto).
+- WinRate wird nicht auf Basis der Anzahl Projekte oder Lose berechnet.
+- Infrashare wird als gewonnene HHUSto / ausgeschriebene HHUSto im betrachteten Markt oder Zeitraum berechnet.
+
+## Epic 3: MVP1 Report Views
+
+Ziel: die MVP1-Sichten des NGFC/Control-Tower-Reportings bereitstellen.
+
+### Story 3.1: Gesamtübersicht Win/Loss
+
+Akzeptanzkriterien:
+
+- View zeigt gewonnene HHUSto YTD, verlorene HHUSto YTD, WinRate YTD und Projektanzahl als Hinweisgröße.
+- Filter: Region, Mandant, Förderprogramm, Förderaufruf, Zeitraum.
+- Aggregation: Bund und Region.
+
+### Story 3.2: Monatliche Entwicklung
+
+Akzeptanzkriterien:
+
+- View zeigt HHUSto Wins, HHUSto Losses und monatliche WinRate je Monat.
+- Standardansicht ist YTD.
+- Filter aus Story 3.1 wirken konsistent.
+
+### Story 3.3: Projektdetails Win/Loss
+
+Akzeptanzkriterien:
+
+- View zeigt Top 10 Wins und Flop 10 Losses sortiert nach HHUSto.
+- Attribute: Angebotsnummer, Projekt, Landkreis, Region, Mandant, Förderprogramm, Förderaufruf, HHUSto.
+- Bei Loss wird Wettbewerbername angezeigt, sobald verfügbar.
+
+### Story 3.4: Angebote kurz vor Angebotsabgabe
+
+Akzeptanzkriterien:
+
+- View zeigt Angebote sortiert nach nächstem Abgabedatum.
+- Attribute: Angebotsnummer, Bezeichnung, Landkreis, Region, Mandant, Win-Chance, HHUSto, Abgabedatum, Iteration.
+- Gesamtlose und Einzellose werden so behandelt, dass HHUSto nicht doppelt gezählt werden.
+
+## Epic 4: MVP1 Funnel, Forecast und Competitive Intelligence
+
+Ziel: Subsidy Bid Control Tower Sichten über den reinen Win/Loss-Report hinaus bereitstellen.
+
+### Story 4.1: Funnel View
+
+Akzeptanzkriterien:
+
+- Status von Branchendialog, MEV, TNA, Angebotsrunden, Reklamation, Win und Loss werden abgebildet.
+- View zeigt Projektanzahl, HHUSto und Brutto-CAPEX je Status.
+- Statusoutput entspricht der transformierten BidDatabase-Logik.
+
+### Story 4.2: Forecast View
+
+Akzeptanzkriterien:
+
+- Offene HHUSto werden nach Win-Wahrscheinlichkeit gruppiert.
+- Win, Loss und keine Teilnahme sind aus dem Forecast ausgeschlossen.
+- View unterstützt Regionen und Bund.
+
+### Story 4.3: Wettbewerber Views
+
+Akzeptanzkriterien:
+
+- Größte Wettbewerber je Region werden nach verlorenen HHUSto ausgewiesen.
+- Wettbewerberdetail zeigt vergangene Loss-Projekte und Angebotscharakteristika.
+- Fehlende Wettbewerberdaten werden sichtbar markiert.
+
+### Story 4.4: MBfD Management View
+
+Akzeptanzkriterien:
+
+- View zeigt Füllstand für CAPEX und HHUSto.
+- CPH wird gegen Planvorgabe bzw. ZBTC/Forecast verglichen.
+- Infrashare, Tiefbau, Brutto-CAPEX und Cash-In werden als Management-KPIs vorbereitet.
+
+## Epic 5: Gemeinsames Datenmodell MVP1/MVP2
+
+Ziel: durchgängige Dimensionen von Vergabe bis Umsetzung schaffen.
+
+### Story 5.1: Förderprojekt, Angebot, Los und Loskombination modellieren
+
+Akzeptanzkriterien:
+
+- Angebot und Los sind als n:m-Beziehung modellierbar.
+- Gesamtlose, Einzellose und vordefinierte Loskombinationen werden unterstützt.
+- Zuschläge können auf Los-, Bündel- oder Projektebene abgebildet werden.
+
+### Story 5.2: Übergang von Win zu Vertrag modellieren
+
+Akzeptanzkriterien:
+
+- Gewonnene Lose können mit Vertrag, Betreibervertrag oder Zuwendungsvertrag verbunden werden.
+- MVP2-Objekte Vertrag, Los und Bautranche referenzieren MVP1-Förderprojekt und Zuschlag.
+- Altfälle ohne vollständige Referenz werden als Datenqualitätsfälle ausgewiesen.
+
+### Story 5.3: Überschneidungs- und Konfliktregeln dokumentieren
+
+Akzeptanzkriterien:
+
+- Projektanzahl ist nur Hinweisgröße und geht nicht in WinRate ein.
+- HHUSto/Adressmengen werden nach Prozessphase semantisch getrennt.
+- Cash-In in MVP1 ist Managementindikator, in MVP2 detaillierter Forecast-Datenquader.
+
+## Epic 6: MVP2 Vertrags- und Adress-Sollmengen
 
 Ziel: vertragliche Sollmengen und Vertragsstammdaten als Basis der Abrechenbarkeit bereitstellen.
 
-### Story 2.1: Import Vertragsstruktur Vertrag, Los, Bautranche
+### Story 6.1: Vertragsstruktur Vertrag, Los, Bautranche importieren
 
 Akzeptanzkriterien:
 
-- Hauptvertrag, Los und Bautranche werden aus PFau bzw. Vertragsdatenquelle importiert.
+- Hauptvertrag, Los und Bautranche werden aus PFAU bzw. Vertragsdatenquelle importiert.
 - Summe der Bautranchen-Adressen je Los wird gegen die Vertragsadressliste geprüft.
 - Inkonsistenzen erzeugen Abweichungseinträge.
 
-### Story 2.2: P1-Sollmengen TDG/GFPlus HP/BP/HC
-
-Bezug: Excel `AZ-BB`.
+### Story 6.2: Sollmengen TDG/GFPlus HP/BP/HC
 
 Akzeptanzkriterien:
 
@@ -57,9 +176,7 @@ Akzeptanzkriterien:
 - Werte sind nach Quelle und Stand nachvollziehbar.
 - Dashboard zeigt Sollmengen neben Istmengen aus GBGS.
 
-### Story 2.3: Vertragsstammdaten und Vertragspreise
-
-Bezug: Excel `BC-BH`.
+### Story 6.3: Vertragsstammdaten und Vertragspreise
 
 Akzeptanzkriterien:
 
@@ -67,13 +184,11 @@ Akzeptanzkriterien:
 - Vertragsdaten sind filterbar und exportierbar.
 - Fehlende Werte werden als Datenqualitäts-Hinweis markiert.
 
-## Epic 3: Rollout-Monitoring HP/BP/HC
+## Epic 7: MVP2 Rollout, PFau-vs-GBGS und Abweichungen
 
-Ziel: geplanter und gebauter Rollout auf Monatsscheiben darstellen.
+Ziel: geplanter und gebauter Rollout auf Monatsscheiben darstellen und abrechenbare Adressen nachweisen.
 
-### Story 3.1: Monatsscheibenmodell für HP/BP/HC
-
-Bezug: Excel `BL-IX`.
+### Story 7.1: Monatsscheibenmodell für HP/BP/HC
 
 Akzeptanzkriterien:
 
@@ -81,9 +196,7 @@ Akzeptanzkriterien:
 - Das Datenmodell unterstützt Plan, Forecast und Ist.
 - Summen je Jahr und Gesamt werden automatisch berechnet.
 
-### Story 3.2: GBGS-Istmengen und Meilensteine
-
-Bezug: Excel `BF-BH`, `IY-JI`.
+### Story 7.2: GBGS-Istmengen und Meilensteine
 
 Akzeptanzkriterien:
 
@@ -91,19 +204,7 @@ Akzeptanzkriterien:
 - Meilensteine L2.9 bis L4.9 werden angezeigt.
 - Tiefbaumeter und Ausbauparameter werden als Ist-/Statusdaten dargestellt.
 
-### Story 3.3: Rollout-Dashboard
-
-Akzeptanzkriterien:
-
-- Dashboard zeigt Soll/Ist/Forecast je Monat.
-- Nutzer können zwischen HP, BP und HC umschalten.
-- Kritische Abweichungen werden visuell hervorgehoben.
-
-## Epic 4: PFau-vs-GBGS-Abgleich und Abweichungsprozess
-
-Ziel: Abrechenbarkeit der Adressen fachlich nachweisen.
-
-### Story 4.1: Abgleich Vertragsadressbestand gegen gebaute Adressen
+### Story 7.3: PFau-vs-GBGS-Abgleich
 
 Akzeptanzkriterien:
 
@@ -111,7 +212,7 @@ Akzeptanzkriterien:
 - Nur tatsächlich gebaute und zuordenbare Adressen werden als abrechenbar markiert.
 - Nicht zuordenbare, offene oder überschüssige Adressen werden kategorisiert.
 
-### Story 4.2: Abweichungsmonitor
+### Story 7.4: Abweichungsmonitor
 
 Akzeptanzkriterien:
 
@@ -119,21 +220,11 @@ Akzeptanzkriterien:
 - Nutzer können von KPI oder Tabelle in die Abweichungsliste drillen.
 - Statuswerte mindestens: Neu, In Klärung, Zur Korrektur, Erledigt, Blockiert.
 
-### Story 4.3: Fachlicher Bereinigungsworkflow
+## Epic 8: MVP2 Cash-In und Fördermittelabruf
 
-Akzeptanzkriterien:
+Ziel: Mittelzufluss, Abrechnungskreise und Fördermittelabruf steuerbar machen.
 
-- Abweichung kann kommentiert und einem Owner zugewiesen werden.
-- Fälligkeiten und nächste Schritte sind sichtbar.
-- Historie zeigt Änderungen an Status und Kommentar.
-
-## Epic 5: Cash-In Forecast
-
-Ziel: Mengen- und Zahlungsprognose für Mittelzufluss steuerbar machen.
-
-### Story 5.1: Abrechnungskreis GFPlus/JV
-
-Bezug: Excel `JL-JO`.
+### Story 8.1: Cash-In GFPlus/JV
 
 Akzeptanzkriterien:
 
@@ -141,9 +232,7 @@ Akzeptanzkriterien:
 - Darstellung erfolgt nach Monat, Vertrag, Los und GKS.
 - Werte sind gegen abrechenbare Adressen plausibilisiert.
 
-### Story 5.2: Abrechnungskreis Deckungslückenmodell
-
-Bezug: Excel `JP-JT` und Forecast-Monatsscheiben.
+### Story 8.2: Cash-In Deckungslückenmodell
 
 Akzeptanzkriterien:
 
@@ -151,108 +240,48 @@ Akzeptanzkriterien:
 - Forecast kann getrennt von GFPlus gefiltert und analysiert werden.
 - Offene Beträge werden je Monat ausgewiesen.
 
-### Story 5.3: Cash-In Gesamtsicht
-
-Akzeptanzkriterien:
-
-- Summensicht kombiniert GFPlus/JV und Deckungslückenmodell.
-- Dashboard zeigt Ist, Forecast, Jahresziel und Gap.
-- Nutzer können vom Gesamtbetrag auf Abrechnungskreis und Los drillen.
-
-## Epic 6: Fördermittelabruf gemäß Bewilligung
-
-Ziel: Zahlungs- und Realisierungspläne mit Abruf und Auszahlung vergleichen.
-
-### Story 6.1: ZRP-/Bewilligungsdaten importieren
-
-Bezug: Excel `MH-MV`.
+### Story 8.3: Fördermittelabruf gemäß Bewilligung
 
 Akzeptanzkriterien:
 
 - Aktueller ZRP ist nach Jahr, GKS und Fördermittelart verfügbar.
 - Bundes-, Landes-, kommunaler und EU-Anteil werden separat geführt.
-- Gesamtwerte werden automatisch summiert.
+- Dashboard zeigt geplante, abgerufene, ausgezahlte und offene Mittel.
 
-### Story 6.2: P1 Bundesfördermittel und kommunaler Eigenanteil
+## Epic 9: UX, Rollen und Betrieb
 
-Bezug: Excel `MN`, `MU`.
+Ziel: beide MVP-Stufen in einer bedienbaren Oberfläche zusammenführen.
 
-Akzeptanzkriterien:
-
-- Bundesfördermittel und kommunaler Eigenanteil sind im MVP enthalten.
-- Abweichungen zwischen geplant, abgerufen und ausgezahlt werden angezeigt.
-- Dashboard zeigt offene Mittel je GKS und Jahr.
-
-### Story 6.3: Fördermittel-Dashboard
+### Story 9.1: MVP-Umschalter und integrierte Navigation
 
 Akzeptanzkriterien:
 
-- Nutzer sehen geplante, abgerufene, ausgezahlte und offene Mittel.
-- Drilldown nach Fördermittelart, Jahr, GKS und Vertrag ist möglich.
-- Ampellogik warnt bei Zielgefährdung.
+- Nutzer können zwischen MVP1 Bid Control Tower, MVP2 Realisierung und Gesamtübersicht wechseln.
+- Globale Filter sind rollenkonform sichtbar.
+- Gemeinsame Dimensionen wirken über beide MVP-Stufen.
 
-## Epic 7: Reporting UX und Klickdummy
-
-Ziel: Management- und Fachnutzer erhalten eine bedienbare Oberfläche als Diskussionsgrundlage.
-
-### Story 7.1: Portfolio-Übersicht
+### Story 9.2: Rollen- und Berechtigungskonzept
 
 Akzeptanzkriterien:
 
-- Startansicht zeigt KPI-Kacheln, Rollout-Chart, Los-Tabelle und Top-Abweichungen.
-- Filter beeinflussen sichtbare Kennzahlen.
-- Stichtag und Aktualität sind sichtbar.
-
-### Story 7.2: Vertrags- und Losdetail
-
-Akzeptanzkriterien:
-
-- Auswahl eines Loses öffnet Detailansicht.
-- Detailansicht zeigt Vertragsdaten, Bautranchen, PFau/GBGS-Abgleich und nächste Schritte.
-- Nutzer können zwischen Überblick, Sachkonten und Historie wechseln.
-
-### Story 7.3: Reports und Export
-
-Akzeptanzkriterien:
-
-- Reports für Portfolio, Rollout, Cash-In, Fördermittel und Abweichungen sind auswählbar.
-- Exportfunktion ist vorgesehen.
-- Export enthält Stichtag, Filter und Quelle.
-
-## Epic 8: Betrieb, Berechtigungen und Datenqualität
-
-Ziel: MVP betreibbar und fachlich vertrauenswürdig machen.
-
-### Story 8.1: Rollen- und Berechtigungskonzept
-
-Akzeptanzkriterien:
-
-- Rollen für Management, Fachbereich, IT, Datenowner und Read-only sind definiert.
+- Rollen für Management, Fachbereich, Regionen, IT, Datenowner und Read-only sind definiert.
 - Pflege von Abweichungen ist rollenbasiert eingeschränkt.
 - Exportberechtigungen sind geklärt.
 
-### Story 8.2: Datenqualitätsregeln
-
-Akzeptanzkriterien:
-
-- Pflichtfelder und Plausibilitätsregeln sind definiert.
-- Datenqualitätsfehler erscheinen im Dashboard.
-- Fehler sind Quelle und Owner zuordenbar.
-
-### Story 8.3: Monitoring der Schnittstellen
+### Story 9.3: Schnittstellen- und Datenqualitätsmonitor
 
 Akzeptanzkriterien:
 
 - Ladezeitpunkt, Ladeergebnis und Fehler je Schnittstelle sind sichtbar.
-- Nutzer sehen, ob PFau, GBGS und ZRP-Daten aktuell sind.
+- Nutzer sehen, ob PFAU, WFS, GBGS, ZRP und Finanzdaten aktuell sind.
 - Fehlerhafte Läufe erzeugen fachliche Hinweise.
 
-## Priorisierter MVP-Releaseplan
+## Priorisierter Releaseplan
 
-| Release | Inhalt |
-|---|---|
-| R1 Datenkern | Epic 1, Story 2.1, Story 2.2 |
-| R2 Rollout und Abgleich | Epic 3, Epic 4 |
-| R3 Cash-In | Epic 5 |
-| R4 Fördermittel | Epic 6 |
-| R5 UX, Betrieb, Datenqualität | Epic 7, Epic 8 |
+| Release | Projektsprache | Inhalt |
+|---|---|---|
+| R1 | MVP1 | PFAU/WFS Datenkern, Win/Loss, Gesamtübersicht, monatliche Entwicklung |
+| R2 | MVP1+ | Funnel, Forecast, Wettbewerber, Füllstand, MBfD Management View |
+| R3 | MVP2 | Vertragsstruktur, Los/Bautranche, Rollout, PFau-vs-GBGS |
+| R4 | MVP2 | Cash-In Forecast und Fördermittelabruf |
+| R5 | Integration | Rollen, Betrieb, Datenqualität, gemeinsame Gesamtübersicht |
