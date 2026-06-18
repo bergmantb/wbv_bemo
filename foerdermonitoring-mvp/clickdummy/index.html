@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>E2E Fördermonitoring Klickdummy</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --surface: #ffffff;
+      --surface-soft: #fbfcfd;
+      --line: #d9dee7;
+      --line-strong: #c7cedb;
+      --text: #172033;
+      --muted: #667085;
+      --magenta: #e20074;
+      --teal: #006b6f;
+      --teal-soft: #e7f5f5;
+      --amber: #f59e0b;
+      --amber-soft: #fff7e6;
+      --red: #d92d20;
+      --red-soft: #fff0ee;
+      --green: #14804a;
+      --shadow: 0 12px 34px rgba(23, 32, 51, .08);
+      --radius: 8px;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 1120px; }
+    button, select, input { font: inherit; }
+    .app { display: grid; grid-template-columns: 220px 1fr 390px; min-height: 100vh; }
+    .sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--line);
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; height: 38px; }
+    .menu-icon { width: 22px; height: 16px; display: grid; gap: 4px; }
+    .menu-icon span { height: 2px; background: #30384a; border-radius: 2px; }
+    .brand-title { color: var(--magenta); font-weight: 800; font-size: 18px; }
+    .nav { display: grid; gap: 4px; }
+    .nav-section { border-top: 1px solid var(--line); padding-top: 16px; margin-top: 12px; }
+    .nav button {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      text-align: left;
+      padding: 11px 12px;
+      border-radius: 6px;
+      color: #31394b;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .nav button.active { background: #fff0f7; color: var(--magenta); font-weight: 700; box-shadow: inset 3px 0 0 var(--magenta); }
+    .nav svg { width: 18px; height: 18px; stroke-width: 1.8; }
+    .main { min-width: 0; }
+    .topbar {
+      height: 70px;
+      display: grid;
+      grid-template-columns: repeat(5, minmax(130px, 1fr)) auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 18px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+    }
+    .filter label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 5px; }
+    .filter select, .filter input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 9px 10px;
+      background: var(--surface-soft);
+      color: var(--text);
+      min-height: 38px;
+    }
+    .ghost-button {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: #344054;
+      border-radius: 6px;
+      min-height: 38px;
+      padding: 0 12px;
+      cursor: pointer;
+      font-weight: 650;
+    }
+    .content { padding: 16px; display: grid; gap: 12px; }
+    .screen { display: none; }
+    .screen.active { display: grid; gap: 12px; }
+    .kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .panel, .kpi {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 1px 2px rgba(23,32,51,.04);
+    }
+    .kpi { padding: 16px; min-height: 112px; display: grid; gap: 8px; }
+    .kpi-title { color: #293348; font-size: 13px; font-weight: 750; display: flex; justify-content: space-between; align-items: center; }
+    .kpi-value { font-size: 25px; font-weight: 800; letter-spacing: 0; line-height: 1.12; overflow-wrap: normal; }
+    .kpi-value.warn { color: #e87800; }
+    .delta { font-size: 12px; color: var(--muted); }
+    .delta strong { color: var(--teal); }
+    .delta.warn strong { color: #e87800; }
+    .spark { width: 72px; height: 26px; }
+    .panel { padding: 14px; }
+    .panel-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+    .panel-title { font-weight: 800; font-size: 16px; }
+    .panel-subtitle { color: var(--muted); font-size: 12px; margin-top: 4px; }
+    .segmented { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+    .segmented button { border: 0; background: var(--surface); padding: 7px 12px; font-weight: 700; cursor: pointer; font-size: 12px; }
+    .segmented button.active { background: var(--magenta); color: #fff; }
+    .chart-wrap { height: 276px; position: relative; }
+    .chart-wrap svg { width: 100%; height: 100%; display: block; }
+    .chart-legend { display: flex; gap: 22px; justify-content: center; font-size: 12px; color: #344054; }
+    .legend-dot { display: inline-block; width: 16px; height: 8px; margin-right: 6px; border-radius: 2px; background: var(--teal); }
+    .legend-line { display: inline-block; width: 24px; height: 2px; margin-right: 6px; vertical-align: middle; background: var(--magenta); }
+    .toolbar { display: flex; align-items: center; gap: 8px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { border: 1px solid var(--line); padding: 10px 9px; text-align: right; }
+    th { background: #f8fafc; font-size: 12px; color: #30384a; font-weight: 800; }
+    td:first-child, th:first-child, td:nth-child(2), th:nth-child(2), td:nth-child(3), th:nth-child(3) { text-align: left; }
+    tbody tr { cursor: pointer; }
+    tbody tr:hover { background: #fff7fb; }
+    .link { color: var(--magenta); font-weight: 800; text-decoration: underline; text-underline-offset: 2px; }
+    .status { display: inline-flex; align-items: center; gap: 7px; justify-content: flex-end; width: 100%; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+    .dot.green { background: var(--teal); }
+    .dot.amber { background: var(--amber); }
+    .dot.red { background: #e00000; }
+    .summary-row td { font-weight: 800; background: #f8fafc; }
+    .detail {
+      background: var(--surface);
+      border-left: 1px solid var(--line);
+      min-width: 0;
+      padding: 18px;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 16px;
+    }
+    .detail-top { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
+    .detail h2 { margin: 0; font-size: 17px; }
+    .detail .muted { color: var(--muted); font-size: 12px; margin-top: 4px; }
+    .close-btn { border: 0; background: transparent; cursor: pointer; font-size: 22px; color: #475467; }
+    .detail select { width: 100%; border: 1px solid var(--line); border-radius: 6px; padding: 9px; background: var(--surface-soft); }
+    .tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); }
+    .tabs button { border: 0; background: transparent; padding: 11px 12px; cursor: pointer; font-weight: 750; color: var(--muted); border-bottom: 2px solid transparent; }
+    .tabs button.active { color: var(--magenta); border-bottom-color: var(--magenta); }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: grid; gap: 16px; }
+    .mini-title { font-weight: 800; font-size: 13px; margin-bottom: 8px; }
+    .reco-table th, .reco-table td { font-size: 12px; padding: 9px 8px; }
+    .negative { color: var(--red); font-weight: 800; }
+    .positive { color: var(--teal); font-weight: 800; }
+    .todo { border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+    .todo-row { display: grid; grid-template-columns: 24px 1fr auto; gap: 8px; padding: 11px; align-items: center; border-bottom: 1px solid var(--line); font-size: 12px; }
+    .todo-row:last-child { border-bottom: 0; }
+    .pill { display: inline-flex; align-items: center; border-radius: 999px; padding: 4px 8px; font-size: 12px; font-weight: 800; }
+    .pill.red { background: var(--red-soft); color: var(--red); }
+    .pill.amber { background: var(--amber-soft); color: #b65f00; }
+    .pill.green { background: var(--teal-soft); color: var(--teal); }
+    .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .info-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; display: grid; gap: 8px; }
+    .info-card h3 { margin: 0; font-size: 15px; }
+    .info-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .workflow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    .step { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; min-height: 110px; }
+    .step strong { display: block; margin-bottom: 6px; }
+    .step span { font-size: 12px; color: var(--muted); line-height: 1.35; }
+    .report-grid { display: grid; grid-template-columns: 260px 1fr; gap: 12px; }
+    .report-list { display: grid; gap: 8px; align-content: start; }
+    .report-list button { border: 1px solid var(--line); background: var(--surface); border-radius: 6px; padding: 11px; text-align: left; cursor: pointer; font-weight: 750; }
+    .report-list button.active { border-color: var(--magenta); color: var(--magenta); background: #fff7fb; }
+    .empty-note { color: var(--muted); line-height: 1.5; }
+    .mobile-warning { display: none; }
+
+    @media (max-width: 1120px) {
+      body { min-width: 0; }
+      .app { display: block; }
+      .mobile-warning { display: block; padding: 10px 14px; background: #fff7e6; border-bottom: 1px solid #ffd48a; font-size: 13px; }
+      .sidebar, .detail { display: none; }
+      .topbar { grid-template-columns: repeat(2, minmax(0, 1fr)); height: auto; }
+      .content { padding: 12px; }
+      .kpis, .cards, .workflow, .report-grid { grid-template-columns: 1fr; }
+      table { min-width: 760px; }
+      .table-scroll { overflow-x: auto; }
+    }
+
+    @media (min-width: 1700px) {
+      .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-warning">Der Klickdummy ist für Desktop-Steuerung optimiert; auf kleinen Viewports werden Tabellen horizontal gescrollt.</div>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="brand-title">E2E Fördermonitoring</div>
+      </div>
+      <nav class="nav" aria-label="Hauptnavigation">
+        <button class="active" data-screen="overview">▦ Übersicht</button>
+        <button data-screen="portfolio">▣ Portfolio</button>
+        <button data-screen="contracts">▤ Verträge</button>
+        <button data-screen="rollout">▥ Rollout</button>
+        <button data-screen="cashin">◉ Cash-In</button>
+        <button data-screen="funding">◍ Fördermittel</button>
+        <button data-screen="deviations">⚠ Abweichungen</button>
+        <div class="nav-section"></div>
+        <button data-screen="reports">▧ Berichte</button>
+        <button data-screen="sources">◎ Datenquellen</button>
+        <button data-screen="admin">⚙ Administration</button>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="filter"><label>Förderprogramm</label><select id="programFilter"><option>Alle</option><option>BFP23</option><option>Gigabit-RL</option></select></div>
+        <div class="filter"><label>Bundesland</label><select id="stateFilter"><option>Alle</option><option>Hessen</option><option>Bayern</option><option>NRW</option></select></div>
+        <div class="filter"><label>Projektträger</label><select id="ownerFilter"><option>Alle</option><option>PTI Mitte</option><option>PTI Süd</option></select></div>
+        <div class="filter"><label>Stichtag</label><input id="dateFilter" type="date" value="2025-05-31"></div>
+        <div class="filter"><label>Los</label><select id="lotFilter"><option>Alle</option></select></div>
+        <button class="ghost-button" id="resetFilters">↻ Filter zurücksetzen</button>
+      </div>
+
+      <section class="content">
+        <div class="screen active" id="overview">
+          <div class="kpis" id="kpis"></div>
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title">Rollout: Gebaute HC (IST) vs. Forecast (Soll)</div>
+                <div class="panel-subtitle">Monatliche Entwicklung, Stichtag 31.05.2025</div>
+              </div>
+              <div class="segmented"><button class="active" data-chart-mode="monthly">Monatlich</button><button data-chart-mode="cumulated">Kumuliert</button></div>
+            </div>
+            <div class="chart-wrap" id="rolloutChart"></div>
+            <div class="chart-legend"><span><i class="legend-dot"></i>IST gebaut HC</span><span><i class="legend-line"></i>Forecast Soll</span><span><i class="legend-line" style="border-top:2px dashed var(--magenta); background:transparent;"></i>Forecast kumuliert</span></div>
+          </section>
+          <section class="panel">
+            <div class="panel-header">
+              <div><div class="panel-title">Losübersicht</div><div class="panel-subtitle">Klick auf ein Los öffnet den PFau-vs-GBGS-Detailabgleich</div></div>
+              <div class="toolbar"><button class="ghost-button" id="configureColumns">Spalten konfigurieren</button><button class="ghost-button" id="exportTable">Export</button></div>
+            </div>
+            <div class="table-scroll"><table id="lotTable"></table></div>
+          </section>
+        </div>
+
+        <div class="screen" id="portfolio">
+          <div class="cards">
+            <div class="info-card"><h3>Portfolio-Schnitt</h3><p>Steuerung über Ausbautreiber, Bundesland, Förderprogramm und GKS. Fokus auf kritische Lücken zwischen Vertragssoll, Bau-Ist und Mittelabruf.</p></div>
+            <div class="info-card"><h3>Management-Ampel</h3><p>Rot, wenn Cash-In- oder Adressdifferenz Jahresziele gefährdet; gelb bei Klärbedarf; grün bei planmäßiger Entwicklung.</p></div>
+            <div class="info-card"><h3>Top-Abweichungen</h3><p>Die größten Differenzen werden nach Ursache, Betrag, Menge und Fälligkeit sortiert.</p></div>
+          </div>
+          <section class="panel"><div class="panel-title">Portfolio-Matrix</div><div class="table-scroll"><table id="portfolioTable"></table></div></section>
+        </div>
+
+        <div class="screen" id="contracts">
+          <section class="panel">
+            <div class="panel-header"><div><div class="panel-title">Vertrag, Los und Bautranche</div><div class="panel-subtitle">Regel: Summe aller Bautranchen-Adressen je Los entspricht der Adressliste des Hauptvertrags.</div></div></div>
+            <div class="workflow">
+              <div class="step"><strong>1. Hauptvertrag</strong><span>PFau-/WFS-ID, GKS, Förderprogramm, Status, Vertragsende.</span></div>
+              <div class="step"><strong>2. Lose</strong><span>Los-ID, Region, Losart, Vertragsmengen und Vertragspreise.</span></div>
+              <div class="step"><strong>3. Bautranchen</strong><span>kleine Ausbaueinheiten mit HP/BP/HC-Sollmengen.</span></div>
+              <div class="step"><strong>4. Adressen</strong><span>Adressliste wird gegen Bau-Ist aus GBGS abgeglichen.</span></div>
+              <div class="step"><strong>5. Abrechnung</strong><span>Nur gebaute und zuordenbare Adressen werden abrechenbar.</span></div>
+            </div>
+          </section>
+          <section class="panel"><div class="panel-title">Vertragsdaten MVP</div><div class="table-scroll"><table id="contractTable"></table></div></section>
+        </div>
+
+        <div class="screen" id="rollout">
+          <section class="panel">
+            <div class="panel-header"><div><div class="panel-title">HP/BP/HC Monatsscheiben</div><div class="panel-subtitle">Plan, Ist und Forecast von 2025 bis 2029.</div></div></div>
+            <div class="chart-wrap" id="rolloutDeepChart"></div>
+          </section>
+          <section class="panel"><div class="panel-title">Ausbauparameter und Meilensteine</div><div class="table-scroll"><table id="milestoneTable"></table></div></section>
+        </div>
+
+        <div class="screen" id="cashin">
+          <div class="cards">
+            <div class="info-card"><h3>GFPlus / JV</h3><p>Innenverhältnis TDG-GFPlus, Rechnungsstellung an GKS, bezahlt, offen und Bemerkung.</p></div>
+            <div class="info-card"><h3>Deckungslückenmodell</h3><p>Klassischer Eigenausbau mit separatem Forecast und Zahlungslogik.</p></div>
+            <div class="info-card"><h3>Gesamtsicht</h3><p>Summendarstellung beider Abrechnungstreiber je Monat, Jahr, Los und GKS.</p></div>
+          </div>
+          <section class="panel"><div class="panel-title">Cash-In Forecast</div><div class="chart-wrap" id="cashinChart"></div></section>
+          <section class="panel"><div class="table-scroll"><table id="cashinTable"></table></div></section>
+        </div>
+
+        <div class="screen" id="funding">
+          <section class="panel"><div class="panel-title">Geplanter Abruf der Fördermittel gemäß Bewilligung</div><div class="chart-wrap" id="fundingChart"></div></section>
+          <section class="panel"><div class="table-scroll"><table id="fundingTable"></table></div></section>
+        </div>
+
+        <div class="screen" id="deviations">
+          <section class="panel">
+            <div class="panel-header"><div><div class="panel-title">Abweichungsmonitor</div><div class="panel-subtitle">Differenzen aus Vertragsadressbestand, GBGS-Bau-Ist, Rechnungs- und Fördermittelstatus.</div></div></div>
+            <div class="table-scroll"><table id="deviationTable"></table></div>
+          </section>
+        </div>
+
+        <div class="screen" id="reports">
+          <div class="report-grid">
+            <div class="report-list" id="reportList"></div>
+            <section class="panel">
+              <div class="panel-header"><div><div class="panel-title" id="reportTitle">Portfolio-Übersicht</div><div class="panel-subtitle">Report-Vorschau mit angewendeten Filtern und Stichtag.</div></div><button class="ghost-button" id="simulateReport">Report erzeugen</button></div>
+              <div id="reportPreview" class="empty-note"></div>
+            </section>
+          </div>
+        </div>
+
+        <div class="screen" id="sources">
+          <section class="panel"><div class="panel-title">Datenquellen und Schnittstellenstatus</div><div class="table-scroll"><table id="sourceTable"></table></div></section>
+        </div>
+
+        <div class="screen" id="admin">
+          <section class="panel">
+            <div class="panel-title">Administration</div>
+            <p class="empty-note">Rollenmodell, Datenqualitätsregeln, Exportberechtigungen und Ladeüberwachung sind für die IT-Schätzung vorgesehen. Im MVP-Dummy sind die Controls bewusst simuliert.</p>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <aside class="detail" id="detailPane">
+      <div class="detail-top">
+        <div><h2>Detailabgleich: PFau vs. GBGS</h2><div class="muted">Ausgewähltes Los mit Reconciliation, Differenzanalyse und To-dos.</div></div>
+        <button class="close-btn" id="closeDetail" aria-label="Detail schließen">×</button>
+      </div>
+      <select id="detailLot"></select>
+      <div>
+        <div class="tabs"><button class="active" data-tab="tabOverview">Überblick</button><button data-tab="tabAccounts">Sachkonten</button><button data-tab="tabHistory">Historie</button></div>
+        <div class="tab-pane active" id="tabOverview">
+          <div>
+            <div class="mini-title">Reconciliation (in €)</div>
+            <table class="reco-table" id="recoTable"></table>
+          </div>
+          <div>
+            <div class="mini-title">Differenzanalyse</div>
+            <table class="reco-table" id="diffTable"></table>
+          </div>
+          <div>
+            <div class="mini-title">Nächste Schritte / To-dos</div>
+            <div class="todo" id="todoList"></div>
+          </div>
+        </div>
+        <div class="tab-pane" id="tabAccounts">
+          <div class="mini-title">Sachkonten-Mapping</div>
+          <table class="reco-table" id="accountTable"></table>
+        </div>
+        <div class="tab-pane" id="tabHistory">
+          <div class="mini-title">Klärhistorie</div>
+          <div id="historyList" class="todo"></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    const lots = [
+      { id: "LOS-01", tranche: "Nord", gks: "GKS-001", program: "BFP23", state: "Hessen", hpSoll: 120000, hpIst: 112345, bpSoll: 85000, bpIst: 78231, hcSoll: 52000, hcIst: 43210, status: "im Plan", amp: "green", cash: 58.3, gap: -2.1 },
+      { id: "LOS-02", tranche: "Nord-Ost", gks: "GKS-002", program: "BFP23", state: "Hessen", hpSoll: 95000, hpIst: 78453, bpSoll: 65000, bpIst: 52781, hcSoll: 38000, hcIst: 28912, status: "kritisch", amp: "red", cash: 42.8, gap: -18.6 },
+      { id: "LOS-03", tranche: "Mitte", gks: "GKS-003", program: "BFP23", state: "Bayern", hpSoll: 150000, hpIst: 142880, bpSoll: 110000, bpIst: 100221, hcSoll: 65000, hcIst: 55984, status: "im Plan", amp: "green", cash: 76.1, gap: -3.4 },
+      { id: "LOS-04", tranche: "Süd-West", gks: "GKS-004", program: "Gigabit-RL", state: "NRW", hpSoll: 130000, hpIst: 110056, bpSoll: 90000, bpIst: 72004, hcSoll: 50000, hcIst: 34112, status: "kritisch", amp: "red", cash: 36.7, gap: -12.8 },
+      { id: "LOS-05", tranche: "Süd", gks: "GKS-005", program: "BFP23", state: "Bayern", hpSoll: 110000, hpIst: 105770, bpSoll: 75000, bpIst: 69001, hcSoll: 40000, hcIst: 36476, status: "im Plan", amp: "green", cash: 49.9, gap: -1.4 },
+      { id: "LOS-06", tranche: "West", gks: "GKS-006", program: "Gigabit-RL", state: "NRW", hpSoll: 140000, hpIst: 126412, bpSoll: 95000, bpIst: 82353, hcSoll: 55000, hcIst: 43872, status: "leicht kritisch", amp: "amber", cash: 48.6, gap: -5.7 }
+    ];
+    const months = ["Jun 24","Jul 24","Aug 24","Sep 24","Okt 24","Nov 24","Dez 24","Jan 25","Feb 25","Mrz 25","Apr 25","Mai 25","Jun 25","Jul 25","Aug 25","Sep 25","Okt 25","Nov 25","Dez 25"];
+    const built = [5000,12000,17000,29000,31000,40000,38000,46000,45000,44000,52000,56000,58000,61000,63000,69000,70000,76000,81000];
+    const forecast = [1000,3000,6000,9500,15000,21000,27000,33000,39000,44000,50500,54500,57000,60500,62500,68000,69000,73500,78000];
+    const cashin = [
+      ["2025", 71.4, 38.6, 110.0, 126.0, -16.0],
+      ["2026", 82.2, 47.1, 129.3, 141.0, -11.7],
+      ["2027", 46.8, 26.0, 72.8, 77.5, -4.7]
+    ];
+    const funding = [
+      ["2025", 2.95, 1.00, 0.29, 0.00, 4.24],
+      ["2026", 5.90, 2.50, 0.59, 0.00, 8.99],
+      ["2027", 10.81, 4.36, 1.08, 0.00, 16.25],
+      ["2028", 0.00, 0.00, 0.00, 0.00, 0.00],
+      ["2029", 0.00, 0.00, 0.00, 0.00, 0.00]
+    ];
+    const sources = [
+      ["PFau", "Vertrag, Los, Bautranche, Abrechnung", "monatlich", "OK", "31.05.2025 08:15"],
+      ["GBGS", "HP/BP/HC gebaut, Meilensteine, Tiefbaumeter", "wöchentlich", "OK", "31.05.2025 07:40"],
+      ["Vertragssysteme", "Preise, Pönale, Nachträge, Laufzeiten", "monatlich", "Klärung", "30.05.2025 17:20"],
+      ["ZRP/Bewilligung", "Fördermittelplan und Mittelabruf", "monatlich", "OK", "31.05.2025 09:10"],
+      ["Finanzen", "Zahlungseingänge, offene Beträge", "monatlich", "Fehler", "31.05.2025 06:55"]
+    ];
+    let selectedLot = lots[1];
+    let chartMode = "monthly";
+
+    const fmt = new Intl.NumberFormat("de-DE");
+    const money = value => `${value.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} Mio. €`;
+    const pct = (a, b) => `${Math.round(a / b * 100)} %`;
+
+    function iconSpark(color = "#e20074") {
+      return `<svg class="spark" viewBox="0 0 72 26" aria-hidden="true"><polyline points="2,22 13,14 24,18 35,7 47,17 58,5 70,12" fill="none" stroke="${color}" stroke-width="2"/></svg>`;
+    }
+
+    function currentLots() {
+      const program = document.getElementById("programFilter").value;
+      const state = document.getElementById("stateFilter").value;
+      const lot = document.getElementById("lotFilter").value;
+      return lots.filter(x => (program === "Alle" || x.program === program) && (state === "Alle" || x.state === state) && (lot === "Alle" || x.id === lot));
+    }
+
+    function renderKpis() {
+      const data = currentLots();
+      const hp = data.reduce((s, x) => s + x.hpSoll, 0);
+      const hcIst = data.reduce((s, x) => s + x.hcIst, 0);
+      const cash = data.reduce((s, x) => s + x.cash, 0);
+      const gap = data.reduce((s, x) => s + x.gap, 0);
+      document.getElementById("kpis").innerHTML = [
+        ["abrechenbare Adressen", fmt.format(hp), "+18.732", "vs. Vormonat", iconSpark()],
+        ["gebaut HC", fmt.format(hcIst), "+27.538", "vs. Vormonat", iconSpark()],
+        ["Cash-In Forecast (IST+FC)", money(cash), "+28,7 Mio. €", "vs. Vormonat", iconSpark()],
+        ["offene Differenz (PFau vs. GBGS)", money(gap), "+2,3 Mio. €", "vs. Vormonat", iconSpark("#f59e0b")]
+      ].map((k, i) => `<article class="kpi"><div class="kpi-title">${k[0]} ${k[4]}</div><div class="kpi-value ${i === 3 ? "warn" : ""}">${k[1]}</div><div class="delta ${i === 3 ? "warn" : ""}"><strong>${k[2]}</strong><br>${k[3]}</div></article>`).join("");
+    }
+
+    function renderChart(targetId, valuesA = built, valuesB = forecast) {
+      const max = Math.max(...valuesA, ...valuesB, 100000);
+      const w = 960, h = 250, pad = 38, innerW = w - pad * 2, innerH = h - pad * 1.6;
+      const points = valuesB.map((v, i) => `${pad + i * innerW / (valuesB.length - 1)},${h - pad - (v / max * innerH)}`).join(" ");
+      const bars = valuesA.map((v, i) => {
+        const x = pad + i * innerW / valuesA.length + 4;
+        const bh = v / max * innerH;
+        return `<rect x="${x}" y="${h - pad - bh}" width="18" height="${bh}" fill="#006b6f"/>`;
+      }).join("");
+      const grid = [0, .25, .5, .75, 1].map(t => `<line x1="${pad}" x2="${w-pad}" y1="${h-pad-t*innerH}" y2="${h-pad-t*innerH}" stroke="#d9dee7"/>`).join("");
+      const labels = months.map((m, i) => i % 2 === 0 ? `<text x="${pad + i * innerW / (months.length - 1)}" y="${h - 8}" text-anchor="middle" font-size="11" fill="#667085">${m}</text>` : "").join("");
+      document.getElementById(targetId).innerHTML = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Rollout Chart">${grid}${bars}<polyline points="${points}" fill="none" stroke="#e20074" stroke-width="3"/><polyline points="${points}" fill="none" stroke="#e20074" stroke-width="2" stroke-dasharray="6 6" opacity=".45" transform="translate(0,-22)"/><line x1="560" x2="560" y1="20" y2="${h-pad}" stroke="#006b6f"/><text x="560" y="17" text-anchor="middle" font-size="11" fill="#006b6f" font-weight="700">Stichtag</text>${labels}</svg>`;
+    }
+
+    function renderTable(id, headers, rows, options = {}) {
+      const head = `<thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead>`;
+      const body = `<tbody>${rows.map((r, idx) => `<tr data-row="${idx}">${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody>`;
+      document.getElementById(id).innerHTML = head + body;
+      if (options.onRow) {
+        document.querySelectorAll(`#${id} tbody tr`).forEach((tr, idx) => tr.addEventListener("click", () => options.onRow(idx)));
+      }
+    }
+
+    function renderLotTable() {
+      const data = currentLots();
+      const rows = data.map(l => [
+        `<span class="link">${l.id}</span>`, l.tranche, l.gks,
+        fmt.format(l.hpSoll), fmt.format(l.hpIst), pct(l.hpIst, l.hpSoll),
+        fmt.format(l.bpSoll), fmt.format(l.bpIst), pct(l.bpIst, l.bpSoll),
+        fmt.format(l.hcSoll), fmt.format(l.hcIst), pct(l.hcIst, l.hcSoll),
+        l.status, `<span class="status"><span class="dot ${l.amp}"></span></span>`
+      ]);
+      const total = data.reduce((a, l) => ({
+        hpSoll: a.hpSoll + l.hpSoll, hpIst: a.hpIst + l.hpIst, bpSoll: a.bpSoll + l.bpSoll, bpIst: a.bpIst + l.bpIst, hcSoll: a.hcSoll + l.hcSoll, hcIst: a.hcIst + l.hcIst
+      }), { hpSoll: 0, hpIst: 0, bpSoll: 0, bpIst: 0, hcSoll: 0, hcIst: 0 });
+      rows.push(["<strong>Gesamt</strong>", "", "", fmt.format(total.hpSoll), fmt.format(total.hpIst), pct(total.hpIst, total.hpSoll), fmt.format(total.bpSoll), fmt.format(total.bpIst), pct(total.bpIst, total.bpSoll), fmt.format(total.hcSoll), fmt.format(total.hcIst), pct(total.hcIst, total.hcSoll), "", ""]);
+      renderTable("lotTable", ["Los", "Bautranche", "GKS", "HP Soll", "HP Ist", "%", "BP Soll", "BP Ist", "%", "HC Soll", "HC Ist", "%", "Status", "Ampel"], rows, {
+        onRow: idx => { if (data[idx]) selectLot(data[idx]); }
+      });
+      document.querySelector("#lotTable tbody tr:last-child").classList.add("summary-row");
+    }
+
+    function selectLot(lot) {
+      selectedLot = lot;
+      document.getElementById("detailLot").value = lot.id;
+      renderDetail();
+    }
+
+    function renderDetail() {
+      const l = selectedLot;
+      const open = Math.abs(l.gap) * 1000000;
+      const rows = [
+        ["Gesamtfördermittel bewilligt", "102.450.000", "102.450.000", "0"],
+        ["Gesamtfördermittel abgerufen", "48.765.210", "48.102.450", `<span class="negative">-662.760</span>`],
+        ["Gesamtfördermittel ausgezahlt", "47.250.300", "46.821.100", `<span class="negative">-429.200</span>`],
+        ["Offene Mittel", "53.684.790", "54.347.550", `<span class="positive">662.760</span>`],
+        ["Offene Differenz", "—", "—", `<span class="negative">-${fmt.format(open)}</span>`]
+      ];
+      renderTable("recoTable", ["Position", "PFau", "GBGS", "Differenz"], rows);
+      renderTable("diffTable", ["Ursache", "Betrag", "Anteil"], [
+        ["Nicht übertragene Abrufe", "-9.842.310", "52,9 %"],
+        ["Unstimmigkeiten Sachkonten", "-4.612.120", "24,8 %"],
+        ["Zeitliche Abgrenzung", "-2.905.410", "15,6 %"],
+        ["Sonstige Differenzen", "-1.272.300", "6,7 %"],
+        ["<strong>Gesamt</strong>", `<span class="negative">-${fmt.format(open)}</span>`, "<strong>100 %</strong>"]
+      ]);
+      document.getElementById("todoList").innerHTML = [
+        ["!", `Abrufe Mai 2025 in PFau nacherfassen (${l.id})`, "Fällig: 07.06.2025", "red"],
+        ["!", "Sachkonten Mapping prüfen (SK 6811/6812)", "Fällig: 10.06.2025", "amber"],
+        ["i", "Klärung offener Differenzen mit Kämmerer", "Fällig: 14.06.2025", "green"]
+      ].map(t => `<div class="todo-row"><span class="pill ${t[3]}">${t[0]}</span><span>${t[1]}</span><strong>${t[2]}</strong></div>`).join("");
+      renderTable("accountTable", ["Sachkonto", "PFau", "GBGS", "Status"], [
+        ["6811", "25.840.000", "25.840.000", "OK"],
+        ["6812", "12.125.210", "11.462.450", "Klärung"],
+        ["6813", "10.800.000", "10.800.000", "OK"]
+      ]);
+      document.getElementById("historyList").innerHTML = [
+        ["31.05.2025", "Differenz automatisch erkannt", "System"],
+        ["02.06.2025", "Owner Fachseite gesetzt", "FRP"],
+        ["04.06.2025", "Sachkonto 6812 zur Prüfung an IT gegeben", "FRP"]
+      ].map(h => `<div class="todo-row"><span class="pill green">${h[0]}</span><span>${h[1]}</span><strong>${h[2]}</strong></div>`).join("");
+    }
+
+    function renderSecondary() {
+      renderTable("portfolioTable", ["Bundesland", "Förderprogramm", "Verträge", "HC Ist", "Cash-In", "Risiko"], [
+        ["Hessen", "BFP23", "2", "72.122", "101,1 Mio. €", "<span class='pill red'>hoch</span>"],
+        ["Bayern", "BFP23", "2", "92.460", "126,0 Mio. €", "<span class='pill green'>niedrig</span>"],
+        ["NRW", "Gigabit-RL", "2", "77.984", "85,3 Mio. €", "<span class='pill amber'>mittel</span>"]
+      ]);
+      renderTable("contractTable", ["Vertrag", "Los", "Bautranche", "GKS", "Förderprogramm", "Vertragsstatus", "Vertragsende", "Pönale"], lots.map(l => ["13466", l.id, l.tranche, l.gks, l.program, "unterschrieben", "30.01.2029", l.amp === "red" ? "ja" : "nein"]));
+      renderTable("milestoneTable", ["Los", "Tiefbaumeter geplant", "gebaut", "L2.9", "L3.1", "L4.0", "L4.9"], lots.map((l, i) => [l.id, fmt.format(80000 + i * 9000), fmt.format(62000 + i * 7600), "erl.", i < 4 ? "erl." : "offen", i < 3 ? "erl." : "offen", i < 2 ? "erl." : "offen"]));
+      renderTable("cashinTable", ["Jahr", "GFPlus/JV", "Deckungslücke", "Gesamt", "Jahresziel", "Gap"], cashin.map(r => [r[0], money(r[1]), money(r[2]), money(r[3]), money(r[4]), `<span class="negative">${money(r[5])}</span>`]));
+      renderTable("fundingTable", ["Jahr", "Bund", "Land", "Kommunal", "EU", "Gesamt"], funding.map(r => [r[0], money(r[1]), money(r[2]), money(r[3]), money(r[4]), money(r[5])]));
+      renderTable("deviationTable", ["ID", "Los", "Ursache", "Menge/Betrag", "Owner", "Status", "Fällig"], [
+        ["ABW-001", "LOS-02", "Nicht übertragene Abrufe", "-9,84 Mio. €", "FRP", "<span class='pill red'>Neu</span>", "07.06.2025"],
+        ["ABW-002", "LOS-04", "HC gebaut, nicht PFau-zuordenbar", "15.888 HC", "IT", "<span class='pill amber'>Klärung</span>", "12.06.2025"],
+        ["ABW-003", "LOS-06", "Zeitliche Abgrenzung", "-2,91 Mio. €", "Controlling", "<span class='pill amber'>Klärung</span>", "14.06.2025"]
+      ]);
+      renderTable("sourceTable", ["Quelle", "Daten", "Frequenz", "Status", "Letzter Lauf"], sources.map(s => [s[0], s[1], s[2], s[3] === "OK" ? "<span class='pill green'>OK</span>" : s[3] === "Fehler" ? "<span class='pill red'>Fehler</span>" : "<span class='pill amber'>Klärung</span>", s[4]]));
+      renderReportList();
+    }
+
+    function renderSimpleBarChart(id, labels, seriesA, seriesB) {
+      const max = Math.max(...seriesA, ...seriesB);
+      const w = 900, h = 245, pad = 40, innerW = w - pad * 2, innerH = h - pad * 1.5;
+      const bars = labels.map((label, i) => {
+        const x = pad + i * innerW / labels.length + 12;
+        const a = seriesA[i] / max * innerH;
+        const b = seriesB[i] / max * innerH;
+        return `<rect x="${x}" y="${h-pad-a}" width="18" height="${a}" fill="#006b6f"/><rect x="${x+22}" y="${h-pad-b}" width="18" height="${b}" fill="#e20074"/><text x="${x+20}" y="${h-8}" text-anchor="middle" font-size="11" fill="#667085">${label}</text>`;
+      }).join("");
+      document.getElementById(id).innerHTML = `<svg viewBox="0 0 ${w} ${h}">${bars}<line x1="${pad}" x2="${w-pad}" y1="${h-pad}" y2="${h-pad}" stroke="#c7cedb"/></svg>`;
+    }
+
+    function renderReportList() {
+      const reports = ["Portfolio-Übersicht", "Rollout HP/BP/HC", "PFau-vs-GBGS-Abgleich", "Cash-In Forecast", "Fördermittelabruf", "Abweichungsmonitor"];
+      document.getElementById("reportList").innerHTML = reports.map((r, i) => `<button class="${i === 0 ? "active" : ""}" data-report="${r}">${r}</button>`).join("");
+      document.getElementById("reportPreview").innerHTML = "Wähle einen Report und klicke auf „Report erzeugen“. Der Dummy simuliert die Übergabe von Filter, Stichtag und Quelle in einen Export.";
+      document.querySelectorAll("#reportList button").forEach(btn => btn.addEventListener("click", () => {
+        document.querySelectorAll("#reportList button").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        document.getElementById("reportTitle").textContent = btn.dataset.report;
+      }));
+    }
+
+    function wireEvents() {
+      document.querySelectorAll(".nav button[data-screen]").forEach(btn => btn.addEventListener("click", () => {
+        document.querySelectorAll(".nav button").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+        document.getElementById(btn.dataset.screen).classList.add("active");
+      }));
+      document.querySelectorAll(".tabs button").forEach(btn => btn.addEventListener("click", () => {
+        document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+        document.getElementById(btn.dataset.tab).classList.add("active");
+      }));
+      document.querySelectorAll("[data-chart-mode]").forEach(btn => btn.addEventListener("click", () => {
+        document.querySelectorAll("[data-chart-mode]").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        chartMode = btn.dataset.chartMode;
+        const a = chartMode === "cumulated" ? built.map((_, i) => built.slice(0, i + 1).reduce((s, x) => s + x, 0)) : built;
+        const b = chartMode === "cumulated" ? forecast.map((_, i) => forecast.slice(0, i + 1).reduce((s, x) => s + x, 0)) : forecast;
+        renderChart("rolloutChart", a, b);
+      }));
+      ["programFilter", "stateFilter", "lotFilter"].forEach(id => document.getElementById(id).addEventListener("change", refresh));
+      document.getElementById("resetFilters").addEventListener("click", () => {
+        document.getElementById("programFilter").value = "Alle";
+        document.getElementById("stateFilter").value = "Alle";
+        document.getElementById("ownerFilter").value = "Alle";
+        document.getElementById("lotFilter").value = "Alle";
+        refresh();
+      });
+      document.getElementById("detailLot").addEventListener("change", e => selectLot(lots.find(l => l.id === e.target.value)));
+      document.getElementById("closeDetail").addEventListener("click", () => document.getElementById("detailPane").style.display = "none");
+      document.getElementById("exportTable").addEventListener("click", () => alert("Export simuliert: Losübersicht mit aktuellem Filter und Stichtag würde als XLSX/CSV erzeugt."));
+      document.getElementById("configureColumns").addEventListener("click", () => alert("Spaltenkonfiguration simuliert: HP/BP/HC, Cash-In, Fördermittel und Abweichungen auswählbar."));
+      document.getElementById("simulateReport").addEventListener("click", () => {
+        document.getElementById("reportPreview").innerHTML = `<strong>${document.getElementById("reportTitle").textContent}</strong><br>Report erzeugt für Stichtag ${document.getElementById("dateFilter").value}, Förderprogramm ${document.getElementById("programFilter").value}, Bundesland ${document.getElementById("stateFilter").value}. Enthalten: Quelle, Datenstand, Filter und fachliche Kennzahlen.`;
+      });
+    }
+
+    function refresh() {
+      renderKpis();
+      renderLotTable();
+    }
+
+    function init() {
+      const lotOptions = `<option>Alle</option>${lots.map(l => `<option>${l.id}</option>`).join("")}`;
+      document.getElementById("lotFilter").innerHTML = lotOptions;
+      document.getElementById("detailLot").innerHTML = lots.map(l => `<option value="${l.id}">${l.id} - ${l.tranche}</option>`).join("");
+      wireEvents();
+      refresh();
+      renderChart("rolloutChart");
+      renderChart("rolloutDeepChart", built.map(x => Math.round(x * 1.35)), forecast.map(x => Math.round(x * 1.28)));
+      renderSimpleBarChart("cashinChart", cashin.map(x => x[0]), cashin.map(x => x[1]), cashin.map(x => x[2]));
+      renderSimpleBarChart("fundingChart", funding.map(x => x[0]), funding.map(x => x[1]), funding.map(x => x[2]));
+      renderSecondary();
+      selectLot(selectedLot);
+    }
+
+    init();
+  </script>
+</body>
+</html>
