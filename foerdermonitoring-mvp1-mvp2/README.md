@@ -1,9 +1,9 @@
-# E2E Fördermonitoring
+# E2E Fördermonitoring - MVP1 + MVP2 integriert
 
-Artefakte für das MVP-Monitoring des geförderten Glasfaserausbaus:
+Dieses Paket enthält die integrierte Fassung mit MVP1 Bid/Subsidy Control Tower und MVP2 Realisierungsmonitoring.
 
-- [Solutiondesign](docs/solutiondesign.md)
 - [Solutiondesign HTML für Confluence](docs/solutiondesign-confluence.html)
+- [Solutiondesign](docs/solutiondesign.md)
 - [Jira Work-Break-Down](docs/jira-work-breakdown.md)
 - [Klickdummy](clickdummy/index.html)
 
