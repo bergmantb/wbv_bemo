@@ -3,6 +3,7 @@
 Artefakte für das MVP-Monitoring des geförderten Glasfaserausbaus:
 
 - [Solutiondesign](docs/solutiondesign.md)
+- [Solutiondesign HTML für Confluence](docs/solutiondesign-confluence.html)
 - [Jira Work-Break-Down](docs/jira-work-breakdown.md)
 - [Klickdummy](clickdummy/index.html)
 
