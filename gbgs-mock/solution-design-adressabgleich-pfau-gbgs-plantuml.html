@@ -552,278 +552,374 @@ Nicht zugeordnet = VERTRAG_KLS - alle bekannten Bautranchen-KLS - alle offenen D
 </ol>
 <h2>13. UML-Diagramme</h2>
 <h3>13.1 Use Case Diagramm</h3>
-<pre><code class="language-mermaid">flowchart LR
-  User["PTI Nutzer"]
-  Pfau["Pfau Bautranchensicht"]
-  ProcessMenu["Prozess-Dropdown"]
-  Wfmt["WFMT-Auftrag"]
-  GbgsFunctions["GBGS-Funktionen"]
-  AreaWizard["Gebietsdaten erfassen"]
-  IdRules["Gebiets-ID-Regeln"]
-  KlsWizard["KLS-BT-Liste vorschlagen"]
-  DeltaGui["KLS-Abgleich mit GBGS pruefen"]
-  DeltaList["Deltaliste bearbeiten"]
-  Unassigned["Nicht zugeordnete Vertrags-KLS pruefen"]
-  Pst["PST erzeugt echte Liste 1"]
-  Reconcile["Adressabgleich Pfau GBGS"]
-  Vvm["VVM-ONGOING"]
+<pre><code class="language-plantuml">@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam shadowing false
 
-  User --&gt; Pfau
-  Pfau --&gt; ProcessMenu
-  ProcessMenu --&gt; Wfmt
-  Wfmt --&gt;|"erzeugt"| GbgsFunctions
-  ProcessMenu --&gt; GbgsFunctions
-  GbgsFunctions --&gt; AreaWizard
-  AreaWizard --&gt; IdRules
-  GbgsFunctions --&gt; KlsWizard
-  GbgsFunctions --&gt; DeltaGui
-  DeltaGui --&gt; DeltaList
-  DeltaGui --&gt; Unassigned
-  KlsWizard --&gt; Pst
-  AreaWizard --&gt; Reconcile
-  DeltaList --&gt; Reconcile
-  Unassigned --&gt; Reconcile
-  Reconcile --&gt; Pst
-  Reconcile --&gt; Vvm</code></pre>
+actor "PTI Nutzer" as User
+
+rectangle "Pfau Bautranchensicht" as Pfau {
+  usecase "Prozess-Dropdown" as UC_Process
+  usecase "WFMT-Auftrag" as UC_WFMT
+  usecase "GBGS-Funktionen" as UC_GBGS
+  usecase "Gebietsdaten erfassen" as UC_Area
+  usecase "Gebiets-ID-Regeln anwenden" as UC_Rules
+  usecase "KLS-BT-Liste vorschlagen" as UC_KLS
+  usecase "KLS-Abgleich mit GBGS pruefen" as UC_Delta
+  usecase "Deltaliste bearbeiten" as UC_DeltaList
+  usecase "Nicht zugeordnete Vertrags-KLS pruefen" as UC_Unassigned
+}
+
+rectangle "Umsysteme" {
+  usecase "PST erzeugt echte Liste 1" as UC_PST
+  usecase "Adressabgleich Pfau GBGS" as UC_Reconcile
+  usecase "VVM-ONGOING" as UC_VVM
+}
+
+User --&gt; UC_Process
+UC_Process --&gt; UC_WFMT
+UC_WFMT --&gt; UC_GBGS : erzeugt
+UC_Process --&gt; UC_GBGS
+UC_GBGS --&gt; UC_Area
+UC_Area --&gt; UC_Rules
+UC_GBGS --&gt; UC_KLS
+UC_GBGS --&gt; UC_Delta
+UC_Delta --&gt; UC_DeltaList
+UC_Delta --&gt; UC_Unassigned
+UC_KLS --&gt; UC_PST
+UC_Area --&gt; UC_Reconcile
+UC_DeltaList --&gt; UC_Reconcile
+UC_Unassigned --&gt; UC_Reconcile
+UC_Reconcile --&gt; UC_PST
+UC_Reconcile --&gt; UC_VVM
+@enduml</code></pre>
 <h3>13.2 Aktivitaetsdiagramm: Einstieg und Funktionsauswahl</h3>
-<pre><code class="language-mermaid">flowchart TD
-  A["Bautranche in Pfau geoeffnet"] --&gt; B["Prozessstatus laden"]
-  B --&gt; C{"WFMT-Auftrag erzeugt?"}
-  C -- "Nein" --&gt; D["GBGS-Funktionen deaktiviert/grau anzeigen"]
-  D --&gt; E["Nutzer erzeugt WFMT-Auftrag"]
-  E --&gt; B
-  C -- "Ja" --&gt; F["GBGS-Funktionen aktiv anzeigen"]
-  F --&gt; G["Nutzer waehlt GBGS-Funktionen"]
-  G --&gt; H{"Teilfunktion auswaehlen"}
-  H -- "Gebietsdaten" --&gt; I["Gebietsdaten-Wizard starten"]
-  H -- "KLS-BT-Liste" --&gt; J["KLS-BT-Listen-Wizard starten"]
-  H -- "KLS-Abgleich" --&gt; K["Delta-GUI fuer KLS-Abgleich starten"]</code></pre>
+<pre><code class="language-plantuml">@startuml
+skinparam shadowing false
+
+start
+:Bautranche in Pfau geoeffnet;
+:Prozessstatus laden;
+
+if (WFMT-Auftrag erzeugt?) then (Nein)
+  :GBGS-Funktionen deaktiviert/grau anzeigen;
+  :Nutzer erzeugt WFMT-Auftrag;
+  :Prozessstatus erneut laden;
+else (Ja)
+  :GBGS-Funktionen aktiv anzeigen;
+endif
+
+:Nutzer waehlt GBGS-Funktionen;
+
+if (Teilfunktion?) then (Gebietsdaten)
+  :Gebietsdaten-Wizard starten;
+else (KLS-BT-Liste)
+  :KLS-BT-Listen-Wizard starten;
+endif
+
+stop
+@enduml</code></pre>
 <h3>13.3 Aktivitaetsdiagramm: Gebietsdaten</h3>
-<pre><code class="language-mermaid">flowchart TD
-  A["Gebietsdaten-Wizard gestartet"] --&gt; B["Ausbautreiber waehlen"]
-  B --&gt; C["Kontextsensitive ID-Regel anzeigen"]
-  C --&gt; D["Gebiets-ID eingeben"]
-  D --&gt; E{"Frontend-Format gueltig?"}
-  E -- "Nein" --&gt; F["Feldfehler mit Regelhinweis anzeigen"]
-  F --&gt; D
-  E -- "Ja" --&gt; G["Termine eingeben"]
-  G --&gt; H{"Termine plausibel?"}
-  H -- "Nein" --&gt; I["Terminfehler anzeigen"]
-  I --&gt; G
-  H -- "Ja" --&gt; J["Speichern ausloesen"]
-  J --&gt; K["Backend validiert Gebiets-ID"]
-  K --&gt; L{"Backend gueltig?"}
-  L -- "Nein" --&gt; M["Speichern ablehnen"]
-  M --&gt; D
-  L -- "Ja" --&gt; N["Gebietsdaten speichern"]
-  N --&gt; O["Erfolg anzeigen"]</code></pre>
+<pre><code class="language-plantuml">@startuml
+skinparam shadowing false
+
+start
+:Gebietsdaten-Wizard gestartet;
+:Ausbautreiber waehlen;
+:Kontextsensitive ID-Regel anzeigen;
+
+repeat
+  :Gebiets-ID eingeben;
+  if (Frontend-Format gueltig?) then (Ja)
+    break
+  else (Nein)
+    :Feldfehler mit Regelhinweis anzeigen;
+  endif
+repeat while (Korrektur erforderlich?)
+
+:Termine eingeben;
+
+while (Termine plausibel?) is (Nein)
+  :Terminfehler anzeigen;
+  :Termine korrigieren;
+endwhile (Ja)
+
+:Speichern ausloesen;
+:Backend validiert Gebiets-ID;
+
+if (Backend gueltig?) then (Ja)
+  :Gebietsdaten speichern;
+  :Erfolg anzeigen;
+else (Nein)
+  :Speichern ablehnen;
+  :Feldfehler anzeigen;
+endif
+
+stop
+@enduml</code></pre>
 <h3>13.4 Aktivitaetsdiagramm: KLS-BT-Liste</h3>
-<pre><code class="language-mermaid">flowchart TD
-  A["KLS-BT-Listen-Wizard gestartet"] --&gt; B["Bautranche ermitteln"]
-  B --&gt; C["KLS aus Bautranche laden"]
-  C --&gt; D{"KLS vorhanden?"}
-  D -- "Nein" --&gt; E["Leere Liste mit Hinweis anzeigen"]
-  D -- "Ja" --&gt; F["KLS-BT-Liste anzeigen"]
-  F --&gt; G{"Nutzeraktion"}
-  G -- "Export" --&gt; H["CSV/XLSX erzeugen"]
-  G -- "PST bereitstellen" --&gt; I["Uebergabe an PST vorbereiten"]
-  H --&gt; J["Aktion protokollieren"]
-  I --&gt; J</code></pre>
+<pre><code class="language-plantuml">@startuml
+skinparam shadowing false
+
+start
+:KLS-BT-Listen-Wizard gestartet;
+:Bautranche ermitteln;
+:KLS aus Bautranche laden;
+
+if (KLS vorhanden?) then (Nein)
+  :Leere Liste mit Hinweis anzeigen;
+  stop
+else (Ja)
+  :KLS-BT-Liste anzeigen;
+endif
+
+if (Nutzeraktion?) then (Export)
+  :CSV/XLSX erzeugen;
+else (PST bereitstellen)
+  :Uebergabe an PST vorbereiten;
+endif
+
+:Aktion protokollieren;
+stop
+@enduml</code></pre>
 <h3>13.5 Aktivitaetsdiagramm: KLS-Abgleich und Deltafuehrung</h3>
-<pre><code class="language-mermaid">flowchart TD
-  A["KLS-Abgleich mit GBGS gestartet"] --&gt; B["Master-KLS aus Bautranche laden"]
-  B --&gt; C["Slave-KLS aus GBGS-Gebiet laden"]
-  C --&gt; D["Vertrags-KLS laden"]
-  D --&gt; E["Mengenvergleich berechnen"]
-  E --&gt; F{"Abweichungen vorhanden?"}
-  F -- "Nein" --&gt; G["Abgleich ohne Deltas dokumentieren"]
-  F -- "Ja" --&gt; H["Deltas erzeugen oder aktualisieren"]
-  H --&gt; I["Deltagrund vorschlagen"]
-  I --&gt; J["Owner und Loesungsworkflow zuordnen"]
-  J --&gt; K["Deltaliste anzeigen"]
-  D --&gt; L["Nicht zugeordnete Vertrags-KLS berechnen"]
-  L --&gt; M["Unter-GUI anzeigen"]
-  K --&gt; N{"Bearbeiter loest Delta?"}
-  N -- "Ja" --&gt; O["Resolution dokumentieren"]
-  O --&gt; P["Delta final schliessen"]
-  N -- "Nein" --&gt; Q["Delta bleibt im Arbeitsvorrat"]
-  P --&gt; R["Abschlussfaehigkeit neu bewerten"]
-  Q --&gt; R
-  M --&gt; R</code></pre>
+<pre><code class="language-plantuml">@startuml
+skinparam shadowing false
+
+start
+:KLS-Abgleich mit GBGS gestartet;
+:Master-KLS aus Bautranche laden;
+:Slave-KLS aus GBGS-Gebiet laden;
+:Vertrags-KLS laden;
+:Mengenvergleich berechnen;
+
+if (Abweichungen vorhanden?) then (Ja)
+  :Deltas erzeugen oder aktualisieren;
+  :Deltagrund vorschlagen;
+  :Owner und Loesungsworkflow zuordnen;
+  :Deltaliste anzeigen;
+else (Nein)
+  :Abgleich ohne Deltas dokumentieren;
+endif
+
+:Nicht zugeordnete Vertrags-KLS berechnen;
+:Unter-GUI anzeigen;
+
+if (Bearbeiter loest Delta?) then (Ja)
+  :Resolution dokumentieren;
+  :Delta final schliessen;
+else (Nein)
+  :Delta bleibt im Arbeitsvorrat;
+endif
+
+:Abschlussfaehigkeit neu bewerten;
+stop
+@enduml</code></pre>
 <h3>13.5 Sequenzdiagramm: Prozess-Dropdown</h3>
-<pre><code class="language-mermaid">sequenceDiagram
-  actor User as PTI Nutzer
-  participant UI as Pfau UI
-  participant PROC as Prozessstatus API
+<pre><code class="language-plantuml">@startuml
+skinparam shadowing false
 
-  User-&gt;&gt;UI: Oeffnet Bautranche
-  UI-&gt;&gt;PROC: GET /process-state
-  PROC--&gt;&gt;UI: wfmtOrderCreated, gbgsFunctionsEnabled
-  alt WFMT-Auftrag fehlt
-    UI--&gt;&gt;User: GBGS-Funktionen deaktiviert anzeigen
-  else WFMT-Auftrag vorhanden
-    UI--&gt;&gt;User: GBGS-Funktionen aktiv anzeigen
-  end</code></pre>
+actor "PTI Nutzer" as User
+participant "Pfau UI" as UI
+participant "Prozessstatus API" as PROC
+
+User -&gt; UI : Oeffnet Bautranche
+UI -&gt; PROC : GET /process-state
+PROC --&gt; UI : wfmtOrderCreated, gbgsFunctionsEnabled
+
+alt WFMT-Auftrag fehlt
+  UI --&gt; User : GBGS-Funktionen deaktiviert anzeigen
+else WFMT-Auftrag vorhanden
+  UI --&gt; User : GBGS-Funktionen aktiv anzeigen
+end
+@enduml</code></pre>
 <h3>13.6 Sequenzdiagramm: Gebietsdaten speichern</h3>
-<pre><code class="language-mermaid">sequenceDiagram
-  actor User as PTI Nutzer
-  participant UI as Pfau UI
-  participant VAL as Gebiets-ID Validator
-  participant API as GBGS-Funktionen API
-  participant DB as Pfau Persistenz
+<pre><code class="language-plantuml">@startuml
+skinparam shadowing false
 
-  User-&gt;&gt;UI: Waehlt Gebietsdaten erfassen
-  UI--&gt;&gt;User: Zeigt reduzierte Felder
-  User-&gt;&gt;UI: Waehlt Ausbautreiber
-  UI--&gt;&gt;User: Zeigt passende Bildungsregel
-  User-&gt;&gt;UI: Gibt Gebiets-ID und Termine ein
-  UI-&gt;&gt;VAL: validate(areaType, gebietsId)
-  VAL--&gt;&gt;UI: valid/invalid
-  alt ungueltig
-    UI--&gt;&gt;User: Feldfehler anzeigen
-  else gueltig
-    UI-&gt;&gt;API: POST /area-data
-    API-&gt;&gt;VAL: validate(areaType, gebietsId)
-    VAL--&gt;&gt;API: valid
-    API-&gt;&gt;DB: save(areaData)
-    DB--&gt;&gt;API: saved
-    API--&gt;&gt;UI: Erfolg
-    UI--&gt;&gt;User: Speichern bestaetigen
-  end</code></pre>
+actor "PTI Nutzer" as User
+participant "Pfau UI" as UI
+participant "Gebiets-ID Validator" as VAL
+participant "GBGS-Funktionen API" as API
+database "Pfau Persistenz" as DB
+
+User -&gt; UI : Waehlt Gebietsdaten erfassen
+UI --&gt; User : Zeigt reduzierte Felder
+User -&gt; UI : Waehlt Ausbautreiber
+UI --&gt; User : Zeigt passende Bildungsregel
+User -&gt; UI : Gibt Gebiets-ID und Termine ein
+UI -&gt; VAL : validate(areaType, gebietsId)
+VAL --&gt; UI : valid/invalid
+
+alt ungueltig
+  UI --&gt; User : Feldfehler anzeigen
+else gueltig
+  UI -&gt; API : POST /area-data
+  API -&gt; VAL : validate(areaType, gebietsId)
+  VAL --&gt; API : valid
+  API -&gt; DB : save(areaData)
+  DB --&gt; API : saved
+  API --&gt; UI : Erfolg
+  UI --&gt; User : Speichern bestaetigen
+end
+@enduml</code></pre>
 <h3>13.7 Sequenzdiagramm: KLS-BT-Liste</h3>
-<pre><code class="language-mermaid">sequenceDiagram
-  actor User as PTI Nutzer
-  participant UI as Pfau UI
-  participant API as GBGS-Funktionen API
-  participant KLS as Bautranchen/KLS Service
-  participant AUD as Audit Log
-  participant PST as PST
+<pre><code class="language-plantuml">@startuml
+skinparam shadowing false
 
-  User-&gt;&gt;UI: Waehlt KLS-BT-Liste fuer PST
-  UI-&gt;&gt;API: GET /kls-list
-  API-&gt;&gt;KLS: getKlsForBautranche(bautrancheId)
-  KLS--&gt;&gt;API: KLS-Liste
-  API--&gt;&gt;UI: KLS-BT-Listenvorschlag
-  UI--&gt;&gt;User: Liste anzeigen
-  User-&gt;&gt;UI: Exportieren/Bereitstellen
-  UI-&gt;&gt;API: createKlsBtListArtifact()
-  API-&gt;&gt;AUD: log action
-  opt PST-Schnittstelle vorhanden
-    API-&gt;&gt;PST: provideKlsBtList()
-    PST--&gt;&gt;API: accepted
-  end
-  API--&gt;&gt;UI: Ergebnis</code></pre>
+actor "PTI Nutzer" as User
+participant "Pfau UI" as UI
+participant "GBGS-Funktionen API" as API
+participant "Bautranchen/KLS Service" as KLS
+participant "Audit Log" as AUD
+participant "PST" as PST
+
+User -&gt; UI : Waehlt KLS-BT-Liste fuer PST
+UI -&gt; API : GET /kls-list
+API -&gt; KLS : getKlsForBautranche(bautrancheId)
+KLS --&gt; API : KLS-Liste
+API --&gt; UI : KLS-BT-Listenvorschlag
+UI --&gt; User : Liste anzeigen
+User -&gt; UI : Exportieren/Bereitstellen
+UI -&gt; API : createKlsBtListArtifact()
+API -&gt; AUD : log action
+
+opt PST-Schnittstelle vorhanden
+  API -&gt; PST : provideKlsBtList()
+  PST --&gt; API : accepted
+end
+
+API --&gt; UI : Ergebnis
+@enduml</code></pre>
 <h3>13.8a Sequenzdiagramm: KLS-Abgleich</h3>
-<pre><code class="language-mermaid">sequenceDiagram
-  actor User as PTI Nutzer
-  participant UI as Pfau UI
-  participant API as GBGS-Funktionen API
-  participant BT as Bautranchen/KLS Service
-  participant GBGS as GBGS KLS API
-  participant DELTA as Delta Service
-  participant DB as Delta Persistenz
-  participant AUD as Audit Log
+<pre><code class="language-plantuml">@startuml
+skinparam shadowing false
 
-  User-&gt;&gt;UI: Waehlt KLS-Abgleich mit GBGS pruefen
-  UI-&gt;&gt;API: POST /kls-reconciliation/run
-  API-&gt;&gt;BT: getKlsForBautranche(bautrancheId)
-  BT--&gt;&gt;API: Master BT_KLS
-  API-&gt;&gt;GBGS: getKlsForGebiet(gebietsId)
-  GBGS--&gt;&gt;API: Slave GBGS_KLS
-  API-&gt;&gt;DELTA: compare(master, slave, contractKls)
-  DELTA-&gt;&gt;DB: upsertDeltaList()
-  DELTA--&gt;&gt;API: deltas, unassignedContractKls, completionStatus
-  API-&gt;&gt;AUD: log reconciliation run
-  API--&gt;&gt;UI: Abgleichergebnis
-  UI--&gt;&gt;User: Delta-GUI anzeigen
+actor "PTI Nutzer" as User
+participant "Pfau UI" as UI
+participant "GBGS-Funktionen API" as API
+participant "Bautranchen/KLS Service" as BT
+participant "GBGS KLS API" as GBGS
+participant "Delta Service" as DELTA
+database "Delta Persistenz" as DB
+participant "Audit Log" as AUD
 
-  User-&gt;&gt;UI: Loest Delta mit Resolution
-  UI-&gt;&gt;API: PATCH /kls-deltas/{deltaId}
-  API-&gt;&gt;DB: update status, resolution
-  API-&gt;&gt;AUD: log delta resolution
-  API--&gt;&gt;UI: Status aktualisiert</code></pre>
+User -&gt; UI : Waehlt KLS-Abgleich mit GBGS pruefen
+UI -&gt; API : POST /kls-reconciliation/run
+API -&gt; BT : getKlsForBautranche(bautrancheId)
+BT --&gt; API : Master BT_KLS
+API -&gt; GBGS : getKlsForGebiet(gebietsId)
+GBGS --&gt; API : Slave GBGS_KLS
+API -&gt; DELTA : compare(master, slave, contractKls)
+DELTA -&gt; DB : upsertDeltaList()
+DELTA --&gt; API : deltas, unassignedContractKls, completionStatus
+API -&gt; AUD : log reconciliation run
+API --&gt; UI : Abgleichergebnis
+UI --&gt; User : Delta-GUI anzeigen
+
+User -&gt; UI : Loest Delta mit Resolution
+UI -&gt; API : PATCH /kls-deltas/{deltaId}
+API -&gt; DB : update status, resolution
+API -&gt; AUD : log delta resolution
+API --&gt; UI : Status aktualisiert
+@enduml</code></pre>
 <h3>13.8 Komponentendiagramm</h3>
-<pre><code class="language-mermaid">flowchart TB
-  subgraph Frontend["Pfau Frontend"]
-    PD["Prozess-Dropdown"]
-    DIS["Disabled State GBGS-Funktionen"]
-    MOD["GBGS-Funktionen Dialog"]
-    AREA["Gebietsdaten-Wizard"]
-    RULE["Kontextsensitive ID-Regeln"]
-    KLSUI["KLS-BT-Listen-Wizard"]
-    DELTAUI["Delta-GUI KLS-Abgleich"]
-    UNASSIGNEDUI["Unter-GUI nicht zugeordnete Vertrags-KLS"]
-  end
+<pre><code class="language-plantuml">@startuml
+skinparam componentStyle rectangle
+skinparam shadowing false
 
-  subgraph Backend["Pfau Backend"]
-    PROC["Prozessstatus API"]
-    FAPI["GBGS-Funktionen API"]
-    VALID["Gebiets-ID Validator"]
-    DATA["Gebietsdaten Persistenz"]
-    KLSAPI["Bautranchen/KLS API"]
-    GBGSKLS["GBGS-KLS Adapter"]
-    DELTASVC["Delta Service"]
-    DELTADB["Delta Persistenz"]
-    CONTRACT["Vertrags-KLS Adapter"]
-    COMPLETE["Abschlussfaehigkeits-Service"]
-    EXPORT["Export/Bereitstellung"]
-    AUD["Audit Logging"]
-  end
+package "Pfau Frontend" {
+  [Prozess-Dropdown] as PD
+  [Disabled State\nGBGS-Funktionen] as DIS
+  [GBGS-Funktionen Dialog] as MOD
+  [Gebietsdaten-Wizard] as AREA
+  [Kontextsensitive\nID-Regeln] as RULE
+  [KLS-BT-Listen-Wizard] as KLSUI
+  [Delta-GUI\nKLS-Abgleich] as DELTAUI
+  [Unter-GUI\nnicht zugeordnete Vertrags-KLS] as UNASSIGNEDUI
+}
 
-  subgraph External["Umsysteme"]
-    WFMT["WFMT"]
-    PST["PST"]
-    GBGS["GBGS"]
-    CONTRACTSYS["Vertragssystem"]
-  end
+package "Pfau Backend" {
+  [Prozessstatus API] as PROC
+  [GBGS-Funktionen API] as FAPI
+  [Gebiets-ID Validator] as VALID
+  database "Gebietsdaten\nPersistenz" as DATA
+  [Bautranchen/KLS API] as KLSAPI
+  [GBGS-KLS Adapter] as GBGSKLS
+  [Delta Service] as DELTASVC
+  database "Delta Persistenz" as DELTADB
+  [Vertrags-KLS Adapter] as CONTRACT
+  [Abschlussfaehigkeits-Service] as COMPLETE
+  [Export/Bereitstellung] as EXPORT
+  [Audit Logging] as AUD
+}
 
-  PD --&gt; PROC
-  PROC --&gt; WFMT
-  PROC --&gt; DIS
-  PD --&gt; MOD
-  MOD --&gt; AREA
-  AREA --&gt; RULE
-  RULE --&gt; VALID
-  AREA --&gt; FAPI
-  FAPI --&gt; DATA
-  MOD --&gt; KLSUI
-  KLSUI --&gt; KLSAPI
-  MOD --&gt; DELTAUI
-  DELTAUI --&gt; FAPI
-  DELTAUI --&gt; UNASSIGNEDUI
-  KLSAPI --&gt; EXPORT
-  EXPORT --&gt; PST
-  FAPI --&gt; DELTASVC
-  DELTASVC --&gt; KLSAPI
-  DELTASVC --&gt; GBGSKLS
-  DELTASVC --&gt; CONTRACT
-  DELTASVC --&gt; DELTADB
-  DELTASVC --&gt; COMPLETE
-  GBGSKLS --&gt; GBGS
-  CONTRACT --&gt; CONTRACTSYS
-  FAPI --&gt; AUD
-  DELTASVC --&gt; AUD
-  EXPORT --&gt; AUD
-  FAPI --&gt; GBGS</code></pre>
+package "Umsysteme" {
+  [WFMT] as WFMT
+  [PST] as PST
+  [GBGS] as GBGS
+  [Vertragssystem] as CONTRACTSYS
+}
+
+PD --&gt; PROC
+PROC --&gt; WFMT
+PROC --&gt; DIS
+PD --&gt; MOD
+MOD --&gt; AREA
+AREA --&gt; RULE
+RULE --&gt; VALID
+AREA --&gt; FAPI
+FAPI --&gt; DATA
+MOD --&gt; KLSUI
+KLSUI --&gt; KLSAPI
+MOD --&gt; DELTAUI
+DELTAUI --&gt; FAPI
+DELTAUI --&gt; UNASSIGNEDUI
+KLSAPI --&gt; EXPORT
+EXPORT --&gt; PST
+FAPI --&gt; DELTASVC
+DELTASVC --&gt; KLSAPI
+DELTASVC --&gt; GBGSKLS
+DELTASVC --&gt; CONTRACT
+DELTASVC --&gt; DELTADB
+DELTASVC --&gt; COMPLETE
+GBGSKLS --&gt; GBGS
+CONTRACT --&gt; CONTRACTSYS
+FAPI --&gt; AUD
+DELTASVC --&gt; AUD
+EXPORT --&gt; AUD
+FAPI --&gt; GBGS
+@enduml</code></pre>
 <h3>13.9 Statusmodell</h3>
-<pre><code class="language-mermaid">stateDiagram-v2
-  [*] --&gt; WFMT_FEHLT
-  WFMT_FEHLT: GBGS-Funktionen deaktiviert
-  WFMT_FEHLT --&gt; WFMT_ERZEUGT: WFMT-Auftrag erzeugt
-  WFMT_ERZEUGT: GBGS-Funktionen aktiv
-  WFMT_ERZEUGT --&gt; GEBIETSDATEN_ERFASST: Gebietsdaten gespeichert
-  GEBIETSDATEN_ERFASST --&gt; KLS_LISTE_ERSTELLT: KLS-BT-Liste exportiert/bereitgestellt
-  KLS_LISTE_ERSTELLT --&gt; ABGLEICH_GESTARTET: KLS-Abgleich gestartet
-  ABGLEICH_GESTARTET --&gt; DELTAS_OFFEN: Deltas vorhanden
-  ABGLEICH_GESTARTET --&gt; ABGLEICH_OK: Keine Deltas
-  DELTAS_OFFEN --&gt; DELTAS_IN_KLAERUNG: Bearbeitung gestartet
-  DELTAS_IN_KLAERUNG --&gt; DELTAS_OFFEN: Delta wieder geoeffnet
-  DELTAS_IN_KLAERUNG --&gt; DELTAS_GELOEST: Alle blockierenden Deltas geloest
-  DELTAS_GELOEST --&gt; ABGLEICH_GESTARTET: Erneuter GBGS-Abgleich
-  ABGLEICH_OK --&gt; ABSCHLUSSFAEHIG: Keine blockierenden Deltas und keine unzugeordneten Vertrags-KLS
-  DELTAS_GELOEST --&gt; ABSCHLUSSFAEHIG: Abschlusskriterien erfuellt
-  ABSCHLUSSFAEHIG --&gt; ABRECHNUNG_BEREIT: Freigabe fuer weitere Abrechnung
-  ABRECHNUNG_BEREIT --&gt; [*]</code></pre>
+<pre><code class="language-plantuml">@startuml
+skinparam shadowing false
+
+[*] --&gt; WFMT_FEHLT
+
+WFMT_FEHLT : GBGS-Funktionen deaktiviert
+WFMT_FEHLT --&gt; WFMT_ERZEUGT : WFMT-Auftrag erzeugt
+
+WFMT_ERZEUGT : GBGS-Funktionen aktiv
+WFMT_ERZEUGT --&gt; GEBIETSDATEN_ERFASST : Gebietsdaten gespeichert
+
+GEBIETSDATEN_ERFASST --&gt; KLS_LISTE_ERSTELLT : KLS-BT-Liste exportiert/bereitgestellt
+KLS_LISTE_ERSTELLT --&gt; ABGLEICH_GESTARTET : KLS-Abgleich gestartet
+
+ABGLEICH_GESTARTET --&gt; DELTAS_OFFEN : Deltas vorhanden
+ABGLEICH_GESTARTET --&gt; ABGLEICH_OK : Keine Deltas
+
+DELTAS_OFFEN --&gt; DELTAS_IN_KLAERUNG : Bearbeitung gestartet
+DELTAS_IN_KLAERUNG --&gt; DELTAS_OFFEN : Delta wieder geoeffnet
+DELTAS_IN_KLAERUNG --&gt; DELTAS_GELOEST : Alle blockierenden Deltas geloest
+DELTAS_GELOEST --&gt; ABGLEICH_GESTARTET : Erneuter GBGS-Abgleich
+
+ABGLEICH_OK --&gt; ABSCHLUSSFAEHIG : Keine blockierenden Deltas\nund keine unzugeordneten Vertrags-KLS
+DELTAS_GELOEST --&gt; ABSCHLUSSFAEHIG : Abschlusskriterien erfuellt
+ABSCHLUSSFAEHIG --&gt; ABRECHNUNG_BEREIT : Freigabe fuer weitere Abrechnung
+
+ABRECHNUNG_BEREIT --&gt; [*]
+@enduml</code></pre>
 <h2>14. Architektur und Komponenten</h2>
 <h3>14.1 Frontend-Komponenten</h3>
 <table><thead><tr><th>Komponente</th><th>Verantwortung</th><th>Hinweise</th></tr></thead><tbody>
@@ -1661,69 +1757,6 @@ UC_Unassigned --&gt; UC_Reconcile
 UC_Reconcile --&gt; UC_PST
 UC_Reconcile --&gt; UC_VVM
 @enduml</code></pre></div>
-<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-10-aktivitaetsdiagramm-kls-abgleich-deltafuehrung.md</div><p><a href="plantuml-diagramme/13-10-aktivitaetsdiagramm-kls-abgleich-deltafuehrung.md">13-10-aktivitaetsdiagramm-kls-abgleich-deltafuehrung.md</a></p><pre><code class="language-plantuml">@startuml
-skinparam shadowing false
-
-start
-:KLS-Abgleich mit GBGS gestartet;
-:Master-KLS aus Bautranche laden;
-:Slave-KLS aus GBGS-Gebiet laden;
-:Vertrags-KLS laden;
-:Mengenvergleich berechnen;
-
-if (Abweichungen vorhanden?) then (Ja)
-  :Deltas erzeugen oder aktualisieren;
-  :Deltagrund vorschlagen;
-  :Owner und Loesungsworkflow zuordnen;
-  :Deltaliste anzeigen;
-else (Nein)
-  :Abgleich ohne Deltas dokumentieren;
-endif
-
-:Nicht zugeordnete Vertrags-KLS berechnen;
-:Unter-GUI anzeigen;
-
-if (Bearbeiter loest Delta?) then (Ja)
-  :Resolution dokumentieren;
-  :Delta final schliessen;
-else (Nein)
-  :Delta bleibt im Arbeitsvorrat;
-endif
-
-:Abschlussfaehigkeit neu bewerten;
-stop
-@enduml</code></pre></div>
-<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-11-sequenzdiagramm-kls-abgleich.md</div><p><a href="plantuml-diagramme/13-11-sequenzdiagramm-kls-abgleich.md">13-11-sequenzdiagramm-kls-abgleich.md</a></p><pre><code class="language-plantuml">@startuml
-skinparam shadowing false
-
-actor "PTI Nutzer" as User
-participant "Pfau UI" as UI
-participant "GBGS-Funktionen API" as API
-participant "Bautranchen/KLS Service" as BT
-participant "GBGS KLS API" as GBGS
-participant "Delta Service" as DELTA
-database "Delta Persistenz" as DB
-participant "Audit Log" as AUD
-
-User -&gt; UI : Waehlt KLS-Abgleich mit GBGS pruefen
-UI -&gt; API : POST /kls-reconciliation/run
-API -&gt; BT : getKlsForBautranche(bautrancheId)
-BT --&gt; API : Master BT_KLS
-API -&gt; GBGS : getKlsForGebiet(gebietsId)
-GBGS --&gt; API : Slave GBGS_KLS
-API -&gt; DELTA : compare(master, slave, contractKls)
-DELTA -&gt; DB : upsertDeltaList()
-DELTA --&gt; API : deltas, unassignedContractKls, completionStatus
-API -&gt; AUD : log reconciliation run
-API --&gt; UI : Abgleichergebnis
-UI --&gt; User : Delta-GUI anzeigen
-
-User -&gt; UI : Loest Delta mit Resolution
-UI -&gt; API : PATCH /kls-deltas/{deltaId}
-API -&gt; DB : update status, resolution
-API -&gt; AUD : log delta resolution
-API --&gt; UI : Status aktualisiert
-@enduml</code></pre></div>
 <div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-2-aktivitaetsdiagramm-einstieg-und-funktionsauswahl.md</div><p><a href="plantuml-diagramme/13-2-aktivitaetsdiagramm-einstieg-und-funktionsauswahl.md">13-2-aktivitaetsdiagramm-einstieg-und-funktionsauswahl.md</a></p><pre><code class="language-plantuml">@startuml
 skinparam shadowing false
 
@@ -1976,4 +2009,67 @@ DELTAS_GELOEST --&gt; ABSCHLUSSFAEHIG : Abschlusskriterien erfuellt
 ABSCHLUSSFAEHIG --&gt; ABRECHNUNG_BEREIT : Freigabe fuer weitere Abrechnung
 
 ABRECHNUNG_BEREIT --&gt; [*]
+@enduml</code></pre></div>
+<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-10-aktivitaetsdiagramm-kls-abgleich-deltafuehrung.md</div><p><a href="plantuml-diagramme/13-10-aktivitaetsdiagramm-kls-abgleich-deltafuehrung.md">13-10-aktivitaetsdiagramm-kls-abgleich-deltafuehrung.md</a></p><pre><code class="language-plantuml">@startuml
+skinparam shadowing false
+
+start
+:KLS-Abgleich mit GBGS gestartet;
+:Master-KLS aus Bautranche laden;
+:Slave-KLS aus GBGS-Gebiet laden;
+:Vertrags-KLS laden;
+:Mengenvergleich berechnen;
+
+if (Abweichungen vorhanden?) then (Ja)
+  :Deltas erzeugen oder aktualisieren;
+  :Deltagrund vorschlagen;
+  :Owner und Loesungsworkflow zuordnen;
+  :Deltaliste anzeigen;
+else (Nein)
+  :Abgleich ohne Deltas dokumentieren;
+endif
+
+:Nicht zugeordnete Vertrags-KLS berechnen;
+:Unter-GUI anzeigen;
+
+if (Bearbeiter loest Delta?) then (Ja)
+  :Resolution dokumentieren;
+  :Delta final schliessen;
+else (Nein)
+  :Delta bleibt im Arbeitsvorrat;
+endif
+
+:Abschlussfaehigkeit neu bewerten;
+stop
+@enduml</code></pre></div>
+<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-11-sequenzdiagramm-kls-abgleich.md</div><p><a href="plantuml-diagramme/13-11-sequenzdiagramm-kls-abgleich.md">13-11-sequenzdiagramm-kls-abgleich.md</a></p><pre><code class="language-plantuml">@startuml
+skinparam shadowing false
+
+actor "PTI Nutzer" as User
+participant "Pfau UI" as UI
+participant "GBGS-Funktionen API" as API
+participant "Bautranchen/KLS Service" as BT
+participant "GBGS KLS API" as GBGS
+participant "Delta Service" as DELTA
+database "Delta Persistenz" as DB
+participant "Audit Log" as AUD
+
+User -&gt; UI : Waehlt KLS-Abgleich mit GBGS pruefen
+UI -&gt; API : POST /kls-reconciliation/run
+API -&gt; BT : getKlsForBautranche(bautrancheId)
+BT --&gt; API : Master BT_KLS
+API -&gt; GBGS : getKlsForGebiet(gebietsId)
+GBGS --&gt; API : Slave GBGS_KLS
+API -&gt; DELTA : compare(master, slave, contractKls)
+DELTA -&gt; DB : upsertDeltaList()
+DELTA --&gt; API : deltas, unassignedContractKls, completionStatus
+API -&gt; AUD : log reconciliation run
+API --&gt; UI : Abgleichergebnis
+UI --&gt; User : Delta-GUI anzeigen
+
+User -&gt; UI : Loest Delta mit Resolution
+UI -&gt; API : PATCH /kls-deltas/{deltaId}
+API -&gt; DB : update status, resolution
+API -&gt; AUD : log delta resolution
+API --&gt; UI : Status aktualisiert
 @enduml</code></pre></div></main></body></html>
