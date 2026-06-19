@@ -4,13 +4,14 @@
 
 Dieses Dokument beschreibt das vollstaendige Solutiondesign fuer den Use Case `Adressabgleich Pfau GBGS`.
 
-Der Use Case wird in der Pfau-Bautranchensicht angeboten und dient dazu, die fuer den Adressabgleich relevanten Gebietsdaten strukturiert zu erfassen, die Gebiets-ID nach Ausbautreiber zu validieren und fuer die Weiterverarbeitung in PST eine KLS-BT-Liste vorzuschlagen.
+Der Use Case wird in der Pfau-Bautranchensicht angeboten und dient dazu, die fuer den Adressabgleich relevanten Gebietsdaten strukturiert zu erfassen, die Gebiets-ID nach Ausbautreiber zu validieren, fuer die Weiterverarbeitung in PST eine KLS-BT-Liste vorzuschlagen und den eigentlichen KLS-Umfangsabgleich zwischen Bautranche und GBGS-Gebiet zu steuern.
 
-Die aktuelle Designdiskussion hat drei zentrale Entscheidungen ergeben:
+Die aktuelle Designdiskussion hat vier zentrale Entscheidungen ergeben:
 
 1. Die Gebietserfassung in Pfau ist keine vollstaendige GBGS-Gebietsanlage mehr.
 2. Die bisherige VVM-Importlisten-Funktion wird auf einen KLS-BT-Listenvorschlag fuer PST reduziert.
 3. Der Einstieg erfolgt nicht ueber einen separaten Button, sondern ueber das Prozess-Dropdown in der Pfau-Bautranchensicht.
+4. Der fachliche Kern des Adressabgleichs ist der KLS-Umfangsabgleich: Der KLS-Umfang der Bautranche ist Master, der KLS-Umfang des GBGS-Gebiets ist Slave. Abweichungen werden als Deltas mit Abweichungsgrund, Bearbeitungsstatus, Ziel-Owner und Loesungsworkflow gefuehrt.
 
 Der neue Prozess-Dropdown-Eintrag heisst:
 
@@ -24,18 +25,19 @@ Er wird unterhalb von `WFMT-Auftrag` angezeigt und ist erst aktiv, wenn der WFMT
 
 Der PTI Nutzer arbeitet in der Pfau-Bautranchensicht. Sobald der WFMT-Auftrag erzeugt wurde, kann der Nutzer ueber das Prozess-Dropdown `GBGS-Funktionen` aufrufen.
 
-Der Dialog `GBGS-Funktionen` bietet zwei fachliche Teilfunktionen:
+Der Dialog `GBGS-Funktionen` bietet drei fachliche Teilfunktionen:
 
 | Funktion | Ziel |
 | --- | --- |
 | `Gebietsdaten fuer Adressabgleich erfassen` | Erfassung der minimal benoetigten Gebietsdaten und Validierung der Gebiets-ID |
 | `KLS-BT-Liste fuer PST vorschlagen` | Bereitstellung des KLS-Anteils aus der Bautranche fuer die spaetere Liste-1-Erzeugung in PST |
+| `KLS-Abgleich mit GBGS pruefen` | Gegenueberstellung Master-KLS der Bautranche mit Slave-KLS des GBGS-Gebiets, Fuehrung und Aufloesung von Deltas |
 
 Die Loesung entkoppelt damit klar:
 
-- Pfau: Erfassung und Vorbereitung fuer den Adressabgleich.
+- Pfau: Erfassung, Vorbereitung, Deltafuehrung und fachliche Steuerung des Adressabgleichs.
 - PST: Erzeugung der echten `Liste 1`.
-- GBGS: Zielsystem bzw. Referenzkontext fuer Gebietsdaten und Adressabgleich.
+- GBGS: Slave-Quelle fuer den aktuellen KLS-Umfang am Gebiet.
 
 ## 3. Fachlicher Hintergrund
 
@@ -68,6 +70,24 @@ Pfau soll daher eine KLS-BT-Liste vorschlagen:
 - Ziel: Weiterverwendung in PST
 - Nicht-Ziel: finale Liste-1-Erzeugung
 
+### 3.4 KLS-Umfangsabgleich Bautranche gegen GBGS
+
+Der eigentliche Use Case `Adressabgleich Pfau GBGS` besteht in der fachlichen Gegenueberstellung zweier KLS-Umfaenge:
+
+| Quelle | Rolle im Abgleich | Bedeutung |
+| --- | --- | --- |
+| Bautranche in Pfau | Master | Fuehrender Soll-Umfang der KLS, die fuer die Bautranche relevant sind |
+| GBGS-Gebiet | Slave | Aktueller Ist-Umfang der KLS, die im GBGS-Gebiet enthalten sind |
+
+Der Vergleich erzeugt eine Deltaliste. Ein Delta ist jede fachlich relevante Abweichung zwischen Master und Slave, zum Beispiel:
+
+- KLS ist in der Bautranche vorhanden, fehlt aber im GBGS-Gebiet.
+- KLS ist im GBGS-Gebiet vorhanden, gehoert aber nicht zur Bautranche.
+- KLS ist in beiden Quellen vorhanden, aber Metadaten oder Zuordnungskontext weichen ab.
+- KLS aus dem Vertrag ist noch keiner Bautranche/keinem Delta zugeordnet und muss dem Bearbeiter separat sichtbar sein.
+
+Die Deltaliste ist kein statischer Export, sondern ein Arbeitsvorrat. Sie muss den aktuellen fachlichen Stand, die Bearbeitung je Delta und den Abschlussstatus der Bautranche nachvollziehbar abbilden.
+
 ## 4. Scope
 
 ### 4.1 Im Scope
@@ -86,6 +106,11 @@ Im Scope dieses Solutiondesigns sind:
 - Speicherung der reduzierten Gebietsdaten je Bautranche.
 - Vorschlag einer KLS-BT-Liste aus den KLS der aktuellen Bautranche.
 - Export oder technische Bereitstellung der KLS-BT-Liste fuer PST.
+- Abgleich der KLS-Umfaenge `Bautranche` gegen `GBGS-Gebiet`.
+- Anzeige und Pflege einer Deltaliste mit Abweichungsgrund, Kategorie, Bearbeiter, Status und Loesungsvorschlag.
+- Anzeige der noch nicht zugeordneten Vertrags-KLS in einer separaten Unter-GUI.
+- Aktualisierung der Deltaliste durch erneuten GBGS-Abgleichslauf und durch finale Deltaaufloesung.
+- Abschlusspruefung, ob eine Bautranche fuer die weitere Abrechnung freigegeben werden darf.
 - Auditierbarkeit relevanter Nutzeraktionen.
 - Jira-Arbeitspakete fuer IT-Umsetzung.
 
@@ -116,8 +141,9 @@ Nicht im Scope sind:
 | Pfau Frontend | Darstellung Bautranchensicht, Prozess-Dropdown, Dialoge und Validierungshinweise |
 | Pfau Backend | Prozessstatus, Persistenz, Gebiets-ID-Validierung, KLS-BT-Liste |
 | WFMT | Prozessuale Vorbedingung fuer Aktivierung von `GBGS-Funktionen` |
-| GBGS | Fachlicher Zielkontext fuer Gebiet und Adressabgleich |
+| GBGS | Slave-Quelle fuer den aktuellen KLS-Umfang am Gebiet |
 | PST | Erzeugung der echten `Liste 1` auf Basis geeigneter Inputs |
+| Delta-Bearbeiter | Bearbeitet zugewiesene Deltafaelle, setzt Loesungsstatus und dokumentiert Ergebnis |
 | Audit/Logging | Nachvollziehbarkeit von Speicherung, Export und Fehlerfaellen |
 
 ## 6. Fachliche Anforderungen
@@ -155,17 +181,45 @@ Nicht im Scope sind:
 | FA-24 | WE-/GE-Pruefung entfaellt in diesem Wizard. |
 | FA-25 | Die UI-Texte muessen klar machen, dass PST die finale Liste erzeugt. |
 
-### 6.4 Adressabgleich und VVM-ONGOING
+### 6.4 KLS-Umfangsabgleich Bautranche gegen GBGS
+
+| ID | Anforderung |
+| --- | --- |
+| FA-30 | Der KLS-Umfang der Bautranche ist Master fuer den Abgleich. |
+| FA-31 | Der KLS-Umfang des GBGS-Gebiets ist Slave und wird gegen den Master verglichen. |
+| FA-32 | Ein Abgleichslauf erzeugt bzw. aktualisiert eine Deltaliste pro Bautranche und Gebiets-ID. |
+| FA-33 | Ein Delta wird erzeugt, wenn eine KLS im Master fehlt, im Slave fehlt oder mit abweichendem Zuordnungskontext vorhanden ist. |
+| FA-34 | Jede Delta-Position muss eine Abweichungskategorie, einen Bearbeitungsstatus, einen Ziel-Owner und einen Loesungsvorschlag fuehren koennen. |
+| FA-35 | Die GUI zeigt den aktuellen Stand aller Deltas inklusive Status, Alter, Quelle, letzter Aktualisierung und Bearbeiter. |
+| FA-36 | Die GUI zeigt in einer separaten Unter-GUI alle noch nicht zugeordneten KLS aus dem Vertrag, die in keiner Bautranche und in keinem Delta enthalten sind. |
+| FA-37 | Ein Delta kann durch einen Bearbeiter final geloest werden. |
+| FA-38 | Ein final geloestes Delta wird nicht automatisch geloescht, sondern bleibt fuer Audit und Historie sichtbar. |
+| FA-39 | Bei einem erneuten GBGS-Abgleichslauf wird die Deltaliste aktualisiert, ohne manuell geloeste Historie zu verlieren. |
+| FA-40 | Die Deltaliste muss erkennen, ob ein frueheres Delta durch Quellsystemaenderung automatisch erledigt wurde. |
+| FA-41 | Die Bautranche darf erst abgeschlossen und der weiteren Abrechnung zugefuehrt werden, wenn keine offenen blockierenden Deltas und keine relevanten unzugeordneten Vertrags-KLS mehr vorhanden sind. |
+
+### 6.5 Deltagrund und Aufloesungsworkflow
+
+| ID | Anforderung |
+| --- | --- |
+| FA-50 | Deltagruende werden als fachliche Kategorien gepflegt und in der Deltaliste angezeigt. |
+| FA-51 | Jede Kategorie enthaelt eine fachliche Erlaeuterung fuer den Bearbeiter. |
+| FA-52 | Jede Kategorie enthaelt einen empfohlenen Loesungsworkflow und einen primaeren Ziel-Owner. |
+| FA-53 | Der Bearbeiter kann die Kategorie bestaetigen oder begruendet aendern. |
+| FA-54 | Der Bearbeiter muss eine Resolution dokumentieren, bevor ein Delta final geschlossen werden kann. |
+| FA-55 | Statusaenderungen an Deltas werden auditierbar protokolliert. |
+
+### 6.6 Adressabgleich und VVM-ONGOING
 
 Die zuvor formulierte Regel zum verpflichtenden Adressabgleich vor `VVM-ONGOING` bleibt als fachliche Rahmenbedingung bestehen, wird aber in der aktualisierten Loesung aus Pfau-Sicht umgesetzt.
 
 | ID | Anforderung |
 | --- | --- |
-| FA-30 | Vor `VVM-ONGOING` muss ein Adressabgleich mit konfigurierbarem Vorlauf erzwungen werden. |
-| FA-31 | Der Default-Vorlauf betraegt `10 Arbeitstage vor VVM-ONGOING`. |
-| FA-32 | Die Arbeitstagsberechnung beruecksichtigt Wochenenden und perspektivisch Feiertage. |
-| FA-33 | Die Pfau-Daten dienen als vorbereitende Datenbasis fuer diesen Adressabgleich. |
-| FA-34 | Ob die harte VVM-Blockade in Pfau, GBGS oder einem uebergeordneten Prozessservice erfolgt, ist technisch zu entscheiden. |
+| FA-60 | Vor `VVM-ONGOING` muss ein Adressabgleich mit konfigurierbarem Vorlauf erzwungen werden. |
+| FA-61 | Der Default-Vorlauf betraegt `10 Arbeitstage vor VVM-ONGOING`. |
+| FA-62 | Die Arbeitstagsberechnung beruecksichtigt Wochenenden und perspektivisch Feiertage. |
+| FA-63 | Die Pfau-Daten und die Deltaliste bilden die pruefbare Datenbasis fuer diesen Adressabgleich. |
+| FA-64 | Ob die harte VVM-Blockade in Pfau, GBGS oder einem uebergeordneten Prozessservice erfolgt, ist technisch zu entscheiden. |
 
 Berechnungsregel:
 
@@ -200,6 +254,7 @@ Der Dialog bietet zwei klar getrennte Aktionen:
 | --- | --- | --- |
 | Gebietsdaten | `Gebietsdaten fuer Adressabgleich erfassen` | Reduzierter Wizard fuer Gebietsdaten |
 | KLS-Liste | `KLS-BT-Liste fuer PST vorschlagen` | KLS aus Bautranche anzeigen/exportieren |
+| KLS-Abgleich | `KLS-Abgleich mit GBGS pruefen` | Deltas zwischen Bautranche und GBGS-Gebiet anzeigen und bearbeiten |
 
 ### 7.3 Gebietsdaten-Wizard
 
@@ -239,6 +294,42 @@ oder, falls technische Uebergabe an PST umgesetzt wird:
 ```text
 KLS-BT-Liste fuer PST bereitstellen
 ```
+
+### 7.5 Delta-GUI fuer KLS-Abgleich
+
+Die Delta-GUI ist die zentrale Arbeitsoberflaeche fuer Use Case 3. Sie zeigt nicht nur das Ergebnis eines Abgleichslaufs, sondern fuehrt den Bearbeitungsstand bis zur Abschlussfaehigkeit der Bautranche.
+
+Die GUI besteht aus zwei Bereichen:
+
+| Bereich | Inhalt | Zweck |
+| --- | --- | --- |
+| Deltaliste | Alle aktuellen Deltas zwischen Bautranche und GBGS-Gebiet | Bearbeitung, Kategorisierung und Aufloesung der Abweichungen |
+| Nicht zugeordnete Vertrags-KLS | KLS aus dem Vertrag, die keiner Bautranche und keinem aktuellen Delta zugeordnet sind | Transparenz ueber noch zu klaerende KLS ausserhalb der Deltaliste |
+
+Die Deltaliste sollte folgende Spalten enthalten:
+
+| Spalte | Beschreibung |
+| --- | --- |
+| Delta-ID | Technische oder fachliche Referenz |
+| KLS-ID | Betroffene KLS |
+| Abweichung | Kurzbeschreibung, z.B. `Fehlt in GBGS` |
+| Kategorie | Fachlicher Deltagrund |
+| Master BT | Status im Bautranchenumfang |
+| Slave GBGS | Status im GBGS-Gebiet |
+| Owner | Zustaendige Rolle/Organisation |
+| Status | `Offen`, `In Klaerung`, `In Umsetzung`, `Geloest`, `Automatisch erledigt`, `Akzeptierte Abweichung` |
+| Loesungsvorschlag | Naechste empfohlene Aktion |
+| Letzte Aktualisierung | Zeitpunkt des letzten Abgleichs oder der letzten Bearbeitung |
+
+Die Unter-GUI `Nicht zugeordnete Vertrags-KLS` sollte mindestens anzeigen:
+
+| Spalte | Beschreibung |
+| --- | --- |
+| KLS-ID | KLS aus dem Vertrag |
+| Vertragsreferenz | Vertrag bzw. Untervertrag |
+| Ort/Adresshinweis | Hilfsinformation fuer Zuordnung |
+| Grund fuer Nichtzuordnung | Noch keiner Bautranche zugeordnet, keine GBGS-Referenz, technische KLS unvollstaendig |
+| Empfohlene Aktion | Bautranche zuordnen, KLS fachlich pruefen, Vertrag korrigieren |
 
 ## 8. Use Case 1: Gebietsdaten fuer Adressabgleich erfassen
 
@@ -492,15 +583,126 @@ Optionale Spalten:
 | Exportfehler | Fehler mit Korrelations-ID |
 | PST-Uebergabe nicht konfiguriert | Nur Download anbieten |
 
-## 11. Use Case 3: Verpflichtender Adressabgleich vor VVM-ONGOING
+## 11. Use Case 3: KLS-Umfangsabgleich Bautranche gegen GBGS
 
 ### 11.1 Ziel
 
-Vor dem Erreichen von `VVM-ONGOING` soll sichergestellt werden, dass der Adressabgleich rechtzeitig erfolgt.
+Der Use Case stellt sicher, dass der KLS-Umfang der Bautranche mit dem KLS-Umfang des zugehoerigen GBGS-Gebiets abgeglichen wird. Die Bautranche ist dabei die fuehrende Quelle. GBGS wird als nachgelagerte Vergleichsquelle betrachtet.
 
-### 11.2 Regel
+Ziel ist nicht nur die Anzeige von Unterschieden, sondern die steuerbare Aufloesung dieser Unterschiede bis zur Abschlussfaehigkeit der Bautranche.
 
-Der Pflichtzeitpunkt wird anhand eines konfigurierbaren Vorlaufs berechnet.
+### 11.2 Praemisse Master/Slave
+
+| Quelle | Rolle | Konsequenz |
+| --- | --- | --- |
+| Bautranche | Master | Definiert den fachlich fuehrenden Soll-KLS-Umfang |
+| GBGS-Gebiet | Slave | Wird gegen den Master verglichen und bei Abweichungen fachlich korrigiert oder begruendet abweichend akzeptiert |
+
+Diese Praemisse ist wichtig fuer alle Deltakategorien. Ein KLS, der nur in GBGS existiert, ist nicht automatisch korrekt, sondern muss gegen Bautranche, Vertrag und fachliche Gebietssicht geprueft werden.
+
+### 11.3 Abgleichslogik
+
+Der Abgleich verwendet drei Mengen:
+
+| Menge | Beschreibung |
+| --- | --- |
+| `BT_KLS` | KLS-Umfang der aktuellen Bautranche in Pfau |
+| `GBGS_KLS` | KLS-Umfang des gespeicherten GBGS-Gebiets |
+| `VERTRAG_KLS` | KLS aus dem Vertrag bzw. Untervertrag, soweit verfuegbar |
+
+Basisregeln:
+
+```text
+Delta A = BT_KLS - GBGS_KLS
+Delta B = GBGS_KLS - BT_KLS
+Delta C = Schnittmenge(BT_KLS, GBGS_KLS) mit abweichenden Metadaten
+Nicht zugeordnet = VERTRAG_KLS - alle bekannten Bautranchen-KLS - alle offenen Deltas
+```
+
+### 11.4 Deltakategorien mit Loesungsvorschlaegen
+
+| Kategorie | Erkennung | Fachliche Erlaeuterung | Primaerer Owner | Loesungsvorschlag |
+| --- | --- | --- | --- | --- |
+| `BT_FEHLT_IN_GBGS` | KLS ist in der Bautranche, aber nicht im GBGS-Gebiet | Der Master fordert eine KLS, die im GBGS-Gebiet noch fehlt. | GBGS/Pfau-Fachbearbeitung | KLS im GBGS-Gebiet ergaenzen oder begruenden, warum sie nicht ins Gebiet gehoert. |
+| `GBGS_NICHT_IN_BT` | KLS ist im GBGS-Gebiet, aber nicht in der Bautranche | GBGS enthaelt eine KLS, die im fuehrenden Bautranchenumfang nicht enthalten ist. | GBGS-Fachbearbeitung | Pruefen, ob KLS aus GBGS entfernt, in Bautranche nachgepflegt oder als begruendete Ausnahme akzeptiert wird. |
+| `KLS_IN_ANDERER_BT` | KLS ist im Vertrag vorhanden, aber einer anderen Bautranche zugeordnet | Die KLS koennte fachlich falsch oder bewusst anders trancheiert sein. | Pfau-Bautranchenbearbeitung | Zuordnung pruefen, Bautranche korrigieren oder dokumentierte Querzuordnung akzeptieren. |
+| `KLS_OHNE_BT_ZUORDNUNG` | KLS ist im Vertrag vorhanden, aber keiner Bautranche zugeordnet | Es existiert Vertragsumfang, der noch nicht in der Bautranchenstruktur abgebildet ist. | Vertrags-/Pfau-Bearbeitung | KLS einer Bautranche zuordnen oder Vertrag/KLS-Stammdaten korrigieren. |
+| `METADATEN_ABWEICHEND` | KLS in beiden Quellen vorhanden, aber OID, Ort, Adressbezug oder Gebietskontext weichen ab | Umfang ist mengenmaessig gleich, aber die fachliche Referenz ist nicht eindeutig. | Datenqualitaet/Pfau | Fachliche Quelle pruefen, Metadaten in Pfau oder GBGS korrigieren. |
+| `GBGS_NEUE_KLS` | GBGS liefert eine neue KLS, die in Pfau/BT nicht bekannt ist | Moeglicherweise wurde GBGS ausserhalb des Pfau-Prozesses erweitert. | GBGS-Fachbearbeitung | Herkunft pruefen. Falls fachlich korrekt, Bautranche/Vertrag nachpflegen; falls falsch, KLS aus GBGS entfernen. |
+| `KLS_TECHNISCH_UNGUELTIG` | KLS-ID fehlt, ist nicht eindeutig oder technisch ungueltig | Der Abgleich kann die KLS nicht belastbar verarbeiten. | Datenqualitaet/Pfau | KLS-ID in der Bautranchen-GUI bzw. im Quellsystem korrigieren. |
+| `AKZEPTIERTE_ABWEICHUNG` | Bearbeiter markiert Delta als fachlich akzeptiert | Abweichung bleibt bestehen, blockiert aber nach Entscheidung nicht mehr. | Fachverantwortung | Begruendung erfassen, Freigabestatus setzen, Audit sichern. |
+
+### 11.5 Aufloesungsworkflows pro Kategorie
+
+| Kategorie | Zuweisung | Bearbeiterhinweis | Workflow | Abschlussbedingung |
+| --- | --- | --- | --- | --- |
+| `BT_FEHLT_IN_GBGS` | GBGS/Pfau-Fachbearbeitung | KLS ist im Master enthalten, fehlt aber im GBGS-Gebiet. | GBGS-Gebiet pruefen, KLS ergaenzen, erneuten Abgleich starten. | KLS ist in GBGS vorhanden oder Abweichung ist begruendet akzeptiert. |
+| `GBGS_NICHT_IN_BT` | GBGS-Fachbearbeitung | GBGS enthaelt eine KLS ausserhalb des Master-Umfangs. | Herkunft pruefen, GBGS entfernen oder Bautranche nachpflegen. | KLS ist entfernt, nachgepflegt oder als akzeptierte Abweichung dokumentiert. |
+| `KLS_IN_ANDERER_BT` | Pfau-Bautranchenbearbeitung | KLS ist vorhanden, aber nicht in der erwarteten Bautranche. | Tranchierung pruefen, Zuordnung korrigieren oder Querbezug dokumentieren. | KLS ist korrekt zugeordnet oder Ausnahme freigegeben. |
+| `KLS_OHNE_BT_ZUORDNUNG` | Vertrags-/Pfau-Bearbeitung | Vertrags-KLS ist noch nicht operativ zugeordnet. | KLS einer Bautranche zuordnen, Nichtrelevanz begruenden oder Vertragsdaten korrigieren. | KLS erscheint in einer Bautranche oder ist fachlich ausgeschlossen. |
+| `METADATEN_ABWEICHEND` | Datenqualitaet/Pfau | KLS ist in beiden Quellen vorhanden, aber Kontextdaten weichen ab. | Fuehrende Quelle bestimmen, Daten korrigieren, erneuten Abgleich starten. | Metadaten stimmen oder Abweichung ist akzeptiert. |
+| `KLS_TECHNISCH_UNGUELTIG` | Datenqualitaet/Pfau | KLS kann technisch nicht eindeutig verarbeitet werden. | KLS-ID oder Referenzdaten korrigieren. | KLS ist eindeutig und erneut abgleichbar. |
+
+### 11.6 Bearbeitungsstatus der Deltaliste
+
+| Status | Bedeutung | Sichtbarkeit |
+| --- | --- | --- |
+| `OFFEN` | Delta wurde erzeugt und ist noch nicht bearbeitet | In aktueller Deltaliste sichtbar |
+| `IN_KLAERUNG` | Bearbeiter hat Delta uebernommen oder Rueckfrage gestartet | In aktueller Deltaliste sichtbar |
+| `IN_UMSETZUNG` | Korrektur in Pfau, GBGS oder Vertrag wurde angestossen | In aktueller Deltaliste sichtbar |
+| `GELOEST` | Bearbeiter hat Delta final geschlossen | In Historie sichtbar, nicht mehr blockierend |
+| `AUTO_ERLEDIGT` | Erneuter Abgleich erkennt, dass Delta nicht mehr besteht | In Historie sichtbar, nicht mehr blockierend |
+| `AKZEPTIERTE_ABWEICHUNG` | Fachlich freigegebene, bleibende Abweichung | In aktueller Liste oder Sonderfilter sichtbar, nicht blockierend sofern freigegeben |
+| `WIEDER_GEOEFFNET` | Delta war geloest, tritt aber nach erneutem Abgleich wieder auf | In aktueller Deltaliste sichtbar und blockierend |
+
+### 11.7 Aktualisierung der Deltaliste
+
+Die Deltaliste wird durch zwei Ereignisse aktualisiert:
+
+| Trigger | Wirkung |
+| --- | --- |
+| Erneuter GBGS-Abgleichslauf | GBGS-KLS werden neu gelesen, Deltas werden neu berechnet, bestehende offene Deltas aktualisiert, geloeste Deltas ggf. als `AUTO_ERLEDIGT` markiert oder als `WIEDER_GEOEFFNET` reaktiviert. |
+| Finale Loesung durch Bearbeiter | Einzelnes Delta wird mit Resolution, Kommentar, Bearbeiter und Zeitpunkt geschlossen. |
+
+Die Periodizitaet des automatischen GBGS-Abgleichs ist fachlich/technisch festzulegen. Empfehlung fuer das Zielbild:
+
+| Variante | Beschreibung | Bewertung |
+| --- | --- | --- |
+| Manuell | Bearbeiter startet Abgleich in der Delta-GUI | Einfach, aber fehleranfaellig |
+| Periodisch taeglich | Nachtlauf aktualisiert alle offenen Bautranchen | Gute Balance fuer operative Steuerung |
+| Ereignisbasiert | Aenderung in GBGS oder Pfau triggert Abgleich | Zielbild mit hoechster Aktualitaet |
+
+Empfehlung: MVP mit manuellem Abgleich plus taeglichem periodischem Lauf, Zielbild ereignisbasiert.
+
+### 11.8 Verhalten bei Statusaenderungen
+
+Die Deltaliste soll standardmaessig nur aktuelle, offene und steuerungsrelevante Eintraege zeigen. Geloeste Eintraege bleiben ueber Filter/Historie erreichbar.
+
+| Situation | Verhalten |
+| --- | --- |
+| Delta wird final geloest | Eintrag wechselt auf `GELOEST`, verschwindet aus Standardfilter, bleibt in Historie |
+| Delta wird durch neuen Abgleich nicht mehr gefunden | Eintrag wechselt auf `AUTO_ERLEDIGT` |
+| Geloestes Delta tritt erneut auf | Eintrag wird als `WIEDER_GEOEFFNET` sichtbar und erneut blockierend |
+| Akzeptierte Abweichung besteht weiterhin | Eintrag bleibt mit Status `AKZEPTIERTE_ABWEICHUNG` sichtbar, aber nicht blockierend |
+| Kategorie wird geaendert | Alte und neue Kategorie werden auditierbar gespeichert |
+
+### 11.9 Abschlussfaehigkeit der Bautranche
+
+Eine Bautranche ist fuer den weiteren Abrechnungsprozess nur dann abschliessbar, wenn folgende Bedingungen erfuellt sind:
+
+| Bedingung | Muss-Kriterium |
+| --- | --- |
+| Gebietsdaten | Gueltige Gebietsdaten inkl. validierter Gebiets-ID sind gespeichert |
+| KLS-ID-Vollstaendigkeit | Keine Adresse in der Bautranche ohne KLS-ID |
+| KLS-Abgleich | Letzter Abgleichslauf ist erfolgreich und nicht aelter als konfigurierter Maximalwert |
+| Deltas | Keine offenen blockierenden Deltas vorhanden |
+| Nicht zugeordnete Vertrags-KLS | Keine relevanten unzugeordneten Vertrags-KLS vorhanden oder alle fachlich ausgeschlossen |
+| Akzeptierte Abweichungen | Alle akzeptierten Abweichungen sind begruendet und freigegeben |
+| VVM-Vorlauf | Adressabgleich wurde vor `VVM-ONGOING` innerhalb des konfigurierten Vorlaufs durchgefuehrt |
+
+### 11.10 Technische Einordnung VVM-ONGOING
+
+Der Pflichtzeitpunkt fuer den Adressabgleich wird weiterhin anhand eines konfigurierbaren Vorlaufs berechnet.
 
 Default:
 
@@ -514,21 +716,15 @@ Berechnung:
 adressabgleichFaelligAb = VVM_ONGOING - konfigurierterVorlaufInArbeitstagen
 ```
 
-### 11.3 Technische Einordnung
+Die harte Blockade des VVM-Uebergangs bzw. der Abrechnungsfreigabe kann technisch in Pfau, GBGS oder einem uebergeordneten Prozessservice umgesetzt werden. Aus Solution-Sicht ist entscheidend, dass Pfau den pruefbaren Status bereitstellt:
 
-Die aktualisierte Pfau-Funktion liefert die notwendigen Daten und Prozessartefakte fuer den Adressabgleich. Die harte Blockade des VVM-Uebergangs kann technisch an verschiedenen Stellen umgesetzt werden:
-
-| Option | Beschreibung |
-| --- | --- |
-| Pfau | Blockiert Pfau-seitige Prozessaktion |
-| GBGS | Blockiert GBGS-seitigen VVM-Uebergang |
-| Prozessservice | Zentraler Validator fuer Prozessstatus |
-
-Empfehlung:
-
-- Backend-seitige Validierung ist verpflichtend.
-- Frontend darf nur visualisieren, nicht allein entscheiden.
-- Die finale Systemverantwortung fuer die harte VVM-Blockade ist fachlich/architektonisch zu entscheiden.
+```text
+abschlussfaehig = gebietsdatenGueltig
+  UND keineAdresseOhneKlsId
+  UND letzterAbgleichGueltig
+  UND keineBlockierendenDeltas
+  UND keineRelevantenUnzugeordnetenVertragsKls
+```
 
 ## 12. Fachlicher Gesamtprozess
 
@@ -544,9 +740,16 @@ Empfehlung:
 10. System speichert Gebietsdaten.
 11. Nutzer erzeugt KLS-BT-Listenvorschlag.
 12. Pfau stellt KLS aus Bautranche bereit.
-13. PST erzeugt echte `Liste 1`.
-14. Adressabgleich Pfau GBGS kann auf Basis der Daten erfolgen.
-15. Vor `VVM-ONGOING` wird der Adressabgleich gemaess konfiguriertem Vorlauf erzwungen.
+13. Nutzer startet oder prueft den KLS-Abgleich mit GBGS.
+14. Pfau liest den Master-KLS-Umfang aus der Bautranche.
+15. Pfau liest den Slave-KLS-Umfang aus GBGS.
+16. Pfau berechnet Deltas und zeigt sie in der Delta-GUI an.
+17. Pfau zeigt nicht zugeordnete Vertrags-KLS in einer separaten Unter-GUI an.
+18. Bearbeiter kategorisiert und loest Deltas gemaess Workflow.
+19. Ein erneuter Abgleich aktualisiert die Deltaliste.
+20. Sobald keine blockierenden Deltas und keine relevanten unzugeordneten Vertrags-KLS mehr bestehen, ist die Bautranche fachlich abschlussfaehig.
+21. PST erzeugt echte `Liste 1`.
+22. Vor `VVM-ONGOING` wird der Adressabgleich gemaess konfiguriertem Vorlauf erzwungen.
 
 ## 13. UML-Diagramme
 
@@ -562,6 +765,9 @@ flowchart LR
   AreaWizard["Gebietsdaten erfassen"]
   IdRules["Gebiets-ID-Regeln"]
   KlsWizard["KLS-BT-Liste vorschlagen"]
+  DeltaGui["KLS-Abgleich mit GBGS pruefen"]
+  DeltaList["Deltaliste bearbeiten"]
+  Unassigned["Nicht zugeordnete Vertrags-KLS pruefen"]
   Pst["PST erzeugt echte Liste 1"]
   Reconcile["Adressabgleich Pfau GBGS"]
   Vvm["VVM-ONGOING"]
@@ -574,9 +780,14 @@ flowchart LR
   GbgsFunctions --> AreaWizard
   AreaWizard --> IdRules
   GbgsFunctions --> KlsWizard
+  GbgsFunctions --> DeltaGui
+  DeltaGui --> DeltaList
+  DeltaGui --> Unassigned
   KlsWizard --> Pst
   AreaWizard --> Reconcile
-  Pst --> Reconcile
+  DeltaList --> Reconcile
+  Unassigned --> Reconcile
+  Reconcile --> Pst
   Reconcile --> Vvm
 ```
 
@@ -594,6 +805,7 @@ flowchart TD
   G --> H{"Teilfunktion auswaehlen"}
   H -- "Gebietsdaten" --> I["Gebietsdaten-Wizard starten"]
   H -- "KLS-BT-Liste" --> J["KLS-BT-Listen-Wizard starten"]
+  H -- "KLS-Abgleich" --> K["Delta-GUI fuer KLS-Abgleich starten"]
 ```
 
 ### 13.3 Aktivitaetsdiagramm: Gebietsdaten
@@ -633,6 +845,31 @@ flowchart TD
   G -- "PST bereitstellen" --> I["Uebergabe an PST vorbereiten"]
   H --> J["Aktion protokollieren"]
   I --> J
+```
+
+### 13.5 Aktivitaetsdiagramm: KLS-Abgleich und Deltafuehrung
+
+```mermaid
+flowchart TD
+  A["KLS-Abgleich mit GBGS gestartet"] --> B["Master-KLS aus Bautranche laden"]
+  B --> C["Slave-KLS aus GBGS-Gebiet laden"]
+  C --> D["Vertrags-KLS laden"]
+  D --> E["Mengenvergleich berechnen"]
+  E --> F{"Abweichungen vorhanden?"}
+  F -- "Nein" --> G["Abgleich ohne Deltas dokumentieren"]
+  F -- "Ja" --> H["Deltas erzeugen oder aktualisieren"]
+  H --> I["Deltagrund vorschlagen"]
+  I --> J["Owner und Loesungsworkflow zuordnen"]
+  J --> K["Deltaliste anzeigen"]
+  D --> L["Nicht zugeordnete Vertrags-KLS berechnen"]
+  L --> M["Unter-GUI anzeigen"]
+  K --> N{"Bearbeiter loest Delta?"}
+  N -- "Ja" --> O["Resolution dokumentieren"]
+  O --> P["Delta final schliessen"]
+  N -- "Nein" --> Q["Delta bleibt im Arbeitsvorrat"]
+  P --> R["Abschlussfaehigkeit neu bewerten"]
+  Q --> R
+  M --> R
 ```
 
 ### 13.5 Sequenzdiagramm: Prozess-Dropdown
@@ -710,6 +947,39 @@ sequenceDiagram
   API-->>UI: Ergebnis
 ```
 
+### 13.8a Sequenzdiagramm: KLS-Abgleich
+
+```mermaid
+sequenceDiagram
+  actor User as PTI Nutzer
+  participant UI as Pfau UI
+  participant API as GBGS-Funktionen API
+  participant BT as Bautranchen/KLS Service
+  participant GBGS as GBGS KLS API
+  participant DELTA as Delta Service
+  participant DB as Delta Persistenz
+  participant AUD as Audit Log
+
+  User->>UI: Waehlt KLS-Abgleich mit GBGS pruefen
+  UI->>API: POST /kls-reconciliation/run
+  API->>BT: getKlsForBautranche(bautrancheId)
+  BT-->>API: Master BT_KLS
+  API->>GBGS: getKlsForGebiet(gebietsId)
+  GBGS-->>API: Slave GBGS_KLS
+  API->>DELTA: compare(master, slave, contractKls)
+  DELTA->>DB: upsertDeltaList()
+  DELTA-->>API: deltas, unassignedContractKls, completionStatus
+  API->>AUD: log reconciliation run
+  API-->>UI: Abgleichergebnis
+  UI-->>User: Delta-GUI anzeigen
+
+  User->>UI: Loest Delta mit Resolution
+  UI->>API: PATCH /kls-deltas/{deltaId}
+  API->>DB: update status, resolution
+  API->>AUD: log delta resolution
+  API-->>UI: Status aktualisiert
+```
+
 ### 13.8 Komponentendiagramm
 
 ```mermaid
@@ -721,6 +991,8 @@ flowchart TB
     AREA["Gebietsdaten-Wizard"]
     RULE["Kontextsensitive ID-Regeln"]
     KLSUI["KLS-BT-Listen-Wizard"]
+    DELTAUI["Delta-GUI KLS-Abgleich"]
+    UNASSIGNEDUI["Unter-GUI nicht zugeordnete Vertrags-KLS"]
   end
 
   subgraph Backend["Pfau Backend"]
@@ -729,6 +1001,11 @@ flowchart TB
     VALID["Gebiets-ID Validator"]
     DATA["Gebietsdaten Persistenz"]
     KLSAPI["Bautranchen/KLS API"]
+    GBGSKLS["GBGS-KLS Adapter"]
+    DELTASVC["Delta Service"]
+    DELTADB["Delta Persistenz"]
+    CONTRACT["Vertrags-KLS Adapter"]
+    COMPLETE["Abschlussfaehigkeits-Service"]
     EXPORT["Export/Bereitstellung"]
     AUD["Audit Logging"]
   end
@@ -737,6 +1014,7 @@ flowchart TB
     WFMT["WFMT"]
     PST["PST"]
     GBGS["GBGS"]
+    CONTRACTSYS["Vertragssystem"]
   end
 
   PD --> PROC
@@ -750,9 +1028,21 @@ flowchart TB
   FAPI --> DATA
   MOD --> KLSUI
   KLSUI --> KLSAPI
+  MOD --> DELTAUI
+  DELTAUI --> FAPI
+  DELTAUI --> UNASSIGNEDUI
   KLSAPI --> EXPORT
   EXPORT --> PST
+  FAPI --> DELTASVC
+  DELTASVC --> KLSAPI
+  DELTASVC --> GBGSKLS
+  DELTASVC --> CONTRACT
+  DELTASVC --> DELTADB
+  DELTASVC --> COMPLETE
+  GBGSKLS --> GBGS
+  CONTRACT --> CONTRACTSYS
   FAPI --> AUD
+  DELTASVC --> AUD
   EXPORT --> AUD
   FAPI --> GBGS
 ```
@@ -767,8 +1057,17 @@ stateDiagram-v2
   WFMT_ERZEUGT: GBGS-Funktionen aktiv
   WFMT_ERZEUGT --> GEBIETSDATEN_ERFASST: Gebietsdaten gespeichert
   GEBIETSDATEN_ERFASST --> KLS_LISTE_ERSTELLT: KLS-BT-Liste exportiert/bereitgestellt
-  KLS_LISTE_ERSTELLT --> ADRESSABGLEICH_BEREIT: Input fuer Adressabgleich vorhanden
-  ADRESSABGLEICH_BEREIT --> [*]
+  KLS_LISTE_ERSTELLT --> ABGLEICH_GESTARTET: KLS-Abgleich gestartet
+  ABGLEICH_GESTARTET --> DELTAS_OFFEN: Deltas vorhanden
+  ABGLEICH_GESTARTET --> ABGLEICH_OK: Keine Deltas
+  DELTAS_OFFEN --> DELTAS_IN_KLAERUNG: Bearbeitung gestartet
+  DELTAS_IN_KLAERUNG --> DELTAS_OFFEN: Delta wieder geoeffnet
+  DELTAS_IN_KLAERUNG --> DELTAS_GELOEST: Alle blockierenden Deltas geloest
+  DELTAS_GELOEST --> ABGLEICH_GESTARTET: Erneuter GBGS-Abgleich
+  ABGLEICH_OK --> ABSCHLUSSFAEHIG: Keine blockierenden Deltas und keine unzugeordneten Vertrags-KLS
+  DELTAS_GELOEST --> ABSCHLUSSFAEHIG: Abschlusskriterien erfuellt
+  ABSCHLUSSFAEHIG --> ABRECHNUNG_BEREIT: Freigabe fuer weitere Abrechnung
+  ABRECHNUNG_BEREIT --> [*]
 ```
 
 ## 14. Architektur und Komponenten
@@ -783,6 +1082,8 @@ stateDiagram-v2
 | Gebiets-ID-Hilfe | Kontextsensitiver Regeltext | DL, GFP, BEMO getrennt |
 | Gebiets-ID-Frontend-Validator | Sofortfeedback im Formular | Backend bleibt fuehrend |
 | KLS-BT-Listen-Wizard | KLS anzeigen/exportieren | Keine WE/GE-Pruefung |
+| Delta-GUI KLS-Abgleich | Anzeige und Bearbeitung der Deltaliste | Master Bautranche gegen Slave GBGS |
+| Unter-GUI nicht zugeordnete Vertrags-KLS | Anzeige noch nicht zugeordneter Vertrags-KLS | Separater Arbeitsvorrat neben Deltaliste |
 | Fehler-/Hinweiskomponente | Fachliche und technische Fehler | Mit Korrelations-ID bei technischen Fehlern |
 
 ### 14.2 Backend-Komponenten
@@ -794,6 +1095,11 @@ stateDiagram-v2
 | Gebiets-ID Validator | Validiert ID nach Ausbautreiber | Reusable fuer Frontend-Kontrakt |
 | Gebietsdaten Persistenz | Speichert reduzierte Gebietsdaten | Auditierbar |
 | KLS API | Liefert KLS der Bautranche | Quelle fuer KLS-BT-Liste |
+| GBGS-KLS Adapter | Liest KLS-Umfang des GBGS-Gebiets | Slave-Quelle im Abgleich |
+| Vertrags-KLS Adapter | Liest KLS-Umfang aus Vertrag/Untervertrag | Quelle fuer Unter-GUI nicht zugeordnete KLS |
+| Delta Service | Berechnet, kategorisiert und aktualisiert Deltas | Fachlicher Kern von Use Case 3 |
+| Delta Persistenz | Speichert Deltas, Status, Resolution und Historie | Auditierbar und historisierbar |
+| Abschlussfaehigkeits-Service | Bewertet, ob Bautranche abrechnungsbereit ist | Nutzt Delta- und Validierungsstatus |
 | Export/Bereitstellung | Erzeugt CSV/XLSX oder Uebergabe an PST | Zielbild offen |
 | Audit Logging | Protokolliert relevante Aktionen | Security/Compliance |
 
@@ -803,7 +1109,8 @@ stateDiagram-v2
 | --- | --- | --- |
 | WFMT | Prozessstatus | Liefert oder beeinflusst Status `WFMT-Auftrag erzeugt` |
 | PST | Datei/Schnittstelle | Erzeugt echte `Liste 1` |
-| GBGS | Referenz/Zielkontext | Kein vollstaendiger Import aus Pfau |
+| GBGS | KLS-Umfang je Gebiet | Slave-Quelle fuer KLS-Abgleich |
+| Vertragssystem | KLS-Umfang je Vertrag/Untervertrag | Quelle fuer nicht zugeordnete Vertrags-KLS |
 
 ## 15. Schnittstellenentwurf
 
@@ -1003,6 +1310,148 @@ POST /api/pfau/gbgs-functions/bautranchen/{bautrancheId}/kls-list/provide-to-pst
 
 Die konkrete Schnittstelle ist mit PST abzustimmen.
 
+### 15.8 KLS-Abgleich starten
+
+```http
+POST /api/pfau/gbgs-functions/bautranchen/{bautrancheId}/kls-reconciliation/run
+```
+
+Payload:
+
+```json
+{
+  "gebietsId": "BEMO_1312200021",
+  "runMode": "MANUAL",
+  "includeContractKls": true
+}
+```
+
+Antwort:
+
+```json
+{
+  "runId": "rec-20260619-001",
+  "bautrancheId": "5005300021",
+  "gebietsId": "BEMO_1312200021",
+  "masterCount": 3,
+  "slaveCount": 3,
+  "deltaCount": 3,
+  "blockingDeltaCount": 2,
+  "unassignedContractKlsCount": 2,
+  "completionStatus": "NOT_READY",
+  "lastRunAt": "2026-06-19T08:15:00Z"
+}
+```
+
+### 15.9 Deltaliste laden
+
+```http
+GET /api/pfau/gbgs-functions/bautranchen/{bautrancheId}/kls-deltas?status=active
+```
+
+Antwort:
+
+```json
+{
+  "bautrancheId": "5005300021",
+  "gebietsId": "BEMO_1312200021",
+  "lastRunAt": "2026-06-19T08:15:00Z",
+  "items": [
+    {
+      "deltaId": "DELTA-001",
+      "klsId": "44113099",
+      "category": "BT_FEHLT_IN_GBGS",
+      "description": "KLS ist in der Bautranche vorhanden, fehlt aber im GBGS-Gebiet.",
+      "masterState": "IN_BT",
+      "slaveState": "MISSING_IN_GBGS",
+      "owner": "GBGS_FACHBEARBEITUNG",
+      "status": "OFFEN",
+      "resolutionProposal": "KLS im GBGS-Gebiet ergaenzen oder begruendet ausschliessen.",
+      "blocking": true
+    }
+  ]
+}
+```
+
+### 15.10 Delta aktualisieren
+
+```http
+PATCH /api/pfau/gbgs-functions/kls-deltas/{deltaId}
+```
+
+Payload:
+
+```json
+{
+  "status": "GELOEST",
+  "category": "BT_FEHLT_IN_GBGS",
+  "resolutionCode": "ADDED_TO_GBGS",
+  "resolutionComment": "KLS wurde im GBGS-Gebiet nachgepflegt.",
+  "assignedTo": "EMEA1\\A7577402"
+}
+```
+
+Antwort:
+
+```json
+{
+  "deltaId": "DELTA-001",
+  "status": "GELOEST",
+  "blocking": false,
+  "updatedAt": "2026-06-19T09:10:00Z"
+}
+```
+
+### 15.11 Nicht zugeordnete Vertrags-KLS laden
+
+```http
+GET /api/pfau/gbgs-functions/bautranchen/{bautrancheId}/contract-kls/unassigned
+```
+
+Antwort:
+
+```json
+{
+  "contractId": "13122",
+  "items": [
+    {
+      "klsId": "99110001",
+      "contractReference": "13122",
+      "addressHint": "Berg, Ahornweg",
+      "reason": "Noch keiner Bautranche zugeordnet",
+      "proposal": "Bautranchierung pruefen und KLS einer Bautranche zuordnen"
+    }
+  ]
+}
+```
+
+### 15.12 Abschlussfaehigkeit pruefen
+
+```http
+GET /api/pfau/gbgs-functions/bautranchen/{bautrancheId}/completion-status
+```
+
+Antwort:
+
+```json
+{
+  "bautrancheId": "5005300021",
+  "completionStatus": "NOT_READY",
+  "checks": [
+    {
+      "key": "NO_ADDRESSES_WITHOUT_KLS_ID",
+      "passed": false,
+      "message": "Eine Adresse in der Bautranche hat keine KLS-ID."
+    },
+    {
+      "key": "NO_BLOCKING_DELTAS",
+      "passed": false,
+      "message": "Es existieren zwei offene blockierende Deltas."
+    }
+  ]
+}
+```
+
 ## 16. Datenmodell
 
 ### 16.1 Entity `GbgsAreaData`
@@ -1053,6 +1502,70 @@ Die konkrete Schnittstelle ist mit PST abzustimmen.
 | `GFP_PREFIX_RULE` | Vorlaeufige GFP-Regel |
 | `BEMO_10_DIGIT_CONTRACT` | BEMO-Regel mit 10 Ziffern |
 
+### 16.5 Entity `KlsReconciliationRun`
+
+| Attribut | Typ | Pflicht | Beschreibung |
+| --- | --- | --- | --- |
+| `id` | UUID | ja | Abgleichslauf-ID |
+| `bautrancheId` | String | ja | Bautranche |
+| `gebietsId` | String | ja | GBGS-Gebiet |
+| `runMode` | Enum | ja | `MANUAL`, `SCHEDULED`, `EVENT_TRIGGERED` |
+| `masterCount` | Integer | ja | Anzahl KLS in Bautranche |
+| `slaveCount` | Integer | ja | Anzahl KLS in GBGS |
+| `deltaCount` | Integer | ja | Anzahl erzeugter/aktualisierter Deltas |
+| `blockingDeltaCount` | Integer | ja | Anzahl blockierender Deltas |
+| `unassignedContractKlsCount` | Integer | ja | Anzahl nicht zugeordneter Vertrags-KLS |
+| `status` | Enum | ja | `SUCCESS`, `FAILED`, `PARTIAL` |
+| `startedAt` | DateTime | ja | Startzeitpunkt |
+| `finishedAt` | DateTime | nein | Ende |
+| `triggeredBy` | String | ja | Nutzer oder System |
+
+### 16.6 Entity `KlsDelta`
+
+| Attribut | Typ | Pflicht | Beschreibung |
+| --- | --- | --- | --- |
+| `id` | UUID | ja | Delta-ID |
+| `bautrancheId` | String | ja | Bautranche |
+| `gebietsId` | String | ja | GBGS-Gebiet |
+| `klsId` | String | ja | Betroffene KLS |
+| `category` | Enum | ja | Deltakategorie |
+| `masterState` | Enum | ja | Zustand im Bautranchenumfang |
+| `slaveState` | Enum | ja | Zustand im GBGS-Umfang |
+| `status` | Enum | ja | Bearbeitungsstatus |
+| `ownerRole` | Enum | ja | Ziel-Owner |
+| `assignedTo` | String | nein | Konkreter Bearbeiter |
+| `blocking` | Boolean | ja | Blockiert Abschlussfaehigkeit |
+| `resolutionProposal` | String | ja | Systemseitiger Loesungsvorschlag |
+| `resolutionCode` | Enum | nein | Gewaehlte Resolution |
+| `resolutionComment` | String | nein | Fachliche Begruendung |
+| `firstDetectedRunId` | UUID | ja | Erster Abgleichslauf |
+| `lastDetectedRunId` | UUID | ja | Letzter Abgleichslauf |
+| `createdAt` | DateTime | ja | Anlagezeitpunkt |
+| `updatedAt` | DateTime | ja | Letzte Aenderung |
+| `resolvedAt` | DateTime | nein | Abschlusszeitpunkt |
+
+### 16.7 Entity `UnassignedContractKls`
+
+| Attribut | Typ | Pflicht | Beschreibung |
+| --- | --- | --- | --- |
+| `id` | UUID | ja | Technische ID |
+| `contractId` | String | ja | Vertrag/Untervertrag |
+| `klsId` | String | ja | KLS aus Vertragsumfang |
+| `addressHint` | String | nein | Hilfsinformation |
+| `reason` | String | ja | Grund der Nichtzuordnung |
+| `proposal` | String | ja | Empfohlene Aktion |
+| `blocking` | Boolean | ja | Blockiert Abschlussfaehigkeit |
+| `status` | Enum | ja | `OFFEN`, `GEKLAERT`, `AUSGESCHLOSSEN` |
+
+### 16.8 Enums fuer Deltas
+
+| Enum | Werte |
+| --- | --- |
+| `KlsDeltaCategory` | `BT_FEHLT_IN_GBGS`, `GBGS_NICHT_IN_BT`, `KLS_IN_ANDERER_BT`, `KLS_OHNE_BT_ZUORDNUNG`, `METADATEN_ABWEICHEND`, `GBGS_NEUE_KLS`, `KLS_TECHNISCH_UNGUELTIG`, `AKZEPTIERTE_ABWEICHUNG` |
+| `KlsDeltaStatus` | `OFFEN`, `IN_KLAERUNG`, `IN_UMSETZUNG`, `GELOEST`, `AUTO_ERLEDIGT`, `AKZEPTIERTE_ABWEICHUNG`, `WIEDER_GEOEFFNET` |
+| `KlsDeltaOwnerRole` | `PFAU_BEARBEITUNG`, `GBGS_FACHBEARBEITUNG`, `VERTRAG_BEARBEITUNG`, `DATENQUALITAET`, `FACHVERANTWORTUNG` |
+| `ResolutionCode` | `ADDED_TO_GBGS`, `REMOVED_FROM_GBGS`, `ADDED_TO_BT`, `REMOVED_FROM_BT`, `CONTRACT_FIXED`, `METADATA_FIXED`, `ACCEPTED_EXCEPTION`, `NOT_RELEVANT` |
+
 ## 17. Validierung
 
 ### 17.1 Prozessstatus
@@ -1083,6 +1596,29 @@ Die konkrete Schnittstelle ist mit PST abzustimmen.
 | Gebiets-ID optional | Wird uebernommen, wenn gueltig gespeichert |
 | Keine WE/GE-Pruefung | Nicht Teil des Use Cases |
 
+### 17.4 KLS-Abgleich und Deltaliste
+
+| Regel | Beschreibung |
+| --- | --- |
+| Bautranche ist Master | Abweichungsbewertung geht immer vom BT-KLS-Umfang aus |
+| GBGS ist Slave | GBGS-KLS werden als Vergleichsmenge geladen |
+| KLS-ID Pflicht | KLS ohne ID koennen nicht in den Abgleich einbezogen werden und erzeugen blockierenden Validierungsfehler |
+| Delta-Kategorie Pflicht | Jedes aktive Delta muss eine Kategorie besitzen |
+| Delta-Status Pflicht | Jedes Delta muss einen eindeutigen Bearbeitungsstatus besitzen |
+| Resolution Pflicht bei Abschluss | `GELOEST` oder `AKZEPTIERTE_ABWEICHUNG` ist nur mit ResolutionCode und Kommentar erlaubt |
+| Historie erhalten | Geloeste und automatisch erledigte Deltas duerfen nicht physisch geloescht werden |
+| Reopen moeglich | Ein geloestes Delta kann bei erneutem Auftreten wieder geoeffnet werden |
+
+### 17.5 Abschlussfaehigkeit
+
+| Regel | Beschreibung |
+| --- | --- |
+| Keine Adresse ohne KLS-ID | Jede Adresse der Bautranche braucht eine KLS-ID |
+| Keine blockierenden Deltas | Status `OFFEN`, `IN_KLAERUNG`, `IN_UMSETZUNG`, `WIEDER_GEOEFFNET` blockiert, sofern `blocking=true` |
+| Keine relevanten unzugeordneten Vertrags-KLS | Offene Vertrags-KLS muessen zugeordnet oder ausgeschlossen sein |
+| Frischer Abgleich | Letzter erfolgreicher Abgleich darf nicht aelter als konfigurierter Grenzwert sein |
+| Akzeptierte Abweichungen freigegeben | Jede akzeptierte Abweichung braucht Begruendung und fachliche Freigabe |
+
 ## 18. Fehlerbehandlung
 
 | Fehler | Ursache | Verhalten |
@@ -1095,6 +1631,12 @@ Die konkrete Schnittstelle ist mit PST abzustimmen.
 | `KLS_SERVICE_UNAVAILABLE` | KLS-Service nicht erreichbar | Fehler und Retry |
 | `EXPORT_FAILED` | Export konnte nicht erzeugt werden | Fehler mit Korrelations-ID |
 | `PST_HANDOVER_FAILED` | PST-Uebergabe fehlgeschlagen | Export lokal anbieten, Fehler protokollieren |
+| `GBGS_KLS_UNAVAILABLE` | GBGS-KLS koennen nicht geladen werden | Abgleich abbrechen, letzter Stand bleibt sichtbar |
+| `CONTRACT_KLS_UNAVAILABLE` | Vertrags-KLS koennen nicht geladen werden | Abgleich mit Warnstatus `PARTIAL` markieren |
+| `KLS_ID_MISSING` | Adresse in Bautranche ohne KLS-ID | Abschluss blockieren, Hinweis auf Bautranche bearbeiten |
+| `DELTA_CATEGORY_REQUIRED` | Delta ohne Kategorie | Speichern ablehnen |
+| `DELTA_RESOLUTION_REQUIRED` | Delta soll geschlossen werden, aber Resolution fehlt | Statuswechsel ablehnen |
+| `RECONCILIATION_STALE` | Letzter Abgleich ist zu alt | Abschluss blockieren, neuen Abgleich anfordern |
 
 ## 19. Security, Berechtigungen und Audit
 
@@ -1118,6 +1660,12 @@ Auditpflichtige Aktionen:
 | Gebiets-ID ungueltig abgelehnt | Nutzer, Bautranche, Regel, Zeitpunkt |
 | KLS-BT-Liste exportiert | Nutzer, Bautranche, Anzahl KLS, Format, Zeitpunkt |
 | KLS-BT-Liste an PST bereitgestellt | Nutzer, Bautranche, PST-Referenz, Zeitpunkt |
+| KLS-Abgleich gestartet | Nutzer/System, Bautranche, Gebiets-ID, Run-ID, Ergebnis |
+| Delta erzeugt/aktualisiert | Delta-ID, KLS-ID, Kategorie, Status, Run-ID |
+| Delta geloest | Delta-ID, Bearbeiter, ResolutionCode, Kommentar, Zeitpunkt |
+| Delta wieder geoeffnet | Delta-ID, vorheriger Status, neuer Run-ID, Zeitpunkt |
+| Akzeptierte Abweichung freigegeben | Delta-ID, Freigeber, Begruendung, Zeitpunkt |
+| Abschlussfaehigkeit bewertet | Bautranche, Ergebnis, blockierende Kriterien |
 | Fehler bei Export/Uebergabe | Korrelations-ID, Fehlercode, Zeitpunkt |
 
 ### 19.3 Datenschutz
@@ -1137,6 +1685,11 @@ Auditpflichtige Aktionen:
 | `pfau.gbgsFunctions.areaId.rules.gfp` | `^GFP_.+$` | Vorlaeufige GFP-Regel |
 | `pfau.gbgsFunctions.areaId.rules.bemo` | `^BEMO_[0-9]{10}$` | BEMO-Regel |
 | `addressReconciliation.leadTimeWorkingDays` | `10` | Vorlauf vor VVM-ONGOING |
+| `addressReconciliation.gbgsSync.mode` | `MANUAL_AND_DAILY` | Periodizitaet des GBGS-Abgleichs |
+| `addressReconciliation.gbgsSync.dailyTime` | `02:00` | Uhrzeit fuer periodischen Abgleich |
+| `addressReconciliation.maxRunAgeWorkingDays` | `1` | Maximalalter des letzten erfolgreichen Abgleichs fuer Abschluss |
+| `addressReconciliation.blockOnUnassignedContractKls` | `true` | Offene Vertrags-KLS blockieren Abschluss |
+| `addressReconciliation.blockOnAcceptedDeviationMissingApproval` | `true` | Akzeptierte Abweichung braucht Freigabe |
 
 ## 21. Testkonzept
 
@@ -1148,6 +1701,9 @@ Auditpflichtige Aktionen:
 | Prozessstatus Mapping | WFMT fehlt/vorhanden |
 | Terminvalidierung | Ende vor Beginn, gueltige Reihenfolge |
 | KLS-Mapper | KLS aus Bautranche in Exportmodell |
+| Delta-Vergleich | BT fehlt in GBGS, GBGS nicht in BT, Schnittmenge ohne Delta, Metadatenabweichung |
+| Delta-Kategorisierung | Kategorie- und Owner-Vorschlag je Deltagrund |
+| Abschlussfaehigkeits-Service | Offene Deltas, geloeste Deltas, unzugeordnete Vertrags-KLS, fehlende KLS-ID |
 
 ### 21.2 Integrationstests
 
@@ -1159,6 +1715,10 @@ Auditpflichtige Aktionen:
 | Gebietsdaten speichern mit ungueltigem BEMO | Fehler |
 | KLS-BT-Liste laden | nur KLS der Bautranche |
 | Export CSV | Datei erzeugt |
+| KLS-Abgleich mit GBGS | Deltas werden erzeugt und persistiert |
+| Delta aktualisieren | Status und Resolution werden gespeichert |
+| Nicht zugeordnete Vertrags-KLS laden | Separate Liste wird geliefert |
+| Abschlussstatus laden | Blockierende Kriterien werden korrekt gemeldet |
 
 ### 21.3 E2E Tests
 
@@ -1170,6 +1730,11 @@ Auditpflichtige Aktionen:
 | Gebietsdaten erfassen falsche BEMO-ID | Feldfehler |
 | Ausbautreiber wechseln | Regelhinweis wechselt |
 | KLS-BT-Liste anzeigen | KLS-Tabelle sichtbar |
+| KLS-Abgleich starten | Delta-GUI zeigt aktuellen Stand |
+| Delta loesen | Status wechselt auf geloest und Counter aktualisiert |
+| Nicht zugeordnete Vertrags-KLS | Unter-GUI zeigt separaten Arbeitsvorrat |
+| Fehlende KLS-ID | Hinweisbanner und Abschlussblockade sichtbar |
+| Abschlussfaehige Bautranche | Freigabe erst nach geloesten Deltas moeglich |
 | Alter Button | nicht vorhanden |
 
 ### 21.4 Regressionstests
@@ -1374,6 +1939,128 @@ Akzeptanzkriterien:
 - Test fuer KLS-BT-Liste.
 - Test, dass alter Button nicht mehr erscheint.
 
+### PFAU-GBGS-214: Delta-GUI fuer KLS-Abgleich erstellen
+
+Komponente: Pfau Frontend
+
+Beschreibung:
+Erstellung einer GUI fuer den KLS-Umfangsabgleich zwischen Bautranche und GBGS-Gebiet. Die GUI zeigt aktuelle Deltas, Bearbeitungsstatus, Owner, Deltagrund und Loesungsvorschlag.
+
+Akzeptanzkriterien:
+
+- Funktion ist ueber `GBGS-Funktionen` erreichbar.
+- Deltaliste zeigt aktuelle Deltas mit Kategorie, Status, Owner und Vorschlag.
+- Deltas koennen zur Bearbeitung geoeffnet werden.
+- Statusaenderungen werden sichtbar aktualisiert.
+
+### PFAU-GBGS-215: Unter-GUI fuer nicht zugeordnete Vertrags-KLS erstellen
+
+Komponente: Pfau Frontend
+
+Beschreibung:
+Erstellung einer separaten Unter-GUI fuer KLS aus dem Vertrag, die keiner Bautranche und keinem aktuellen Delta zugeordnet sind.
+
+Akzeptanzkriterien:
+
+- Liste zeigt KLS-ID, Vertragsreferenz, Adresshinweis, Grund und empfohlene Aktion.
+- Liste ist in der Delta-GUI sichtbar, aber fachlich vom Delta-Arbeitsvorrat getrennt.
+- Offene unzugeordnete KLS koennen die Abschlussfaehigkeit blockieren.
+
+### PFAU-GBGS-216: Delta-Service fuer KLS-Mengenvergleich implementieren
+
+Komponente: Pfau Backend
+
+Beschreibung:
+Implementierung des fachlichen Vergleichs `BT_KLS` gegen `GBGS_KLS` mit Bautranche als Master und GBGS als Slave.
+
+Akzeptanzkriterien:
+
+- Service erkennt `BT_FEHLT_IN_GBGS`.
+- Service erkennt `GBGS_NICHT_IN_BT`.
+- Service erkennt Metadatenabweichungen.
+- Service erzeugt oder aktualisiert Deltas idempotent je Abgleichslauf.
+- Historie geloester Deltas bleibt erhalten.
+
+### PFAU-GBGS-217: GBGS-KLS-Adapter bereitstellen
+
+Komponente: Pfau Backend / Integration
+
+Beschreibung:
+Bereitstellung eines Adapters zum Laden des KLS-Umfangs eines GBGS-Gebiets.
+
+Akzeptanzkriterien:
+
+- Adapter liefert KLS-Liste je Gebiets-ID.
+- Fehler bei GBGS-Nichterreichbarkeit werden sauber gemeldet.
+- Abgleich wird bei fehlenden GBGS-Daten nicht mit falschem Erfolg abgeschlossen.
+
+### PFAU-GBGS-218: Vertrags-KLS-Adapter fuer nicht zugeordnete KLS bereitstellen
+
+Komponente: Pfau Backend / Integration
+
+Beschreibung:
+Bereitstellung der Vertrags-KLS als Quelle fuer die Unter-GUI `Nicht zugeordnete Vertrags-KLS`.
+
+Akzeptanzkriterien:
+
+- Adapter liefert KLS je Vertrag/Untervertrag.
+- Service berechnet KLS, die keiner Bautranche und keinem Delta zugeordnet sind.
+- Ergebnis kann Abschlussfaehigkeit blockieren.
+
+### PFAU-GBGS-219: Delta-Persistenz und Statushistorie implementieren
+
+Komponente: Pfau Backend / Datenbank
+
+Beschreibung:
+Persistenz fuer Deltas, Statusaenderungen, Resolution, Bearbeiter, Run-Referenz und Historie.
+
+Akzeptanzkriterien:
+
+- Deltas koennen angelegt, aktualisiert, geloest und wieder geoeffnet werden.
+- Statushistorie bleibt nachvollziehbar.
+- Geloeste Deltas werden nicht physisch geloescht.
+
+### PFAU-GBGS-220: Resolution-Workflows fuer Deltakategorien implementieren
+
+Komponente: Pfau Backend / Frontend
+
+Beschreibung:
+Umsetzung der Deltakategorien mit Owner-Vorschlag, Bearbeiterhinweis und Loesungsvorschlag.
+
+Akzeptanzkriterien:
+
+- Jede Kategorie hat Owner, Erlaeuterung und Vorschlag.
+- Bearbeiter kann Kategorie bestaetigen oder aendern.
+- Abschluss eines Deltas erfordert ResolutionCode und Kommentar.
+- Akzeptierte Abweichungen koennen nur mit Begruendung/fachlicher Freigabe gesetzt werden.
+
+### PFAU-GBGS-221: Abschlussfaehigkeits-Service fuer Bautranche implementieren
+
+Komponente: Pfau Backend
+
+Beschreibung:
+Berechnung, ob eine Bautranche abgeschlossen und der weiteren Abrechnung zugefuehrt werden darf.
+
+Akzeptanzkriterien:
+
+- Service prueft Gebietsdaten, fehlende KLS-IDs, Abgleichsalter, blockierende Deltas und unzugeordnete Vertrags-KLS.
+- Ergebnis wird mit einzelnen Check-Ergebnissen an die UI geliefert.
+- Offene blockierende Kriterien verhindern Abschlussfreigabe.
+
+### PFAU-GBGS-222: Periodischen GBGS-Abgleich konzipieren und umsetzen
+
+Komponente: Prozess / Backend
+
+Beschreibung:
+Umsetzung eines manuellen und optional periodischen Abgleichslaufs fuer offene Bautranchen.
+
+Akzeptanzkriterien:
+
+- Manueller Abgleich ist ueber die GUI startbar.
+- Periodischer Lauf kann konfiguriert werden.
+- Lauf aktualisiert Deltas ohne geloeste Historie zu verlieren.
+- Lauf markiert automatisch erledigte oder wieder geoeffnete Deltas korrekt.
+
 ## 23. Betrieb und Monitoring
 
 Zu monitorende Kennzahlen:
@@ -1386,6 +2073,12 @@ Zu monitorende Kennzahlen:
 | Anzahl KLS-BT-Exporte | PST-Vorbereitung |
 | Fehlerquote KLS-Service | Stabilitaet |
 | Fehlerquote Export/PST-Uebergabe | Integrationsqualitaet |
+| Anzahl GBGS-Abgleichslaeufe | Aktualitaet des Delta-Arbeitsvorrats |
+| Anzahl offener blockierender Deltas | Abschlussrisiko Bautranche |
+| Durchschnittliches Delta-Alter | Prozessdurchlaufzeit |
+| Anzahl wieder geoeffneter Deltas | Stabilitaet der Quellsystemkorrekturen |
+| Anzahl nicht zugeordneter Vertrags-KLS | Qualitaet Vertrags-/Bautranchendaten |
+| Anzahl akzeptierter Abweichungen | Fachliche Sonderfaelle und Governance |
 
 Logging:
 
@@ -1403,6 +2096,11 @@ Logging:
 | Nutzer erwartet echte Liste 1 | Prozessmissverstaendnis | UI-Texte klar auf KLS-BT-Liste fuer PST ausrichten |
 | Frontend-only Validierung reicht nicht | Ungueltige Daten moeglich | Backend-Validator verpflichtend |
 | VVM-Blockade-System unklar | Regel nicht durchsetzbar | Verantwortliches System fuer harte Blockade entscheiden |
+| Delta-Kategorien zu grob | Bearbeiter koennen Faelle nicht zielgerichtet loesen | Kategorien fachlich reviewen und konfigurierbar halten |
+| GBGS-Abgleich zu selten | Deltaliste veraltet | Manuelle Aktualisierung plus periodischen Lauf vorsehen |
+| Geloeste Deltas tauchen wieder auf | Bearbeiter verlieren Vertrauen in Status | Status `WIEDER_GEOEFFNET` mit Historie einfuehren |
+| Vertrags-KLS unvollstaendig | Unter-GUI zeigt falschen Restumfang | Vertragsquelle und Datenqualitaet vor Go-live klaeren |
+| Akzeptierte Abweichungen werden missbraucht | Abschluss trotz fachlicher Fehler | Freigabe/Kommentar verpflichtend machen |
 
 ## 25. Offene Klaerungen
 
@@ -1415,6 +2113,12 @@ Logging:
 - Welche Rollen duerfen `GBGS-Funktionen` nutzen?
 - Soll der Adressabgleich automatisch nach Speicherung der Gebietsdaten gestartet werden oder manuell?
 - Sind optionale Adressspalten im KLS-BT-Export erlaubt?
+- Welche technische Quelle liefert `VERTRAG_KLS` verbindlich?
+- Welche Periodizitaet soll der GBGS-Abgleich im Zielbetrieb haben?
+- Welche Deltakategorien sind fachlich final freigegeben?
+- Welche Rollen duerfen Deltas final loesen oder akzeptierte Abweichungen freigeben?
+- Wie alt darf der letzte erfolgreiche Abgleich maximal sein, bevor eine Bautranche nicht mehr abgeschlossen werden darf?
+- Sollen akzeptierte Abweichungen im Standardfilter sichtbar bleiben oder nur ueber Sonderfilter?
 
 ## 26. Entscheidungslog
 
@@ -1426,3 +2130,7 @@ Logging:
 | 2026-06-15 | Pfau erzeugt keine echte `Liste 1`; PST bleibt dafuer verantwortlich |
 | 2026-06-15 | Pfau stellt nur KLS-BT-Listenvorschlag bereit |
 | 2026-06-15 | Gebiets-ID-Bildungsregeln werden kontextsensitiv nach Ausbautreiber angezeigt |
+| 2026-06-19 | Bautranche ist Master fuer KLS-Umfang, GBGS ist Slave |
+| 2026-06-19 | Abweichungen werden als Deltas mit Kategorie, Owner, Status und Resolution gefuehrt |
+| 2026-06-19 | Nicht zugeordnete Vertrags-KLS werden in separater Unter-GUI sichtbar gemacht |
+| 2026-06-19 | Abschlussfaehigkeit der Bautranche haengt von geloesten Deltas, vollstaendigen KLS-IDs und aktuellem Abgleich ab |

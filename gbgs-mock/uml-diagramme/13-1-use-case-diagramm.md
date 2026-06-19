@@ -12,6 +12,9 @@ flowchart LR
   AreaWizard["Gebietsdaten erfassen"]
   IdRules["Gebiets-ID-Regeln"]
   KlsWizard["KLS-BT-Liste vorschlagen"]
+  DeltaGui["KLS-Abgleich mit GBGS pruefen"]
+  DeltaList["Deltaliste bearbeiten"]
+  Unassigned["Nicht zugeordnete Vertrags-KLS pruefen"]
   Pst["PST erzeugt echte Liste 1"]
   Reconcile["Adressabgleich Pfau GBGS"]
   Vvm["VVM-ONGOING"]
@@ -24,8 +27,13 @@ flowchart LR
   GbgsFunctions --> AreaWizard
   AreaWizard --> IdRules
   GbgsFunctions --> KlsWizard
+  GbgsFunctions --> DeltaGui
+  DeltaGui --> DeltaList
+  DeltaGui --> Unassigned
   KlsWizard --> Pst
   AreaWizard --> Reconcile
-  Pst --> Reconcile
+  DeltaList --> Reconcile
+  Unassigned --> Reconcile
+  Reconcile --> Pst
   Reconcile --> Vvm
 ```

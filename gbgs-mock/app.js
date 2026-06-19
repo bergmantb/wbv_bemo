@@ -7,6 +7,7 @@ const wfmtStatus = document.querySelector("[data-wfmt-status]");
 const choiceBackdrop = document.querySelector("[data-choice-backdrop]");
 const areaBackdrop = document.querySelector("[data-area-backdrop]");
 const klsBackdrop = document.querySelector("[data-kls-backdrop]");
+const deltaBackdrop = document.querySelector("[data-delta-backdrop]");
 const areaForm = document.querySelector("[data-area-form]");
 const areaType = document.querySelector("[data-area-type]");
 const areaId = document.querySelector("[data-area-id]");
@@ -15,6 +16,10 @@ const ruleText = document.querySelector("[data-rule-text]");
 const bemoFormat = document.querySelector("[data-bemo-format]");
 const bemoLegend = document.querySelector("[data-bemo-legend]");
 const validationMessage = document.querySelector("[data-validation-message]");
+const blockingCount = document.querySelector("[data-blocking-count]");
+const completionBanner = document.querySelector("[data-completion-banner]");
+const completeTrancheButton = document.querySelector("[data-complete-tranche]");
+const lastRun = document.querySelector("[data-last-run]");
 const toast = document.querySelector("[data-toast]");
 let wfmtCreated = false;
 let savedAreaId = "BEMO_1312200021";
@@ -91,6 +96,7 @@ function closeAllModals() {
   hide(choiceBackdrop);
   hide(areaBackdrop);
   hide(klsBackdrop);
+  hide(deltaBackdrop);
 }
 
 processToggle.addEventListener("click", () => {
@@ -119,6 +125,11 @@ document.querySelector("[data-start-kls]").addEventListener("click", () => {
   show(klsBackdrop);
 });
 
+document.querySelector("[data-start-delta]").addEventListener("click", () => {
+  hide(choiceBackdrop);
+  show(deltaBackdrop);
+});
+
 document.querySelectorAll("[data-close-choice]").forEach((button) => {
   button.addEventListener("click", () => hide(choiceBackdrop));
 });
@@ -131,7 +142,11 @@ document.querySelectorAll("[data-close-kls]").forEach((button) => {
   button.addEventListener("click", () => hide(klsBackdrop));
 });
 
-[choiceBackdrop, areaBackdrop, klsBackdrop].forEach((backdrop) => {
+document.querySelectorAll("[data-close-delta]").forEach((button) => {
+  button.addEventListener("click", () => hide(deltaBackdrop));
+});
+
+[choiceBackdrop, areaBackdrop, klsBackdrop, deltaBackdrop].forEach((backdrop) => {
   backdrop.addEventListener("click", (event) => {
     if (event.target === backdrop) hide(backdrop);
   });
@@ -155,6 +170,25 @@ document.querySelector("[data-kls-export]").addEventListener("click", (event) =>
   event.currentTarget.textContent = "KLS-BT-Liste exportiert";
   event.currentTarget.disabled = true;
   showToast("KLS-BT-Liste wurde fuer PST vorbereitet.");
+});
+
+document.querySelector("[data-run-reconcile]").addEventListener("click", () => {
+  lastRun.textContent = "Letzter Abgleich: gerade eben, manuell gestartet";
+  showToast("GBGS-Abgleich wurde erneut gestartet. Deltaliste ist aktualisiert.");
+});
+
+document.querySelector("[data-resolve-delta]").addEventListener("click", (event) => {
+  const row = event.currentTarget.closest("[data-delta-row]");
+  const status = row.querySelector("[data-delta-status]");
+  status.textContent = "Geloest";
+  status.className = "status-pill status-done";
+  event.currentTarget.textContent = "Geloest";
+  event.currentTarget.disabled = true;
+  blockingCount.textContent = "1";
+  completionBanner.textContent = "DELTA-001 ist geloest. Bautranche bleibt blockiert: ein weiteres Delta, zwei Vertrags-KLS und eine fehlende KLS-ID sind noch offen.";
+  completionBanner.classList.remove("ready");
+  completeTrancheButton.disabled = true;
+  showToast("Delta DELTA-001 wurde mit Resolution geschlossen.");
 });
 
 editTrancheButtons.forEach((button) => {

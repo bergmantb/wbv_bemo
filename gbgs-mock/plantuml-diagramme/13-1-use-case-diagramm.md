@@ -15,6 +15,9 @@ rectangle "Pfau Bautranchensicht" as Pfau {
   usecase "Gebietsdaten erfassen" as UC_Area
   usecase "Gebiets-ID-Regeln anwenden" as UC_Rules
   usecase "KLS-BT-Liste vorschlagen" as UC_KLS
+  usecase "KLS-Abgleich mit GBGS pruefen" as UC_Delta
+  usecase "Deltaliste bearbeiten" as UC_DeltaList
+  usecase "Nicht zugeordnete Vertrags-KLS pruefen" as UC_Unassigned
 }
 
 rectangle "Umsysteme" {
@@ -30,9 +33,14 @@ UC_Process --> UC_GBGS
 UC_GBGS --> UC_Area
 UC_Area --> UC_Rules
 UC_GBGS --> UC_KLS
+UC_GBGS --> UC_Delta
+UC_Delta --> UC_DeltaList
+UC_Delta --> UC_Unassigned
 UC_KLS --> UC_PST
 UC_Area --> UC_Reconcile
-UC_PST --> UC_Reconcile
+UC_DeltaList --> UC_Reconcile
+UC_Unassigned --> UC_Reconcile
+UC_Reconcile --> UC_PST
 UC_Reconcile --> UC_VVM
 @enduml
 ```

@@ -521,7 +521,7 @@ h1 {
 }
 
 .choice-modal {
-  width: min(760px, 100%);
+  width: min(980px, 100%);
 }
 
 .modal-head {
@@ -556,7 +556,7 @@ h1 {
 
 .choice-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
   padding: 22px;
 }
@@ -708,10 +708,149 @@ h1 {
   width: min(820px, 100%);
 }
 
+.delta-modal {
+  width: min(1180px, 100%);
+}
+
 .kls-intro,
 .kls-modal .hint,
 .kls-table {
   margin: 18px 22px 0;
+}
+
+.delta-body {
+  padding: 18px 22px 0;
+}
+
+.delta-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.delta-summary > div {
+  min-height: 78px;
+  padding: 12px;
+  border: 1px solid #d5d9e0;
+  border-radius: 6px;
+  background: #f8fafc;
+}
+
+.delta-summary strong,
+.delta-summary span {
+  display: block;
+}
+
+.delta-summary span {
+  margin-top: 10px;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.delta-summary .delta-critical {
+  color: #9f1239;
+  background: #fff1f2;
+  border-color: #fecdd3;
+}
+
+.completion-banner {
+  margin-top: 14px;
+  padding: 12px 14px;
+  color: #7c2d12;
+  background: #ffedd5;
+  border: 1px solid #fdba74;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.completion-banner.ready {
+  color: #14532d;
+  background: #dcfce7;
+  border-color: #86efac;
+}
+
+.delta-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 14px 0;
+}
+
+.delta-actions span {
+  color: #5b6471;
+}
+
+.delta-body h3 {
+  margin: 18px 0 10px;
+  font-size: 18px;
+}
+
+.delta-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.delta-table th,
+.delta-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #e1e4e8;
+  text-align: left;
+  vertical-align: top;
+}
+
+.delta-table th {
+  background: #e9eaec;
+  font-weight: 700;
+}
+
+.status-pill {
+  display: inline-flex;
+  min-height: 22px;
+  align-items: center;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status-open {
+  color: #9f1239;
+  background: #ffe4e6;
+}
+
+.status-progress {
+  color: #854d0e;
+  background: #fef3c7;
+}
+
+.status-accepted,
+.status-done {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.table-action {
+  min-height: 28px;
+  padding: 0 10px;
+  color: var(--blue);
+  background: white;
+  border: 1px solid var(--blue);
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.resolution-panel {
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid #cbd0d8;
+  border-radius: 6px;
+  background: #fbfcfd;
+}
+
+.resolution-panel p {
+  margin: 8px 0 0;
+  color: #4b5563;
 }
 
 .wizard-footer {
@@ -776,7 +915,8 @@ h1 {
   .form-grid,
   .kls-intro,
   .choice-grid,
-  .id-legend {
+  .id-legend,
+  .delta-summary {
     grid-template-columns: 1fr;
   }
 }
@@ -960,6 +1100,10 @@ h1 {
           <strong>KLS-BT-Liste fuer PST vorschlagen</strong>
           <span>KLS aus der aktuellen Bautranche als Vorschlagsliste fuer PST bereitstellen.</span>
         </button>
+        <button class="choice-tile" type="button" data-start-delta>
+          <strong>KLS-Abgleich mit GBGS pruefen</strong>
+          <span>BT-KLS als Master gegen GBGS-KLS vergleichen und Deltas bearbeiten.</span>
+        </button>
       </div>
     </section>
   </div>
@@ -1074,6 +1218,140 @@ h1 {
     </section>
   </div>
 
+  <div class="modal-backdrop" hidden data-delta-backdrop>
+    <section class="modal delta-modal" role="dialog" aria-modal="true" aria-labelledby="delta-title">
+      <div class="modal-head">
+        <div>
+          <p class="modal-kicker">Adressabgleich Pfau GBGS</p>
+          <h2 id="delta-title">KLS-Abgleich mit GBGS pruefen</h2>
+        </div>
+        <button class="close-button" type="button" aria-label="Dialog schliessen" data-close-delta>Ã—</button>
+      </div>
+
+      <div class="delta-body">
+        <div class="delta-summary">
+          <div>
+            <strong>Master Bautranche</strong>
+            <span>3 KLS</span>
+          </div>
+          <div>
+            <strong>Slave GBGS</strong>
+            <span>3 KLS</span>
+          </div>
+          <div class="delta-critical">
+            <strong>Blockierende Deltas</strong>
+            <span data-blocking-count>2</span>
+          </div>
+          <div>
+            <strong>Nicht zugeordnet</strong>
+            <span>2 Vertrags-KLS</span>
+          </div>
+        </div>
+
+        <div class="completion-banner" data-completion-banner>
+          Bautranche noch nicht abschlussfaehig: offene Deltas, nicht zugeordnete Vertrags-KLS und eine Adresse ohne KLS-ID muessen geklaert werden.
+        </div>
+
+        <div class="delta-actions">
+          <button class="secondary" type="button" data-run-reconcile>GBGS-Abgleich erneut starten</button>
+          <span data-last-run>Letzter Abgleich: 19.06.2026, 08:15 Uhr</span>
+        </div>
+
+        <h3>Aktuelle Deltas</h3>
+        <div class="table-scroll">
+          <table class="delta-table">
+            <thead>
+              <tr>
+                <th>Delta</th>
+                <th>KLS-ID</th>
+                <th>Abweichung</th>
+                <th>Kategorie</th>
+                <th>Owner</th>
+                <th>Status</th>
+                <th>Loesungsvorschlag</th>
+                <th>Aktion</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr data-delta-row>
+                <td>DELTA-001</td>
+                <td>44113099</td>
+                <td>BT-KLS fehlt in GBGS</td>
+                <td>BT_FEHLT_IN_GBGS</td>
+                <td>GBGS-Fachbearbeitung</td>
+                <td><span class="status-pill status-open" data-delta-status>Offen</span></td>
+                <td>KLS im GBGS-Gebiet ergaenzen oder begruendet ausschliessen.</td>
+                <td><button class="table-action" type="button" data-resolve-delta>Loesen</button></td>
+              </tr>
+              <tr>
+                <td>DELTA-002</td>
+                <td>23696099</td>
+                <td>GBGS enthaelt neue KLS</td>
+                <td>GBGS_NEUE_KLS</td>
+                <td>GBGS-Fachbearbeitung</td>
+                <td><span class="status-pill status-progress">In Klaerung</span></td>
+                <td>Herkunft pruefen; falls falsch, KLS aus GBGS entfernen.</td>
+                <td><button class="table-action" type="button">Bearbeiten</button></td>
+              </tr>
+              <tr>
+                <td>DELTA-003</td>
+                <td>11792181</td>
+                <td>Metadaten weichen ab</td>
+                <td>METADATEN_ABWEICHEND</td>
+                <td>Datenqualitaet</td>
+                <td><span class="status-pill status-accepted">Akzeptiert</span></td>
+                <td>Abweichung dokumentiert und fachlich freigegeben.</td>
+                <td><button class="table-action" type="button">Details</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>Nicht zugeordnete Vertrags-KLS</h3>
+        <div class="table-scroll">
+          <table class="delta-table">
+            <thead>
+              <tr>
+                <th>KLS-ID</th>
+                <th>Vertrag</th>
+                <th>Adresshinweis</th>
+                <th>Grund</th>
+                <th>Empfohlene Aktion</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>99110001</td>
+                <td>13122</td>
+                <td>Berg, Ahornweg</td>
+                <td>Noch keiner Bautranche zugeordnet</td>
+                <td>Bautranchierung pruefen und KLS einer Bautranche zuordnen.</td>
+              </tr>
+              <tr>
+                <td>99110002</td>
+                <td>13122</td>
+                <td>Berg, Finkenstrasse</td>
+                <td>Keine GBGS-Referenz vorhanden</td>
+                <td>Vertrags-/KLS-Stammdaten pruefen.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="resolution-panel">
+          <strong>Aufloesungsworkflow fuer DELTA-001</strong>
+          <p>Fachlicher Grund: Die Bautranche ist Master und enthaelt die KLS 44113099. GBGS enthaelt diese KLS noch nicht.</p>
+          <p>Vorschlag: GBGS-Gebiet korrigieren, erneuten Abgleich starten und Delta danach final schliessen.</p>
+        </div>
+      </div>
+
+      <div class="wizard-footer">
+        <button class="secondary" type="button" data-close-delta>Schliessen</button>
+        <button class="primary" type="button" disabled data-complete-tranche>Bautranche abschliessen</button>
+      </div>
+    </section>
+  </div>
+
   <div class="toast" hidden data-toast></div>
 
   <script>
@@ -1086,6 +1364,7 @@ const wfmtStatus = document.querySelector("[data-wfmt-status]");
 const choiceBackdrop = document.querySelector("[data-choice-backdrop]");
 const areaBackdrop = document.querySelector("[data-area-backdrop]");
 const klsBackdrop = document.querySelector("[data-kls-backdrop]");
+const deltaBackdrop = document.querySelector("[data-delta-backdrop]");
 const areaForm = document.querySelector("[data-area-form]");
 const areaType = document.querySelector("[data-area-type]");
 const areaId = document.querySelector("[data-area-id]");
@@ -1094,6 +1373,10 @@ const ruleText = document.querySelector("[data-rule-text]");
 const bemoFormat = document.querySelector("[data-bemo-format]");
 const bemoLegend = document.querySelector("[data-bemo-legend]");
 const validationMessage = document.querySelector("[data-validation-message]");
+const blockingCount = document.querySelector("[data-blocking-count]");
+const completionBanner = document.querySelector("[data-completion-banner]");
+const completeTrancheButton = document.querySelector("[data-complete-tranche]");
+const lastRun = document.querySelector("[data-last-run]");
 const toast = document.querySelector("[data-toast]");
 let wfmtCreated = false;
 let savedAreaId = "BEMO_1312200021";
@@ -1170,6 +1453,7 @@ function closeAllModals() {
   hide(choiceBackdrop);
   hide(areaBackdrop);
   hide(klsBackdrop);
+  hide(deltaBackdrop);
 }
 
 processToggle.addEventListener("click", () => {
@@ -1198,6 +1482,11 @@ document.querySelector("[data-start-kls]").addEventListener("click", () => {
   show(klsBackdrop);
 });
 
+document.querySelector("[data-start-delta]").addEventListener("click", () => {
+  hide(choiceBackdrop);
+  show(deltaBackdrop);
+});
+
 document.querySelectorAll("[data-close-choice]").forEach((button) => {
   button.addEventListener("click", () => hide(choiceBackdrop));
 });
@@ -1210,7 +1499,11 @@ document.querySelectorAll("[data-close-kls]").forEach((button) => {
   button.addEventListener("click", () => hide(klsBackdrop));
 });
 
-[choiceBackdrop, areaBackdrop, klsBackdrop].forEach((backdrop) => {
+document.querySelectorAll("[data-close-delta]").forEach((button) => {
+  button.addEventListener("click", () => hide(deltaBackdrop));
+});
+
+[choiceBackdrop, areaBackdrop, klsBackdrop, deltaBackdrop].forEach((backdrop) => {
   backdrop.addEventListener("click", (event) => {
     if (event.target === backdrop) hide(backdrop);
   });
@@ -1234,6 +1527,25 @@ document.querySelector("[data-kls-export]").addEventListener("click", (event) =>
   event.currentTarget.textContent = "KLS-BT-Liste exportiert";
   event.currentTarget.disabled = true;
   showToast("KLS-BT-Liste wurde fuer PST vorbereitet.");
+});
+
+document.querySelector("[data-run-reconcile]").addEventListener("click", () => {
+  lastRun.textContent = "Letzter Abgleich: gerade eben, manuell gestartet";
+  showToast("GBGS-Abgleich wurde erneut gestartet. Deltaliste ist aktualisiert.");
+});
+
+document.querySelector("[data-resolve-delta]").addEventListener("click", (event) => {
+  const row = event.currentTarget.closest("[data-delta-row]");
+  const status = row.querySelector("[data-delta-status]");
+  status.textContent = "Geloest";
+  status.className = "status-pill status-done";
+  event.currentTarget.textContent = "Geloest";
+  event.currentTarget.disabled = true;
+  blockingCount.textContent = "1";
+  completionBanner.textContent = "DELTA-001 ist geloest. Bautranche bleibt blockiert: ein weiteres Delta, zwei Vertrags-KLS und eine fehlende KLS-ID sind noch offen.";
+  completionBanner.classList.remove("ready");
+  completeTrancheButton.disabled = true;
+  showToast("Delta DELTA-001 wurde mit Resolution geschlossen.");
 });
 
 editTrancheButtons.forEach((button) => {

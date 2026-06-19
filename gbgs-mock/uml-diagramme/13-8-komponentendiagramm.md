@@ -11,6 +11,8 @@ flowchart TB
     AREA["Gebietsdaten-Wizard"]
     RULE["Kontextsensitive ID-Regeln"]
     KLSUI["KLS-BT-Listen-Wizard"]
+    DELTAUI["Delta-GUI KLS-Abgleich"]
+    UNASSIGNEDUI["Unter-GUI nicht zugeordnete Vertrags-KLS"]
   end
 
   subgraph Backend["Pfau Backend"]
@@ -19,6 +21,11 @@ flowchart TB
     VALID["Gebiets-ID Validator"]
     DATA["Gebietsdaten Persistenz"]
     KLSAPI["Bautranchen/KLS API"]
+    GBGSKLS["GBGS-KLS Adapter"]
+    DELTASVC["Delta Service"]
+    DELTADB["Delta Persistenz"]
+    CONTRACT["Vertrags-KLS Adapter"]
+    COMPLETE["Abschlussfaehigkeits-Service"]
     EXPORT["Export/Bereitstellung"]
     AUD["Audit Logging"]
   end
@@ -27,6 +34,7 @@ flowchart TB
     WFMT["WFMT"]
     PST["PST"]
     GBGS["GBGS"]
+    CONTRACTSYS["Vertragssystem"]
   end
 
   PD --> PROC
@@ -40,9 +48,21 @@ flowchart TB
   FAPI --> DATA
   MOD --> KLSUI
   KLSUI --> KLSAPI
+  MOD --> DELTAUI
+  DELTAUI --> FAPI
+  DELTAUI --> UNASSIGNEDUI
   KLSAPI --> EXPORT
   EXPORT --> PST
+  FAPI --> DELTASVC
+  DELTASVC --> KLSAPI
+  DELTASVC --> GBGSKLS
+  DELTASVC --> CONTRACT
+  DELTASVC --> DELTADB
+  DELTASVC --> COMPLETE
+  GBGSKLS --> GBGS
+  CONTRACT --> CONTRACTSYS
   FAPI --> AUD
+  DELTASVC --> AUD
   EXPORT --> AUD
   FAPI --> GBGS
 ```

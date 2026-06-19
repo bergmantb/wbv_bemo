@@ -514,7 +514,7 @@ h1 {
 }
 
 .choice-modal {
-  width: min(760px, 100%);
+  width: min(980px, 100%);
 }
 
 .modal-head {
@@ -549,7 +549,7 @@ h1 {
 
 .choice-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
   padding: 22px;
 }
@@ -701,10 +701,149 @@ h1 {
   width: min(820px, 100%);
 }
 
+.delta-modal {
+  width: min(1180px, 100%);
+}
+
 .kls-intro,
 .kls-modal .hint,
 .kls-table {
   margin: 18px 22px 0;
+}
+
+.delta-body {
+  padding: 18px 22px 0;
+}
+
+.delta-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.delta-summary > div {
+  min-height: 78px;
+  padding: 12px;
+  border: 1px solid #d5d9e0;
+  border-radius: 6px;
+  background: #f8fafc;
+}
+
+.delta-summary strong,
+.delta-summary span {
+  display: block;
+}
+
+.delta-summary span {
+  margin-top: 10px;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.delta-summary .delta-critical {
+  color: #9f1239;
+  background: #fff1f2;
+  border-color: #fecdd3;
+}
+
+.completion-banner {
+  margin-top: 14px;
+  padding: 12px 14px;
+  color: #7c2d12;
+  background: #ffedd5;
+  border: 1px solid #fdba74;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+.completion-banner.ready {
+  color: #14532d;
+  background: #dcfce7;
+  border-color: #86efac;
+}
+
+.delta-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 14px 0;
+}
+
+.delta-actions span {
+  color: #5b6471;
+}
+
+.delta-body h3 {
+  margin: 18px 0 10px;
+  font-size: 18px;
+}
+
+.delta-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.delta-table th,
+.delta-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #e1e4e8;
+  text-align: left;
+  vertical-align: top;
+}
+
+.delta-table th {
+  background: #e9eaec;
+  font-weight: 700;
+}
+
+.status-pill {
+  display: inline-flex;
+  min-height: 22px;
+  align-items: center;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status-open {
+  color: #9f1239;
+  background: #ffe4e6;
+}
+
+.status-progress {
+  color: #854d0e;
+  background: #fef3c7;
+}
+
+.status-accepted,
+.status-done {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.table-action {
+  min-height: 28px;
+  padding: 0 10px;
+  color: var(--blue);
+  background: white;
+  border: 1px solid var(--blue);
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.resolution-panel {
+  margin-top: 16px;
+  padding: 14px;
+  border: 1px solid #cbd0d8;
+  border-radius: 6px;
+  background: #fbfcfd;
+}
+
+.resolution-panel p {
+  margin: 8px 0 0;
+  color: #4b5563;
 }
 
 .wizard-footer {
@@ -769,7 +908,8 @@ h1 {
   .form-grid,
   .kls-intro,
   .choice-grid,
-  .id-legend {
+  .id-legend,
+  .delta-summary {
     grid-template-columns: 1fr;
   }
 }
