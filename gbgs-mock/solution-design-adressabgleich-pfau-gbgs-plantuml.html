@@ -1619,10 +1619,7 @@ Nicht zugeordnet = VERTRAG_KLS - alle bekannten Bautranchen-KLS - alle offenen D
 <tr><td>2026-06-19</td><td>Abweichungen werden als Deltas mit Kategorie, Owner, Status und Resolution gefuehrt</td></tr>
 <tr><td>2026-06-19</td><td>Nicht zugeordnete Vertrags-KLS werden in separater Unter-GUI sichtbar gemacht</td></tr>
 <tr><td>2026-06-19</td><td>Abschlussfaehigkeit der Bautranche haengt von geloesten Deltas, vollstaendigen KLS-IDs und aktuellem Abgleich ab</td></tr>
-</tbody></table><h2>PlantUML Diagrammdateien</h2><div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-1-use-case-diagramm.md</div><p><a href="plantuml-diagramme/13-1-use-case-diagramm.md">13-1-use-case-diagramm.md</a></p><pre><code># 13.1 Use Case Diagramm
-
-```plantuml
-@startuml
+</tbody></table><h2>PlantUML Diagrammdateien</h2><div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-1-use-case-diagramm.md</div><p><a href="plantuml-diagramme/13-1-use-case-diagramm.md">13-1-use-case-diagramm.md</a></p><pre><code class="language-plantuml">@startuml
 left to right direction
 skinparam packageStyle rectangle
 skinparam shadowing false
@@ -1663,13 +1660,8 @@ UC_DeltaList --&gt; UC_Reconcile
 UC_Unassigned --&gt; UC_Reconcile
 UC_Reconcile --&gt; UC_PST
 UC_Reconcile --&gt; UC_VVM
-@enduml
-```
-</code></pre></div>
-<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-10-aktivitaetsdiagramm-kls-abgleich-deltafuehrung.md</div><p><a href="plantuml-diagramme/13-10-aktivitaetsdiagramm-kls-abgleich-deltafuehrung.md">13-10-aktivitaetsdiagramm-kls-abgleich-deltafuehrung.md</a></p><pre><code># 13.10 Aktivitaetsdiagramm: KLS-Abgleich und Deltafuehrung
-
-```plantuml
-@startuml
+@enduml</code></pre></div>
+<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-10-aktivitaetsdiagramm-kls-abgleich-deltafuehrung.md</div><p><a href="plantuml-diagramme/13-10-aktivitaetsdiagramm-kls-abgleich-deltafuehrung.md">13-10-aktivitaetsdiagramm-kls-abgleich-deltafuehrung.md</a></p><pre><code class="language-plantuml">@startuml
 skinparam shadowing false
 
 start
@@ -1700,13 +1692,8 @@ endif
 
 :Abschlussfaehigkeit neu bewerten;
 stop
-@enduml
-```
-</code></pre></div>
-<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-11-sequenzdiagramm-kls-abgleich.md</div><p><a href="plantuml-diagramme/13-11-sequenzdiagramm-kls-abgleich.md">13-11-sequenzdiagramm-kls-abgleich.md</a></p><pre><code># 13.11 Sequenzdiagramm: KLS-Abgleich
-
-```plantuml
-@startuml
+@enduml</code></pre></div>
+<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-11-sequenzdiagramm-kls-abgleich.md</div><p><a href="plantuml-diagramme/13-11-sequenzdiagramm-kls-abgleich.md">13-11-sequenzdiagramm-kls-abgleich.md</a></p><pre><code class="language-plantuml">@startuml
 skinparam shadowing false
 
 actor "PTI Nutzer" as User
@@ -1736,13 +1723,8 @@ UI -&gt; API : PATCH /kls-deltas/{deltaId}
 API -&gt; DB : update status, resolution
 API -&gt; AUD : log delta resolution
 API --&gt; UI : Status aktualisiert
-@enduml
-```
-</code></pre></div>
-<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-2-aktivitaetsdiagramm-einstieg-und-funktionsauswahl.md</div><p><a href="plantuml-diagramme/13-2-aktivitaetsdiagramm-einstieg-und-funktionsauswahl.md">13-2-aktivitaetsdiagramm-einstieg-und-funktionsauswahl.md</a></p><pre><code># 13.2 Aktivitaetsdiagramm: Einstieg und Funktionsauswahl
-
-```plantuml
-@startuml
+@enduml</code></pre></div>
+<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-2-aktivitaetsdiagramm-einstieg-und-funktionsauswahl.md</div><p><a href="plantuml-diagramme/13-2-aktivitaetsdiagramm-einstieg-und-funktionsauswahl.md">13-2-aktivitaetsdiagramm-einstieg-und-funktionsauswahl.md</a></p><pre><code class="language-plantuml">@startuml
 skinparam shadowing false
 
 start
@@ -1766,13 +1748,8 @@ else (KLS-BT-Liste)
 endif
 
 stop
-@enduml
-```
-</code></pre></div>
-<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-3-aktivitaetsdiagramm-gebietsdaten.md</div><p><a href="plantuml-diagramme/13-3-aktivitaetsdiagramm-gebietsdaten.md">13-3-aktivitaetsdiagramm-gebietsdaten.md</a></p><pre><code># 13.3 Aktivitaetsdiagramm: Gebietsdaten
-
-```plantuml
-@startuml
+@enduml</code></pre></div>
+<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-3-aktivitaetsdiagramm-gebietsdaten.md</div><p><a href="plantuml-diagramme/13-3-aktivitaetsdiagramm-gebietsdaten.md">13-3-aktivitaetsdiagramm-gebietsdaten.md</a></p><pre><code class="language-plantuml">@startuml
 skinparam shadowing false
 
 start
@@ -1808,13 +1785,8 @@ else (Nein)
 endif
 
 stop
-@enduml
-```
-</code></pre></div>
-<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-4-aktivitaetsdiagramm-kls-bt-liste.md</div><p><a href="plantuml-diagramme/13-4-aktivitaetsdiagramm-kls-bt-liste.md">13-4-aktivitaetsdiagramm-kls-bt-liste.md</a></p><pre><code># 13.4 Aktivitaetsdiagramm: KLS-BT-Liste
-
-```plantuml
-@startuml
+@enduml</code></pre></div>
+<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-4-aktivitaetsdiagramm-kls-bt-liste.md</div><p><a href="plantuml-diagramme/13-4-aktivitaetsdiagramm-kls-bt-liste.md">13-4-aktivitaetsdiagramm-kls-bt-liste.md</a></p><pre><code class="language-plantuml">@startuml
 skinparam shadowing false
 
 start
@@ -1837,13 +1809,8 @@ endif
 
 :Aktion protokollieren;
 stop
-@enduml
-```
-</code></pre></div>
-<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-5-sequenzdiagramm-prozess-dropdown.md</div><p><a href="plantuml-diagramme/13-5-sequenzdiagramm-prozess-dropdown.md">13-5-sequenzdiagramm-prozess-dropdown.md</a></p><pre><code># 13.5 Sequenzdiagramm: Prozess-Dropdown
-
-```plantuml
-@startuml
+@enduml</code></pre></div>
+<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-5-sequenzdiagramm-prozess-dropdown.md</div><p><a href="plantuml-diagramme/13-5-sequenzdiagramm-prozess-dropdown.md">13-5-sequenzdiagramm-prozess-dropdown.md</a></p><pre><code class="language-plantuml">@startuml
 skinparam shadowing false
 
 actor "PTI Nutzer" as User
@@ -1859,13 +1826,8 @@ alt WFMT-Auftrag fehlt
 else WFMT-Auftrag vorhanden
   UI --&gt; User : GBGS-Funktionen aktiv anzeigen
 end
-@enduml
-```
-</code></pre></div>
-<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-6-sequenzdiagramm-gebietsdaten-speichern.md</div><p><a href="plantuml-diagramme/13-6-sequenzdiagramm-gebietsdaten-speichern.md">13-6-sequenzdiagramm-gebietsdaten-speichern.md</a></p><pre><code># 13.6 Sequenzdiagramm: Gebietsdaten speichern
-
-```plantuml
-@startuml
+@enduml</code></pre></div>
+<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-6-sequenzdiagramm-gebietsdaten-speichern.md</div><p><a href="plantuml-diagramme/13-6-sequenzdiagramm-gebietsdaten-speichern.md">13-6-sequenzdiagramm-gebietsdaten-speichern.md</a></p><pre><code class="language-plantuml">@startuml
 skinparam shadowing false
 
 actor "PTI Nutzer" as User
@@ -1893,13 +1855,8 @@ else gueltig
   API --&gt; UI : Erfolg
   UI --&gt; User : Speichern bestaetigen
 end
-@enduml
-```
-</code></pre></div>
-<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-7-sequenzdiagramm-kls-bt-liste.md</div><p><a href="plantuml-diagramme/13-7-sequenzdiagramm-kls-bt-liste.md">13-7-sequenzdiagramm-kls-bt-liste.md</a></p><pre><code># 13.7 Sequenzdiagramm: KLS-BT-Liste
-
-```plantuml
-@startuml
+@enduml</code></pre></div>
+<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-7-sequenzdiagramm-kls-bt-liste.md</div><p><a href="plantuml-diagramme/13-7-sequenzdiagramm-kls-bt-liste.md">13-7-sequenzdiagramm-kls-bt-liste.md</a></p><pre><code class="language-plantuml">@startuml
 skinparam shadowing false
 
 actor "PTI Nutzer" as User
@@ -1925,13 +1882,8 @@ opt PST-Schnittstelle vorhanden
 end
 
 API --&gt; UI : Ergebnis
-@enduml
-```
-</code></pre></div>
-<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-8-komponentendiagramm.md</div><p><a href="plantuml-diagramme/13-8-komponentendiagramm.md">13-8-komponentendiagramm.md</a></p><pre><code># 13.8 Komponentendiagramm
-
-```plantuml
-@startuml
+@enduml</code></pre></div>
+<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-8-komponentendiagramm.md</div><p><a href="plantuml-diagramme/13-8-komponentendiagramm.md">13-8-komponentendiagramm.md</a></p><pre><code class="language-plantuml">@startuml
 skinparam componentStyle rectangle
 skinparam shadowing false
 
@@ -1996,13 +1948,8 @@ FAPI --&gt; AUD
 DELTASVC --&gt; AUD
 EXPORT --&gt; AUD
 FAPI --&gt; GBGS
-@enduml
-```
-</code></pre></div>
-<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-9-statusmodell.md</div><p><a href="plantuml-diagramme/13-9-statusmodell.md">13-9-statusmodell.md</a></p><pre><code># 13.9 Statusmodell
-
-```plantuml
-@startuml
+@enduml</code></pre></div>
+<div class="plantuml-shell"><div class="plantuml-title">PlantUML: 13-9-statusmodell.md</div><p><a href="plantuml-diagramme/13-9-statusmodell.md">13-9-statusmodell.md</a></p><pre><code class="language-plantuml">@startuml
 skinparam shadowing false
 
 [*] --&gt; WFMT_FEHLT
@@ -2029,6 +1976,4 @@ DELTAS_GELOEST --&gt; ABSCHLUSSFAEHIG : Abschlusskriterien erfuellt
 ABSCHLUSSFAEHIG --&gt; ABRECHNUNG_BEREIT : Freigabe fuer weitere Abrechnung
 
 ABRECHNUNG_BEREIT --&gt; [*]
-@enduml
-```
-</code></pre></div></main></body></html>
+@enduml</code></pre></div></main></body></html>
