@@ -232,8 +232,22 @@
     .map-attribution { position: absolute; right: 8px; bottom: 8px; padding: 3px 6px; background: rgba(255,255,255,.88); border-radius: 4px; font-size: 11px; color: #344054; }
     .map-attribution a { color: #344054; text-decoration: underline; text-underline-offset: 2px; }
     .map-loading { position: absolute; inset: 0; display: grid; place-items: center; color: #344054; font-size: 13px; background: rgba(255,255,255,.42); }
-    .map-legend { position: absolute; left: 12px; bottom: 12px; display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; }
-    .map-legend span { background: rgba(255,255,255,.92); border: 1px solid var(--line); border-radius: 999px; padding: 5px 8px; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }
+    .map-legend { position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; }
+    .map-legend button {
+      background: rgba(255,255,255,.94);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      color: #172033;
+      cursor: pointer;
+      min-height: 28px;
+    }
+    .map-legend button.off { opacity: .45; text-decoration: line-through; }
+    .map-legend button:focus-visible { outline: 2px solid var(--magenta); outline-offset: 2px; }
     .legend-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
 
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
@@ -399,10 +413,11 @@
                     <div class="map-attribution">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></div>
                   </div>
                   <div class="map-legend">
-                    <span><i class="legend-dot" style="background:#006b6f"></i>Adresse</span>
-                    <span><i class="legend-dot" style="background:#e20074"></i>Gehäuse/NVt</span>
-                    <span><i class="legend-dot" style="background:#f59e0b"></i>Kollokation</span>
-                    <span><i class="legend-dot" style="background:#2563eb"></i>Fiber POP</span>
+                    <button type="button" data-map-kind="addr" aria-pressed="true"><i class="legend-dot" style="background:#006b6f"></i>Adresse</button>
+                    <button type="button" data-map-kind="case" aria-pressed="true"><i class="legend-dot" style="background:#e20074"></i>Gehäuse/NVt</button>
+                    <button type="button" data-map-kind="kollo" aria-pressed="true"><i class="legend-dot" style="background:#f59e0b"></i>Kollokation</button>
+                    <button type="button" data-map-kind="pop" aria-pressed="true"><i class="legend-dot" style="background:#2563eb"></i>Fiber POP</button>
+                    <button type="button" data-map-kind="other" aria-pressed="true"><i class="legend-dot" style="background:#475467"></i>Sonstige</button>
                   </div>
                 </div>
               </section>
@@ -551,6 +566,9 @@
     let hideZero = false;
     let mapMode = "all";
     let gisPointData = [];
+    const allMapKinds = ["addr", "case", "kollo", "pop", "other"];
+    const issueMapKinds = ["kollo", "pop", "other"];
+    let activeMapKinds = new Set(allMapKinds);
     const prignitzMap = {
       centerLon: 12.1592,
       centerLat: 53.2219,
@@ -753,9 +771,8 @@
       }
       tileLayer.innerHTML = tiles;
 
-      const visibleKinds = mapMode === "issues" ? new Set(["kollo", "pop", "other"]) : null;
       pointLayer.innerHTML = gisPointData
-        .filter(p => !visibleKinds || visibleKinds.has(p[2]))
+        .filter(p => activeMapKinds.has(p[2]))
         .map(([lon, lat, kind]) => {
           const p = project(lon, lat);
           const x = p.x - topLeft.x;
@@ -765,6 +782,23 @@
         })
         .join("");
       if (gisPointData.length) loading.style.display = "none";
+    }
+
+    function sameKinds(a, b) {
+      return a.size === b.length && b.every(kind => a.has(kind));
+    }
+
+    function updateMapControls() {
+      document.querySelectorAll("[data-map-kind]").forEach(btn => {
+        const selected = activeMapKinds.has(btn.dataset.mapKind);
+        btn.classList.toggle("off", !selected);
+        btn.setAttribute("aria-pressed", selected ? "true" : "false");
+      });
+      document.querySelectorAll("[data-map-mode]").forEach(btn => btn.classList.remove("active"));
+      const allButton = document.querySelector('[data-map-mode="all"]');
+      const issueButton = document.querySelector('[data-map-mode="issues"]');
+      if (sameKinds(activeMapKinds, allMapKinds)) allButton?.classList.add("active");
+      if (sameKinds(activeMapKinds, issueMapKinds)) issueButton?.classList.add("active");
     }
 
     function refresh() {
@@ -788,9 +822,20 @@
         document.getElementById(btn.dataset.tab).classList.add("active");
       }));
       document.querySelectorAll("[data-map-mode]").forEach(btn => btn.addEventListener("click", () => {
-        document.querySelectorAll("[data-map-mode]").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
         mapMode = btn.dataset.mapMode;
+        activeMapKinds = new Set(mapMode === "issues" ? issueMapKinds : allMapKinds);
+        updateMapControls();
+        renderMap();
+      }));
+      document.querySelectorAll("[data-map-kind]").forEach(btn => btn.addEventListener("click", () => {
+        const kind = btn.dataset.mapKind;
+        if (activeMapKinds.has(kind)) {
+          activeMapKinds.delete(kind);
+        } else {
+          activeMapKinds.add(kind);
+        }
+        mapMode = sameKinds(activeMapKinds, issueMapKinds) ? "issues" : sameKinds(activeMapKinds, allMapKinds) ? "all" : "custom";
+        updateMapControls();
         renderMap();
       }));
       ["areaFilter", "statusFilter", "sourceFilter"].forEach(id => document.getElementById(id).addEventListener("change", refresh));
@@ -825,6 +870,7 @@
       wireEvents();
       refresh();
       await loadGisPoints();
+      updateMapControls();
       renderMap();
       renderGisTable();
       renderTodoTable();
