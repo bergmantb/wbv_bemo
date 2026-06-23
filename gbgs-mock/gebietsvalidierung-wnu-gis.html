@@ -1,0 +1,767 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gebietsvalidierung: WNU vs. GIS Klickdummy</title>
+  <style>
+    :root {
+      --bg: #f6f7f9;
+      --surface: #ffffff;
+      --surface-soft: #fbfcfd;
+      --line: #d9dee7;
+      --line-strong: #c7cedb;
+      --text: #172033;
+      --muted: #667085;
+      --magenta: #e20074;
+      --teal: #006b6f;
+      --teal-soft: #e7f5f5;
+      --amber: #f59e0b;
+      --amber-soft: #fff7e6;
+      --red: #d92d20;
+      --red-soft: #fff0ee;
+      --green: #14804a;
+      --green-soft: #ecfdf3;
+      --blue: #2563eb;
+      --blue-soft: #eff6ff;
+      --shadow: 0 12px 34px rgba(23, 32, 51, .08);
+      --radius: 8px;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 1180px; }
+    button, select, input { font: inherit; }
+    .mobile-warning { display: none; }
+    .shell { min-height: 100vh; display: grid; grid-template-rows: auto auto 1fr; }
+
+    .page-head {
+      background: #f7f7f8;
+      border-bottom: 1px solid #e8e8eb;
+      padding: 22px 22px 0;
+    }
+    .page-head h1 { margin: 0 0 46px; font-size: 42px; line-height: 1.05; letter-spacing: 0; font-weight: 850; }
+    .lot-card {
+      background: var(--surface);
+      border: 1px solid #e4e7ec;
+      box-shadow: 0 4px 18px rgba(23,32,51,.08);
+      border-radius: 8px 8px 0 0;
+      padding: 20px 24px 0;
+    }
+    .lot-meta { color: #344054; font-size: 16px; margin-bottom: 6px; }
+    .lot-title-row { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .lot-title { font-size: 24px; font-weight: 850; line-height: 1.15; }
+    .lot-actions { display: flex; gap: 32px; color: #8a8d95; font-size: 18px; }
+    .lot-id { margin-top: 8px; color: #344054; font-size: 18px; }
+    .phase-tabs {
+      display: grid;
+      grid-template-columns: 150px 190px 240px 250px 230px 1fr;
+      align-items: end;
+      margin-top: 18px;
+      border-top: 1px solid #eceff3;
+      overflow: hidden;
+    }
+    .phase-tab {
+      position: relative;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      border-right: 1px solid #e4e7ec;
+      background: #fff;
+      color: #000;
+      font-size: 18px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .phase-tab:first-child { justify-content: flex-start; padding-left: 34px; }
+    .phase-tab.active { color: #008a49; }
+    .phase-tab.active::after {
+      content: "";
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      bottom: 0;
+      height: 5px;
+      background: #008a49;
+      border-radius: 5px 5px 0 0;
+    }
+    .back-icon {
+      position: absolute;
+      left: 14px;
+      width: 13px;
+      height: 13px;
+      border-left: 2px solid #111;
+      border-bottom: 2px solid #111;
+      transform: rotate(45deg);
+    }
+
+    .app { display: grid; grid-template-columns: 226px 1fr 410px; min-height: 0; }
+    .sidebar {
+      background: var(--surface);
+      border-right: 1px solid var(--line);
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; height: 38px; }
+    .menu-icon { width: 22px; height: 16px; display: grid; gap: 4px; }
+    .menu-icon span { height: 2px; background: #30384a; border-radius: 2px; }
+    .brand-title { color: var(--magenta); font-weight: 850; font-size: 18px; }
+    .nav { display: grid; gap: 4px; }
+    .nav-section { border-top: 1px solid var(--line); padding-top: 16px; margin-top: 12px; }
+    .nav button {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      text-align: left;
+      padding: 11px 12px;
+      border-radius: 6px;
+      color: #31394b;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1.2;
+    }
+    .nav button.active { background: #fff0f7; color: var(--magenta); font-weight: 750; box-shadow: inset 3px 0 0 var(--magenta); }
+    .nav-icon {
+      width: 18px;
+      height: 18px;
+      display: inline-grid;
+      place-items: center;
+      color: currentColor;
+      flex: 0 0 18px;
+    }
+
+    .main { min-width: 0; }
+    .topbar {
+      min-height: 76px;
+      display: grid;
+      grid-template-columns: 1.1fr .95fr .9fr .9fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 18px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+    }
+    .filter label { display: block; font-size: 12px; font-weight: 750; margin-bottom: 5px; color: #293348; }
+    .filter select, .filter input {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 9px 10px;
+      background: var(--surface-soft);
+      color: var(--text);
+      min-height: 38px;
+    }
+    .ghost-button, .primary-button {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: #344054;
+      border-radius: 6px;
+      min-height: 38px;
+      padding: 0 12px;
+      cursor: pointer;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+    .primary-button { background: var(--magenta); color: #fff; border-color: var(--magenta); }
+    .content { padding: 16px; display: grid; gap: 12px; }
+    .screen { display: none; }
+    .screen.active { display: grid; gap: 12px; }
+    .kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+    .panel, .kpi {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: 0 1px 2px rgba(23,32,51,.04);
+    }
+    .kpi { padding: 16px; min-height: 118px; display: grid; gap: 8px; align-content: start; }
+    .kpi-title { color: #293348; font-size: 13px; font-weight: 750; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .kpi-value { font-size: 27px; font-weight: 850; letter-spacing: 0; line-height: 1.08; }
+    .kpi-value.warn { color: #e87800; }
+    .kpi-value.bad { color: var(--red); }
+    .delta { font-size: 12px; color: var(--muted); line-height: 1.35; }
+    .delta strong { color: var(--teal); }
+    .delta.warn strong { color: #e87800; }
+    .panel { padding: 14px; }
+    .panel-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+    .panel-title { font-weight: 850; font-size: 16px; }
+    .panel-subtitle { color: var(--muted); font-size: 12px; margin-top: 4px; line-height: 1.35; }
+    .toolbar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .segmented { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+    .segmented button { border: 0; background: var(--surface); padding: 7px 12px; font-weight: 750; cursor: pointer; font-size: 12px; }
+    .segmented button.active { background: var(--magenta); color: #fff; }
+
+    .summary-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 12px; }
+    .map-wrap { min-height: 342px; position: relative; border: 1px solid var(--line); border-radius: 6px; background: linear-gradient(180deg,#fbfcfd,#f3f6f9); overflow: hidden; }
+    .map-wrap svg { width: 100%; height: 100%; display: block; min-height: 342px; }
+    .map-legend { position: absolute; left: 12px; bottom: 12px; display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; }
+    .map-legend span { background: rgba(255,255,255,.92); border: 1px solid var(--line); border-radius: 999px; padding: 5px 8px; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }
+    .legend-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { border: 1px solid var(--line); padding: 10px 9px; text-align: right; vertical-align: top; }
+    th { background: #f8fafc; font-size: 12px; color: #30384a; font-weight: 850; white-space: nowrap; }
+    td:first-child, th:first-child, td:nth-child(2), th:nth-child(2) { text-align: left; }
+    tbody tr { cursor: pointer; }
+    tbody tr:hover { background: #fff7fb; }
+    .table-scroll { overflow-x: auto; }
+    .status { display: inline-flex; align-items: center; gap: 7px; justify-content: flex-end; width: 100%; font-weight: 800; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; flex: 0 0 10px; }
+    .dot.ok { background: var(--teal); }
+    .dot.warn { background: var(--amber); }
+    .dot.bad { background: var(--red); }
+    .dot.info { background: var(--blue); }
+    .pill { display: inline-flex; align-items: center; border-radius: 999px; padding: 4px 8px; font-size: 12px; font-weight: 850; white-space: nowrap; }
+    .pill.red { background: var(--red-soft); color: var(--red); }
+    .pill.amber { background: var(--amber-soft); color: #b65f00; }
+    .pill.green { background: var(--teal-soft); color: var(--teal); }
+    .pill.blue { background: var(--blue-soft); color: var(--blue); }
+    .pill.gray { background: #f2f4f7; color: #475467; }
+    .negative { color: var(--red); font-weight: 850; }
+    .positive { color: var(--teal); font-weight: 850; }
+    .muted { color: var(--muted); }
+    .link { color: var(--magenta); font-weight: 850; text-decoration: underline; text-underline-offset: 2px; }
+
+    .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .info-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; display: grid; gap: 8px; }
+    .info-card h3 { margin: 0; font-size: 15px; }
+    .info-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+    .step { border: 1px solid var(--line); border-radius: 6px; padding: 12px; min-height: 112px; background: var(--surface); }
+    .step strong { display: block; margin-bottom: 7px; }
+    .step span { color: var(--muted); font-size: 12px; line-height: 1.4; }
+
+    .detail {
+      background: var(--surface);
+      border-left: 1px solid var(--line);
+      min-width: 0;
+      padding: 18px;
+      display: grid;
+      grid-template-rows: auto auto 1fr;
+      gap: 16px;
+    }
+    .detail-top { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
+    .detail h2 { margin: 0; font-size: 17px; line-height: 1.25; }
+    .detail .muted { color: var(--muted); font-size: 12px; margin-top: 4px; line-height: 1.4; }
+    .close-btn { border: 0; background: transparent; cursor: pointer; font-size: 22px; color: #475467; }
+    .detail select { width: 100%; border: 1px solid var(--line); border-radius: 6px; padding: 9px; background: var(--surface-soft); }
+    .tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--line); }
+    .tabs button { border: 0; background: transparent; padding: 11px 10px; cursor: pointer; font-weight: 750; color: var(--muted); border-bottom: 2px solid transparent; font-size: 13px; }
+    .tabs button.active { color: var(--magenta); border-bottom-color: var(--magenta); }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: grid; gap: 16px; }
+    .mini-title { font-weight: 850; font-size: 13px; margin-bottom: 8px; }
+    .todo { border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+    .todo-row { display: grid; grid-template-columns: 34px 1fr auto; gap: 8px; padding: 11px; align-items: center; border-bottom: 1px solid var(--line); font-size: 12px; }
+    .todo-row:last-child { border-bottom: 0; }
+    .detail-note { border: 1px solid var(--line); background: #f8fafc; border-radius: 6px; padding: 11px; font-size: 12px; line-height: 1.45; color: #344054; }
+    .bar-stack { display: grid; gap: 10px; }
+    .bar-row { display: grid; grid-template-columns: 110px 1fr 70px; align-items: center; gap: 8px; font-size: 12px; }
+    .bar-track { height: 10px; background: #eef2f6; border-radius: 999px; overflow: hidden; }
+    .bar-fill { height: 100%; background: var(--teal); border-radius: 999px; }
+    .bar-fill.warn { background: var(--amber); }
+    .bar-fill.bad { background: var(--red); }
+    .empty-note { color: var(--muted); line-height: 1.5; font-size: 13px; }
+
+    @media (max-width: 1180px) {
+      body { min-width: 0; }
+      .mobile-warning { display: block; padding: 10px 14px; background: #fff7e6; border-bottom: 1px solid #ffd48a; font-size: 13px; }
+      .page-head { padding: 16px 12px 0; }
+      .page-head h1 { font-size: 34px; margin-bottom: 24px; }
+      .lot-actions { display: none; }
+      .phase-tabs { grid-template-columns: repeat(5, minmax(150px, 1fr)); overflow-x: auto; }
+      .app { display: block; }
+      .sidebar, .detail { display: none; }
+      .topbar { grid-template-columns: repeat(2, minmax(0, 1fr)); height: auto; }
+      .content { padding: 12px; }
+      .kpis, .cards, .flow, .summary-grid { grid-template-columns: 1fr; }
+      table { min-width: 900px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-warning">Der Klickdummy ist für Desktop-Steuerung optimiert; auf kleinen Viewports werden Tabellen horizontal gescrollt.</div>
+  <div class="shell">
+    <header class="page-head">
+      <h1>Losberechnung</h1>
+      <section class="lot-card">
+        <div class="lot-meta">Prignitz Los 1 · Datenstand 28.04.2026</div>
+        <div class="lot-title-row">
+          <div class="lot-title">Gebietsvalidierung: WNU-Input gegen GIS-Netzplan</div>
+          <div class="lot-actions"><span>Bearbeiten</span><span>Infrastruktur bearbeiten</span></div>
+        </div>
+        <div class="lot-id">ID: 12070_01_03_01 · WNU_GF+v2_4b · Förderkulisse 5055891</div>
+        <nav class="phase-tabs" aria-label="Bearbeitungsphasen">
+          <div class="phase-tab"><span class="back-icon" aria-hidden="true"></span>Adressliste</div>
+          <div class="phase-tab">Adress-Historie</div>
+          <div class="phase-tab active">Gebietsvalidierung</div>
+          <div class="phase-tab">Businesscase Freigabe</div>
+          <div class="phase-tab">Angebot erstellen</div>
+          <div class="phase-tab">Prüfprotokoll</div>
+        </nav>
+      </section>
+    </header>
+
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div class="brand-title">E2E Fördermonitoring</div>
+        </div>
+        <nav class="nav" aria-label="Hauptnavigation">
+          <button class="active" data-screen="overview"><span class="nav-icon">▦</span>Prüfübersicht</button>
+          <button data-screen="matrix"><span class="nav-icon">▤</span>Abweichungsmatrix</button>
+          <button data-screen="gis"><span class="nav-icon">◎</span>GIS-Netzplan</button>
+          <button data-screen="workflow"><span class="nav-icon">◇</span>Klärworkflow</button>
+          <div class="nav-section"></div>
+          <button data-screen="sources"><span class="nav-icon">◉</span>Datenquellen</button>
+          <button data-screen="export"><span class="nav-icon">⇩</span>Export</button>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <div class="topbar">
+          <div class="filter"><label>Prüfbereich</label><select id="areaFilter"><option>Alle</option><option>Längen</option><option>Stückzahlen</option><option>Adressmengen</option><option>GIS-Fähigkeit</option></select></div>
+          <div class="filter"><label>Status</label><select id="statusFilter"><option>Alle</option><option>Kritisch</option><option>Klärung</option><option>OK</option><option>Nicht prüfbar</option></select></div>
+          <div class="filter"><label>Datenquelle</label><select id="sourceFilter"><option>Alle</option><option>VI KJP WL</option><option>WNU exportWnu</option><option>GIS Shapefile</option><option>Adressliste</option></select></div>
+          <div class="filter"><label>Stichtag</label><input id="dateFilter" type="date" value="2026-04-28"></div>
+          <button class="ghost-button" id="resetFilters">↻ Filter zurücksetzen</button>
+        </div>
+
+        <section class="content">
+          <div class="screen active" id="overview">
+            <div class="kpis" id="kpis"></div>
+            <div class="summary-grid">
+              <section class="panel">
+                <div class="panel-header">
+                  <div>
+                    <div class="panel-title">Prüfmatrix VI/KJP · WNU · GIS</div>
+                    <div class="panel-subtitle">Erster automatischer Abgleich der FPF-Artefakte aus Prignitz Los 1.</div>
+                  </div>
+                  <div class="toolbar"><button class="ghost-button" id="showCritical">Nur kritische Deltas</button><button class="primary-button" id="createTicket">Klärfall anlegen</button></div>
+                </div>
+                <div class="table-scroll"><table id="overviewTable"></table></div>
+              </section>
+              <section class="panel">
+                <div class="panel-header">
+                  <div>
+                    <div class="panel-title">GIS-Objekte aus Bauten und Netztechnik</div>
+                    <div class="panel-subtitle">Punkt-Shapefile mit 3.254 Objekten, ETRS89-Koordinaten.</div>
+                  </div>
+                  <div class="segmented"><button class="active" data-map-mode="all">Alle</button><button data-map-mode="issues">Klärung</button></div>
+                </div>
+                <div class="map-wrap">
+                  <svg id="gisMap" viewBox="0 0 580 342" role="img" aria-label="Schematische GIS-Punktkarte"></svg>
+                  <div class="map-legend">
+                    <span><i class="legend-dot" style="background:#006b6f"></i>Adresse</span>
+                    <span><i class="legend-dot" style="background:#e20074"></i>Gehäuse/NVt</span>
+                    <span><i class="legend-dot" style="background:#f59e0b"></i>Kollokation</span>
+                    <span><i class="legend-dot" style="background:#2563eb"></i>Fiber POP</span>
+                  </div>
+                </div>
+              </section>
+            </div>
+            <section class="panel">
+              <div class="panel-header">
+                <div><div class="panel-title">Top-Abweichungen und Prüfhinweise</div><div class="panel-subtitle">Priorisiert nach fachlichem Risiko für Businesscasevalidierung und Angebotsfreigabe.</div></div>
+              </div>
+              <div class="table-scroll"><table id="issueTable"></table></div>
+            </section>
+          </div>
+
+          <div class="screen" id="matrix">
+            <section class="panel">
+              <div class="panel-header">
+                <div><div class="panel-title">Abweichungsmatrix je Kennzahl</div><div class="panel-subtitle">Vergleichbare Kennzahlen werden gegen VI/KJP, WNU exportWnu, Adressliste und GIS gezählt.</div></div>
+                <div class="toolbar"><button class="ghost-button" id="toggleZero">0-Deltas ein-/ausblenden</button><button class="ghost-button">Spalten konfigurieren</button></div>
+              </div>
+              <div class="table-scroll"><table id="matrixTable"></table></div>
+            </section>
+          </div>
+
+          <div class="screen" id="gis">
+            <div class="cards">
+              <div class="info-card"><h3>Geometrietyp</h3><p>Das gelieferte GIS-Paket ist ein Punkt-Shapefile. Linienlängen für Tiefbau, Rohr und Glasfaser können daraus nicht direkt rekonstruiert werden.</p></div>
+              <div class="info-card"><h3>Objektzählung</h3><p>2.771 Adresspunkte, 185 Objekte art 14, 185 Objekte art 30, 35 Fiber POP und 37 Kollokationspunkte wurden aus der DBF gelesen.</p></div>
+              <div class="info-card"><h3>Prüfregel</h3><p>GIS wird für Stückzahlen gegen WNU verwendet; Längen bleiben VI/KJP-vs-WNU-Prüfung und erhalten den Status „GIS nicht prüfbar“.</p></div>
+            </div>
+            <section class="panel">
+              <div class="panel-header"><div><div class="panel-title">GIS-Attributzählung</div><div class="panel-subtitle">Aus `Bauten_und_Netztechnik_v5.1.dbf`; Mapping ist zunächst transparent nach art/art_sonst ausgewiesen.</div></div></div>
+              <div class="table-scroll"><table id="gisTable"></table></div>
+            </section>
+          </div>
+
+          <div class="screen" id="workflow">
+            <section class="panel">
+              <div class="panel-header"><div><div class="panel-title">Klärworkflow Gebietsvalidierung</div><div class="panel-subtitle">Vom automatischen Delta bis zur freigegebenen Inputdatei für die Wirtschaftlichkeitsberechnung.</div></div></div>
+              <div class="flow">
+                <div class="step"><strong>1. Artefakte laden</strong><span>VI/KJP WL, WNU exportWnu, Adressliste und GIS-Shapefile werden einer Los-ID zugeordnet.</span></div>
+                <div class="step"><strong>2. Kennzahlen normalisieren</strong><span>Meter, Stückzahlen und Adressmengen werden auf fachliche Prüfkennzahlen gemappt.</span></div>
+                <div class="step"><strong>3. Deltas berechnen</strong><span>Abweichungen werden mit Status, Quelle und fachlichem Risiko gespeichert.</span></div>
+                <div class="step"><strong>4. Strukturplanung klären</strong><span>Planer prüft FPF-Ausleitung, Mapping, fehlende Linien oder manuelle Rundungen.</span></div>
+                <div class="step"><strong>5. Übergabe sperren/freigeben</strong><span>Businesscasevalidierung startet erst nach dokumentierter Freigabe oder bewusstem Override.</span></div>
+              </div>
+            </section>
+            <section class="panel"><div class="panel-title">Offene Klärfälle</div><div class="table-scroll"><table id="todoTable"></table></div></section>
+          </div>
+
+          <div class="screen" id="sources">
+            <section class="panel">
+              <div class="panel-header"><div><div class="panel-title">Datenquellen und technische Lesbarkeit</div><div class="panel-subtitle">Diese Übersicht macht sichtbar, welches Artefakt für welchen Teil des Abgleichs geeignet ist.</div></div></div>
+              <div class="table-scroll"><table id="sourceTable"></table></div>
+            </section>
+          </div>
+
+          <div class="screen" id="export">
+            <section class="panel">
+              <div class="panel-header"><div><div class="panel-title">Prüfprotokoll und Übergabe an Businesscasevalidierung</div><div class="panel-subtitle">Simulierte Exportstrecke für das spätere MVP.</div></div><button class="primary-button" id="simulateExport">Prüfprotokoll erzeugen</button></div>
+              <div id="exportPreview" class="empty-note">Noch kein Export erzeugt. Im Zielprozess würde hier ein Prüfprotokoll mit Datenstand, Hash je Artefakt, Deltas, Owner und Freigabestatus entstehen.</div>
+            </section>
+          </div>
+        </section>
+      </main>
+
+      <aside class="detail" id="detailPane">
+        <div class="detail-top">
+          <div><h2 id="detailTitle">Detailprüfung</h2><div class="muted" id="detailSubtitle">Ausgewählte Kennzahl mit Quellenvergleich und fachlicher Einordnung.</div></div>
+          <button class="close-btn" id="closeDetail" aria-label="Detail schließen">×</button>
+        </div>
+        <select id="detailSelect"></select>
+        <div>
+          <div class="tabs"><button class="active" data-tab="tabCompare">Vergleich</button><button data-tab="tabEvidence">Evidenz</button><button data-tab="tabActions">To-dos</button></div>
+          <div class="tab-pane active" id="tabCompare">
+            <div>
+              <div class="mini-title">Quellenwerte</div>
+              <table id="detailValues"></table>
+            </div>
+            <div>
+              <div class="mini-title">Delta-Profil</div>
+              <div class="bar-stack" id="detailBars"></div>
+            </div>
+          </div>
+          <div class="tab-pane" id="tabEvidence">
+            <div class="mini-title">Fachliche Evidenz</div>
+            <div class="detail-note" id="detailEvidence"></div>
+          </div>
+          <div class="tab-pane" id="tabActions">
+            <div class="mini-title">Nächste Schritte</div>
+            <div class="todo" id="detailActions"></div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const checks = [
+      { id: "CHK-001", metric: "Tiefbau gesamt", area: "Längen", unit: "m", vi: 148316, wnu: 148316, gis: null, status: "OK", severity: "ok", source: "VI KJP WL", note: "VI unversiegelt + versiegelt entspricht WNU undergroundConstructionTotalInMeters.", evidence: "KJP WL: 95.008 m unversiegelt + 53.308 m versiegelt = 148.316 m. WNU exportWnu: undergroundConstructionTotalInMeters = 148.316.", action: "Keine fachliche Klärung erforderlich." },
+      { id: "CHK-002", metric: "Tiefbau unversiegelt", area: "Längen", unit: "m", vi: 95008, wnu: 95008, gis: null, status: "OK", severity: "ok", source: "VI KJP WL", note: "Wert ist zwischen VI/KJP und WNU identisch.", evidence: "KJP WL Zeile Unversiegelt: 95.008. WNU exportWnu: undergroundConstructionUnsealedInMeters = 95.008.", action: "Als Referenzwert im Prüfprotokoll übernehmen." },
+      { id: "CHK-003", metric: "Tiefbau versiegelt", area: "Längen", unit: "m", vi: 53308, wnu: 53308, gis: null, status: "OK", severity: "ok", source: "VI KJP WL", note: "Wert ist zwischen VI/KJP und WNU identisch.", evidence: "KJP WL Zeile Versiegelt: 53.308. WNU exportWnu: undergroundConstructionSealedInMeters = 53.308.", action: "Als Referenzwert im Prüfprotokoll übernehmen." },
+      { id: "CHK-004", metric: "Alternative Verlegearten", area: "Längen", unit: "m", vi: 8333, wnu: 8333, gis: null, status: "OK", severity: "ok", source: "WNU exportWnu", note: "WNU und Tiefbau_Details liefern gerundet denselben Wert.", evidence: "WNU exportWnu: undergroundConstructionAlternativeInMeters = 8.333. Tiefbau_Details: Spülbohrung 8.333,199 m.", action: "Rundungsregel dokumentieren." },
+      { id: "CHK-005", metric: "Leerrohr / Rohre", area: "Längen", unit: "m", vi: 205122, wnu: 205122, gis: null, status: "OK", severity: "ok", source: "VI KJP WL", note: "VI Leerrohr entspricht WNU SNRV + SNR.", evidence: "KJP WL Leerrohr: 205.122 m. WNU pipesSnrvInMeters 202.243 + pipesSnrInMeters 2.879 = 205.122.", action: "Mappingregel Rohre = SNRV + SNR übernehmen." },
+      { id: "CHK-006", metric: "Glasfaser", area: "Längen", unit: "m", vi: 656614, wnu: 607117, gis: null, status: "Kritisch", severity: "bad", source: "VI KJP WL", note: "49.497 m weniger in WNU als im VI/KJP-Wirtschaftlichkeitslückenblatt.", evidence: "KJP WL Glasfaser: 656.614 m. WNU exportWnu: pipesFiberInMeters = 607.117 m. Delta = -49.497 m bzw. -7,5 % gegen VI.", action: "Strukturplanung muss FPF-Ausleitung und WNU-Mapping für Glasfaser HK/VzK prüfen." },
+      { id: "CHK-007", metric: "Oberirdische Strecke", area: "Längen", unit: "m", vi: 0, wnu: 46934, gis: null, status: "Klärung", severity: "warn", source: "WNU exportWnu", note: "WNU enthält 46.934 m oberirdische Strecke, KJP WL führt bei der Einheit 0.", evidence: "KJP WL Oberirdische Leitungsverläufe: Betrag vorhanden, Einheit 0. WNU exportWnu aboveGroundPoleFieldInMeters = 46.934.", action: "Klären, ob KJP WL die Strecke bewusst nicht ausweist oder ob das Feld falsch befüllt ist." },
+      { id: "CHK-008", metric: "Mastfelder", area: "Stückzahlen", unit: "Stk.", vi: 1341, wnu: 1341, gis: null, status: "OK", severity: "ok", source: "VI KJP WL", note: "VI und WNU stimmen überein; im GIS-Punktplan nicht als eigene Länge prüfbar.", evidence: "KJP WL Masten: 1.341. WNU aboveGroundPoleFieldQuantity = 1.341.", action: "OK; falls GIS-Layer für Maststandorte folgt, zusätzliche Plausibilisierung ergänzen." },
+      { id: "CHK-009", metric: "Adressen", area: "Adressmengen", unit: "Stk.", vi: 2771, wnu: 2771, gis: 2771, status: "OK", severity: "ok", source: "Adressliste", note: "Adressliste, WNU und GIS art 16 stimmen exakt überein.", evidence: "Interne/externe Adressliste: 2.771 Datenzeilen. WNU addressTotalQuantity = 2.771. GIS art 16 = 2.771.", action: "Grüne Referenzlinie für weitere Detailprüfungen." },
+      { id: "CHK-010", metric: "Gf-AP / Hausanschlüsse", area: "Stückzahlen", unit: "Stk.", vi: 2217, wnu: 2217, gis: null, status: "OK", severity: "ok", source: "VI KJP WL", note: "VI/KJP und WNU stimmen bei förderfähigen Gf-AP überein.", evidence: "KJP WL Kosten Hausanschlüsse/Schächte/Verzweiger/Splitter: Einheit 2.217. WNU gfApInitialExpansionEligible = 2.217.", action: "OK; GIS-Mapping auf art-Code ist noch fachlich zu bestätigen." },
+      { id: "CHK-011", metric: "Gf-NVt / FTTH-Gehäuse", area: "Stückzahlen", unit: "Stk.", vi: null, wnu: 185, gis: 185, status: "OK", severity: "ok", source: "GIS Shapefile", note: "WNU gfnvtTotalQuantity passt zu GIS art 14.", evidence: "WNU gfnvtTotalQuantity = 185 und ftthCaseQuantity = 185. GIS art 14 = 185.", action: "Mapping art 14 als Gf-NVt/FTTH-Gehäuse fachlich bestätigen." },
+      { id: "CHK-012", metric: "Verteil-/Schaltobjekte art 30", area: "Stückzahlen", unit: "Stk.", vi: null, wnu: 185, gis: 220, status: "Klärung", severity: "warn", source: "GIS Shapefile", note: "GIS art 30 tritt 220-mal auf; davon 35 mit art_sonst Gehaeuse.", evidence: "GIS art 30 ohne art_sonst = 185, GIS art 30 art_sonst Gehaeuse = 35. WNU ftthCaseQuantity = 185.", action: "Prüfen, ob die 35 Gehaeuse zu Fiber POP, Schacht/Gehäuse oder separater Netztechnik gehören." },
+      { id: "CHK-013", metric: "Fiber POPs", area: "Stückzahlen", unit: "Stk.", vi: null, wnu: 35, gis: 35, status: "OK", severity: "ok", source: "GIS Shapefile", note: "WNU fiberTotalQuantity stimmt mit GIS art_sonst Fiber POP überein.", evidence: "WNU fiberTotalQuantity = 35. GIS art 99 mit art_sonst Fiber POP = 35.", action: "OK; im Detailmapping als Fiber-POP-Klasse führen." },
+      { id: "CHK-014", metric: "OLT gesamt", area: "Stückzahlen", unit: "Stk.", vi: null, wnu: 13, gis: null, status: "Klärung", severity: "warn", source: "WNU exportWnu", note: "WNU enthält 13 OLT, GIS-Punktklassen zeigen kein eindeutiges OLT-Mapping.", evidence: "WNU oltInitialConstructionQuantity = 4, oltExpansionQuantity = 9, oltTotalQuantity = 13. GIS enthält art 12 = 3 und art 17 = 3 im Zustand 2, aber keine eindeutige OLT-Attributbezeichnung.", action: "Art-Code-Legende für OLT/Backbone beschaffen und Mapping ergänzen." },
+      { id: "CHK-015", metric: "GIS-Linienlängen", area: "GIS-Fähigkeit", unit: "m", vi: 1015254, wnu: 1010477, gis: null, status: "Nicht prüfbar", severity: "info", source: "GIS Shapefile", note: "Das gelieferte GIS ist ein Punkt-Shapefile; Längen sind im Netzplanpaket nicht enthalten.", evidence: "Shapefile Header: shape_type 1 Point. Aus .shp können keine Trassen-, Rohr- oder Glasfaserlinien summiert werden.", action: "Linienlayer aus FPF anfordern oder Exportpaket um Trassen/Leerrohr/Glasfaser ergänzen." },
+      { id: "CHK-016", metric: "Wirtschaftlichkeitslücke", area: "Businesscase", unit: "EUR", vi: 13696144, wnu: 14100000, gis: null, status: "Klärung", severity: "warn", source: "VI KJP WL", note: "Investitionskosten/Wirtschaftlichkeitslücke sind nicht identisch und müssen fachlich getrennt werden.", evidence: "KJP WL Summe Investitionskosten: 13.696.143,63 EUR. WNU exportWnu economicGap = 14.100.000 EUR; maximumFundingGap = 15.259.097,16 EUR.", action: "Businesscasevalidierung muss definieren, welcher Wert für Freigabe und Angebot maßgeblich ist." }
+    ];
+
+    const gisObjects = [
+      { art: "16", art_sonst: "-", kollokation: "0", zustand: "1", count: 2771, mapping: "Adresspunkte", wnu: 2771, status: "OK" },
+      { art: "14", art_sonst: "-", kollokation: "0", zustand: "1", count: 185, mapping: "Gf-NVt / FTTH-Gehäuse", wnu: 185, status: "OK" },
+      { art: "30", art_sonst: "-", kollokation: "0", zustand: "1", count: 185, mapping: "FTTH-Schalt-/Verteilobjekte", wnu: 185, status: "OK" },
+      { art: "15", art_sonst: "-", kollokation: "1", zustand: "1", count: 37, mapping: "Kollokationspunkte", wnu: null, status: "Klärung" },
+      { art: "30", art_sonst: "Gehaeuse", kollokation: "0", zustand: "1", count: 35, mapping: "Gehäuse, Zuordnung offen", wnu: null, status: "Klärung" },
+      { art: "99", art_sonst: "Fiber POP", kollokation: "0", zustand: "1", count: 35, mapping: "Fiber POP", wnu: 35, status: "OK" },
+      { art: "12", art_sonst: "-", kollokation: "0", zustand: "2", count: 3, mapping: "Art-Code offen", wnu: null, status: "Klärung" },
+      { art: "17", art_sonst: "-", kollokation: "0", zustand: "2", count: 3, mapping: "Backbone/Art-Code offen", wnu: null, status: "Klärung" }
+    ];
+
+    const sourceRows = [
+      ["VI_v2_4b_12070_01_03_01_20260428.xlsx", "KJP WL", "Invest, Längen, passive/aktive Infrastruktur", "lesbar", "<span class='pill green'>OK</span>"],
+      ["WNU_GF+v2_4b__5056963_6z12070_01_03_01z_Los1.xlsm", "exportWnu", "WNU-Übergabewerte für WFS/Businesscase", "lesbar", "<span class='pill green'>OK</span>"],
+      ["5055891_interne_Adressliste.xlsx", "Adressliste", "Förderkulisse intern inkl. KLS-ID", "2.771 Adressen", "<span class='pill green'>OK</span>"],
+      ["5055891_externe_Adressliste.xlsx", "Adressliste", "Förderkulisse extern", "2.771 Adressen", "<span class='pill green'>OK</span>"],
+      ["Bauten_und_Netztechnik_v5.1.shp/dbf", "GIS Punktplan", "Bauten und Netztechnik; keine Liniengeometrie", "3.254 Punkte", "<span class='pill amber'>Teilweise</span>"]
+    ];
+
+    const todos = [
+      ["GV-001", "Glasfaserlänge", "-49.497 m", "Strukturplanung", "Kritisch", "FPF-Ausleitung Glasfaser HK/VzK gegen WNU `pipesFiberInMeters` prüfen."],
+      ["GV-002", "Oberirdische Strecke", "+46.934 m", "Bidmanager", "Klärung", "KJP WL Feldlogik prüfen: Betrag vorhanden, Menge 0."],
+      ["GV-003", "GIS-Linienlayer", "nicht geliefert", "FPF Betrieb", "Klärung", "Trassen-/Rohr-/Faserlinien als zusätzlichen GIS-Export anfordern."],
+      ["GV-004", "Art-Code-Legende", "8 Klassen", "Strukturplanung", "Klärung", "Mapping art 12/15/17/30 und Zustand 2 fachlich bestätigen."],
+      ["GV-005", "Businesscasewert", "+403.856 EUR", "Controlling", "Klärung", "KJP Investitionssumme und WNU economicGap fachlich trennen."]
+    ];
+
+    let selectedCheck = checks[5];
+    let hideZero = false;
+    let mapMode = "all";
+    const fmt = new Intl.NumberFormat("de-DE");
+    const money = value => `${fmt.format(Math.round(value))} €`;
+    const signed = value => value > 0 ? `+${fmt.format(value)}` : fmt.format(value);
+    const statusClass = status => status === "Kritisch" ? "red" : status === "Klärung" ? "amber" : status === "Nicht prüfbar" ? "blue" : "green";
+    const dotClass = severity => severity === "bad" ? "bad" : severity === "warn" ? "warn" : severity === "info" ? "info" : "ok";
+    const valueText = (value, unit) => value === null || value === undefined ? "—" : unit === "EUR" ? money(value) : `${fmt.format(Math.round(value))} ${unit}`;
+    const delta = item => item.vi !== null && item.wnu !== null ? Math.round(item.wnu - item.vi) : null;
+    const deltaPct = item => item.vi ? ((item.wnu - item.vi) / item.vi * 100) : null;
+
+    function currentChecks() {
+      const area = document.getElementById("areaFilter").value;
+      const status = document.getElementById("statusFilter").value;
+      const source = document.getElementById("sourceFilter").value;
+      return checks.filter(x =>
+        (area === "Alle" || x.area === area) &&
+        (status === "Alle" || x.status === status) &&
+        (source === "Alle" || x.source === source) &&
+        (!hideZero || delta(x) !== 0 || x.status !== "OK")
+      );
+    }
+
+    function renderKpis() {
+      const data = currentChecks();
+      const critical = data.filter(x => x.status === "Kritisch").length;
+      const warn = data.filter(x => x.status === "Klärung").length;
+      const uncheckable = data.filter(x => x.status === "Nicht prüfbar").length;
+      const ok = data.filter(x => x.status === "OK").length;
+      document.getElementById("kpis").innerHTML = [
+        ["Prüfkennzahlen", data.length, `${ok} OK`, "Vergleich VI/KJP, WNU, GIS", ""],
+        ["kritische Abweichungen", critical, "Glasfaser -49.497 m", "blockiert Freigabe bis Klärung", "bad"],
+        ["Klärfälle", warn, "Mapping und Feldlogik", "Owner-Zuordnung erforderlich", "warn"],
+        ["GIS-Abdeckung", `${uncheckable ? "Punktplan" : "vollständig"}`, "Linien fehlen", "Längen nicht aus GIS prüfbar", "warn"]
+      ].map(k => `<article class="kpi"><div class="kpi-title">${k[0]}<span class="dot ${k[4] === "bad" ? "bad" : k[4] === "warn" ? "warn" : "ok"}"></span></div><div class="kpi-value ${k[4] === "bad" ? "bad" : k[4] === "warn" ? "warn" : ""}">${k[1]}</div><div class="delta ${k[4] === "warn" ? "warn" : ""}"><strong>${k[2]}</strong><br>${k[3]}</div></article>`).join("");
+    }
+
+    function renderTable(id, headers, rows, onRow) {
+      const head = `<thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead>`;
+      const body = `<tbody>${rows.map((r, idx) => `<tr data-row="${idx}">${r.map(c => `<td>${c}</td>`).join("")}</tr>`).join("")}</tbody>`;
+      const el = document.getElementById(id);
+      el.innerHTML = head + body;
+      if (onRow) el.querySelectorAll("tbody tr").forEach((tr, idx) => tr.addEventListener("click", () => onRow(idx)));
+    }
+
+    function renderOverviewTable() {
+      const data = currentChecks().slice(0, 8);
+      renderTable("overviewTable",
+        ["Kennzahl", "Bereich", "VI/KJP", "WNU", "GIS", "Delta", "Status"],
+        data.map(x => {
+          const d = delta(x);
+          return [
+            `<span class="link">${x.metric}</span>`,
+            x.area,
+            valueText(x.vi, x.unit),
+            valueText(x.wnu, x.unit),
+            valueText(x.gis, x.unit),
+            d === null ? "—" : `<span class="${d === 0 ? "positive" : "negative"}">${signed(d)} ${x.unit}</span>`,
+            `<span class="status"><span class="dot ${dotClass(x.severity)}"></span>${x.status}</span>`
+          ];
+        }),
+        idx => selectCheck(data[idx])
+      );
+    }
+
+    function renderIssueTable() {
+      const rows = checks.filter(x => x.status !== "OK").map(x => [
+        `<span class="link">${x.id}</span>`,
+        x.metric,
+        x.note,
+        x.status === "Kritisch" ? "<span class='pill red'>hoch</span>" : x.status === "Nicht prüfbar" ? "<span class='pill blue'>systemisch</span>" : "<span class='pill amber'>mittel</span>",
+        x.action
+      ]);
+      renderTable("issueTable", ["ID", "Prüfpunkt", "Befund", "Risiko", "Nächster Schritt"], rows, idx => selectCheck(checks.filter(x => x.status !== "OK")[idx]));
+    }
+
+    function renderMatrixTable() {
+      const data = currentChecks();
+      renderTable("matrixTable",
+        ["ID", "Kennzahl", "Einheit", "VI/KJP WL", "WNU exportWnu", "Adressliste/GIS", "Delta WNU-VI", "Delta %", "Status", "Hinweis"],
+        data.map(x => {
+          const d = delta(x);
+          const pct = deltaPct(x);
+          return [
+            x.id, `<span class="link">${x.metric}</span>`, x.unit,
+            valueText(x.vi, x.unit), valueText(x.wnu, x.unit), valueText(x.gis, x.unit),
+            d === null ? "—" : `<span class="${d === 0 ? "positive" : "negative"}">${signed(d)}</span>`,
+            pct === null ? "—" : `${pct.toLocaleString("de-DE", { maximumFractionDigits: 1 })} %`,
+            `<span class="pill ${statusClass(x.status)}">${x.status}</span>`,
+            x.note
+          ];
+        }),
+        idx => selectCheck(data[idx])
+      );
+    }
+
+    function renderGisTable() {
+      renderTable("gisTable",
+        ["art", "art_sonst", "Kollokation", "Zustand", "GIS Anzahl", "Mapping im Dummy", "WNU Bezug", "Status"],
+        gisObjects.map(x => [
+          x.art, x.art_sonst, x.kollokation, x.zustand, fmt.format(x.count), x.mapping,
+          x.wnu === null ? "—" : fmt.format(x.wnu),
+          `<span class="pill ${statusClass(x.status)}">${x.status}</span>`
+        ])
+      );
+    }
+
+    function renderTodoTable() {
+      renderTable("todoTable", ["ID", "Thema", "Delta", "Owner", "Status", "Arbeitsauftrag"], todos.map(t => [
+        `<span class="link">${t[0]}</span>`, t[1], t[2], t[3], `<span class="pill ${statusClass(t[4])}">${t[4]}</span>`, t[5]
+      ]));
+    }
+
+    function renderSourceTable() {
+      renderTable("sourceTable", ["Datei", "Blatt/Layer", "Verwendung", "Extraktion", "Status"], sourceRows);
+    }
+
+    function renderDetailOptions() {
+      document.getElementById("detailSelect").innerHTML = checks.map(x => `<option value="${x.id}">${x.id} · ${x.metric}</option>`).join("");
+    }
+
+    function selectCheck(item) {
+      selectedCheck = item;
+      document.getElementById("detailSelect").value = item.id;
+      document.getElementById("detailTitle").textContent = `${item.id}: ${item.metric}`;
+      document.getElementById("detailSubtitle").textContent = `${item.area} · Status ${item.status} · Quelle ${item.source}`;
+      renderTable("detailValues", ["Quelle", "Wert"], [
+        ["VI/KJP WL", valueText(item.vi, item.unit)],
+        ["WNU exportWnu", valueText(item.wnu, item.unit)],
+        ["Adressliste/GIS", valueText(item.gis, item.unit)]
+      ]);
+      const max = Math.max(item.vi || 0, item.wnu || 0, item.gis || 0, 1);
+      const rows = [
+        ["VI/KJP", item.vi, "ok"],
+        ["WNU", item.wnu, item.severity === "bad" ? "bad" : item.severity === "warn" ? "warn" : "ok"],
+        ["GIS", item.gis, item.gis === null ? "warn" : "ok"]
+      ];
+      document.getElementById("detailBars").innerHTML = rows.map(([label, value, cls]) => `
+        <div class="bar-row">
+          <strong>${label}</strong>
+          <div class="bar-track"><div class="bar-fill ${cls}" style="width:${value ? Math.max(4, value / max * 100) : 0}%"></div></div>
+          <span>${valueText(value, item.unit)}</span>
+        </div>`).join("");
+      document.getElementById("detailEvidence").textContent = item.evidence;
+      document.getElementById("detailActions").innerHTML = [
+        ["1", item.action, item.status === "Kritisch" ? "sofort" : "nächster Lauf", item.status === "Kritisch" ? "red" : statusClass(item.status)],
+        ["2", "Prüfprotokoll mit Quelle, Feldname und Rundungsregel fortschreiben.", "vor Freigabe", "green"],
+        ["3", "Nach Korrektur WNU-Input und GIS-Export erneut vergleichen.", "automatisch", "blue"]
+      ].map(t => `<div class="todo-row"><span class="pill ${t[3]}">${t[0]}</span><span>${t[1]}</span><strong>${t[2]}</strong></div>`).join("");
+    }
+
+    function renderMap() {
+      const svg = document.getElementById("gisMap");
+      const groups = [
+        { key: "addr", count: 2771, color: "#006b6f", cx: 274, cy: 172, rx: 228, ry: 123, r: 1.55 },
+        { key: "case", count: 185, color: "#e20074", cx: 274, cy: 172, rx: 204, ry: 112, r: 3.2 },
+        { key: "kollo", count: 37, color: "#f59e0b", cx: 288, cy: 166, rx: 178, ry: 92, r: 4.2 },
+        { key: "pop", count: 35, color: "#2563eb", cx: 302, cy: 160, rx: 185, ry: 98, r: 4.8 }
+      ];
+      let circles = "";
+      groups.forEach((g, groupIdx) => {
+        if (mapMode === "issues" && !["kollo", "pop"].includes(g.key)) return;
+        const displayCount = g.key === "addr" ? 520 : g.count;
+        for (let i = 0; i < displayCount; i++) {
+          const t = (i * 137.508 + groupIdx * 23) * Math.PI / 180;
+          const spiral = Math.sqrt((i + 1) / displayCount);
+          const wobble = Math.sin(i * 12.9898 + groupIdx) * 9;
+          const x = g.cx + Math.cos(t) * g.rx * spiral + wobble;
+          const y = g.cy + Math.sin(t) * g.ry * spiral + Math.cos(i * 4.1) * 6;
+          circles += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${g.r}" fill="${g.color}" opacity="${g.key === "addr" ? ".42" : ".88"}"/>`;
+        }
+      });
+      svg.innerHTML = `
+        <defs>
+          <pattern id="grid" width="26" height="26" patternUnits="userSpaceOnUse"><path d="M 26 0 L 0 0 0 26" fill="none" stroke="#d9dee7" stroke-width="1"/></pattern>
+        </defs>
+        <rect width="580" height="342" fill="url(#grid)" opacity=".65"/>
+        <path d="M56 228 C116 132 166 74 258 74 C376 74 458 128 525 214 C458 278 346 309 236 288 C144 270 92 257 56 228Z" fill="#e7f5f5" stroke="#c7cedb" stroke-width="2"/>
+        <path d="M92 220 C182 180 239 137 335 121 C407 109 459 139 496 184" fill="none" stroke="#98a2b3" stroke-width="4" stroke-linecap="round" opacity=".45"/>
+        <path d="M118 254 C196 220 285 209 384 231 C430 241 465 246 503 238" fill="none" stroke="#98a2b3" stroke-width="3" stroke-linecap="round" opacity=".38"/>
+        ${circles}
+        <text x="22" y="30" fill="#30384a" font-size="13" font-weight="800">Prignitz Los 1 · schematische Punktverteilung</text>
+        <text x="22" y="49" fill="#667085" font-size="12">Alle Längenprüfungen benötigen zusätzliche Linienlayer.</text>`;
+    }
+
+    function refresh() {
+      renderKpis();
+      renderOverviewTable();
+      renderIssueTable();
+      renderMatrixTable();
+    }
+
+    function wireEvents() {
+      document.querySelectorAll(".nav button[data-screen]").forEach(btn => btn.addEventListener("click", () => {
+        document.querySelectorAll(".nav button").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+        document.getElementById(btn.dataset.screen).classList.add("active");
+      }));
+      document.querySelectorAll(".tabs button").forEach(btn => btn.addEventListener("click", () => {
+        document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        document.querySelectorAll(".tab-pane").forEach(p => p.classList.remove("active"));
+        document.getElementById(btn.dataset.tab).classList.add("active");
+      }));
+      document.querySelectorAll("[data-map-mode]").forEach(btn => btn.addEventListener("click", () => {
+        document.querySelectorAll("[data-map-mode]").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        mapMode = btn.dataset.mapMode;
+        renderMap();
+      }));
+      ["areaFilter", "statusFilter", "sourceFilter"].forEach(id => document.getElementById(id).addEventListener("change", refresh));
+      document.getElementById("resetFilters").addEventListener("click", () => {
+        document.getElementById("areaFilter").value = "Alle";
+        document.getElementById("statusFilter").value = "Alle";
+        document.getElementById("sourceFilter").value = "Alle";
+        hideZero = false;
+        refresh();
+      });
+      document.getElementById("showCritical").addEventListener("click", () => {
+        document.getElementById("statusFilter").value = "Kritisch";
+        refresh();
+      });
+      document.getElementById("toggleZero").addEventListener("click", () => {
+        hideZero = !hideZero;
+        refresh();
+      });
+      document.getElementById("detailSelect").addEventListener("change", e => selectCheck(checks.find(x => x.id === e.target.value)));
+      document.getElementById("closeDetail").addEventListener("click", () => document.getElementById("detailPane").style.display = "none");
+      document.getElementById("createTicket").addEventListener("click", () => {
+        selectCheck(checks.find(x => x.status === "Kritisch"));
+        alert("Klärfall simuliert: GV-001 Glasfaserlänge wurde Strukturplanung zugeordnet.");
+      });
+      document.getElementById("simulateExport").addEventListener("click", () => {
+        document.getElementById("exportPreview").innerHTML = `<strong>Prüfprotokoll erzeugt</strong><br>Datenstand ${document.getElementById("dateFilter").value}, 16 Prüfkennzahlen, 1 kritische Abweichung, 5 Klärfälle. Businesscase-Freigabe bleibt gesperrt, bis CHK-006 Glasfaserlänge fachlich geklärt oder per Override dokumentiert ist.`;
+      });
+    }
+
+    function init() {
+      renderDetailOptions();
+      wireEvents();
+      refresh();
+      renderMap();
+      renderGisTable();
+      renderTodoTable();
+      renderSourceTable();
+      selectCheck(selectedCheck);
+    }
+
+    init();
+  </script>
+</body>
+</html>
