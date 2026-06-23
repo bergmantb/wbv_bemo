@@ -204,8 +204,34 @@
     .segmented button.active { background: var(--magenta); color: #fff; }
 
     .summary-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 12px; }
-    .map-wrap { min-height: 342px; position: relative; border: 1px solid var(--line); border-radius: 6px; background: linear-gradient(180deg,#fbfcfd,#f3f6f9); overflow: hidden; }
-    .map-wrap svg { width: 100%; height: 100%; display: block; min-height: 342px; }
+    .map-wrap { min-height: 342px; position: relative; border: 1px solid var(--line); border-radius: 6px; background: #dce7e5; overflow: hidden; }
+    .real-map { position: relative; min-height: 342px; height: 342px; overflow: hidden; background: #dce7e5; }
+    .tile-layer, .point-layer, .map-label-layer { position: absolute; inset: 0; }
+    .tile-layer img { position: absolute; width: 256px; height: 256px; user-select: none; pointer-events: none; }
+    .map-point { position: absolute; width: 7px; height: 7px; border-radius: 50%; transform: translate(-50%, -50%); border: 1px solid rgba(255,255,255,.85); box-shadow: 0 1px 3px rgba(17,24,39,.3); }
+    .map-point.addr { width: 4px; height: 4px; background: #006b6f; opacity: .62; border: 0; box-shadow: none; }
+    .map-point.case { background: #e20074; }
+    .map-point.kollo { width: 9px; height: 9px; background: #f59e0b; }
+    .map-point.pop { width: 10px; height: 10px; background: #2563eb; }
+    .map-point.other { background: #475467; }
+    .map-label {
+      position: absolute;
+      left: 12px;
+      top: 12px;
+      max-width: 330px;
+      padding: 8px 10px;
+      background: rgba(255,255,255,.92);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: #30384a;
+      font-size: 12px;
+      line-height: 1.35;
+      box-shadow: 0 8px 18px rgba(23,32,51,.08);
+    }
+    .map-label strong { display: block; margin-bottom: 2px; font-size: 13px; }
+    .map-attribution { position: absolute; right: 8px; bottom: 8px; padding: 3px 6px; background: rgba(255,255,255,.88); border-radius: 4px; font-size: 11px; color: #344054; }
+    .map-attribution a { color: #344054; text-decoration: underline; text-underline-offset: 2px; }
+    .map-loading { position: absolute; inset: 0; display: grid; place-items: center; color: #344054; font-size: 13px; background: rgba(255,255,255,.42); }
     .map-legend { position: absolute; left: 12px; bottom: 12px; display: flex; gap: 8px; flex-wrap: wrap; font-size: 12px; }
     .map-legend span { background: rgba(255,255,255,.92); border: 1px solid var(--line); border-radius: 999px; padding: 5px 8px; display: inline-flex; align-items: center; gap: 6px; font-weight: 700; }
     .legend-dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
@@ -363,7 +389,15 @@
                   <div class="segmented"><button class="active" data-map-mode="all">Alle</button><button data-map-mode="issues">Klärung</button></div>
                 </div>
                 <div class="map-wrap">
-                  <svg id="gisMap" viewBox="0 0 580 342" role="img" aria-label="Schematische GIS-Punktkarte"></svg>
+                  <div class="real-map" id="gisMap" role="img" aria-label="GIS-Punktkarte Prignitz mit OpenStreetMap-Hintergrund">
+                    <div class="tile-layer" id="tileLayer"></div>
+                    <div class="point-layer" id="pointLayer"></div>
+                    <div class="map-label-layer">
+                      <div class="map-label"><strong>Prignitz Los 1</strong>Reale GIS-Punkte aus `Bauten_und_Netztechnik_v5.1` auf OpenStreetMap-Kartenkacheln.</div>
+                    </div>
+                    <div class="map-loading" id="mapLoading">Karte und GIS-Punkte werden geladen ...</div>
+                    <div class="map-attribution">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a></div>
+                  </div>
                   <div class="map-legend">
                     <span><i class="legend-dot" style="background:#006b6f"></i>Adresse</span>
                     <span><i class="legend-dot" style="background:#e20074"></i>Gehäuse/NVt</span>
@@ -514,6 +548,12 @@
     let selectedCheck = checks[5];
     let hideZero = false;
     let mapMode = "all";
+    let gisPointData = [];
+    const prignitzMap = {
+      centerLon: 12.1592,
+      centerLat: 53.2219,
+      zoom: 10
+    };
     const fmt = new Intl.NumberFormat("de-DE");
     const money = value => `${fmt.format(Math.round(value))} €`;
     const signed = value => value > 0 ? `+${fmt.format(value)}` : fmt.format(value);
@@ -663,38 +703,61 @@
       ].map(t => `<div class="todo-row"><span class="pill ${t[3]}">${t[0]}</span><span>${t[1]}</span><strong>${t[2]}</strong></div>`).join("");
     }
 
+    function project(lon, lat, zoom = prignitzMap.zoom) {
+      const scale = 256 * Math.pow(2, zoom);
+      const sinLat = Math.sin(lat * Math.PI / 180);
+      return {
+        x: (lon + 180) / 360 * scale,
+        y: (0.5 - Math.log((1 + sinLat) / (1 - sinLat)) / (4 * Math.PI)) * scale
+      };
+    }
+
+    async function loadGisPoints() {
+      if (gisPointData.length) return;
+      const loading = document.getElementById("mapLoading");
+      try {
+        const response = await fetch("gis-points-light.json", { cache: "no-store" });
+        gisPointData = await response.json();
+      } catch (error) {
+        gisPointData = [];
+        loading.textContent = "GIS-Punkte konnten nicht geladen werden. Bitte über GitHub Pages oder lokalen HTTP-Server öffnen.";
+      }
+    }
+
     function renderMap() {
-      const svg = document.getElementById("gisMap");
-      const groups = [
-        { key: "addr", count: 2771, color: "#006b6f", cx: 274, cy: 172, rx: 228, ry: 123, r: 1.55 },
-        { key: "case", count: 185, color: "#e20074", cx: 274, cy: 172, rx: 204, ry: 112, r: 3.2 },
-        { key: "kollo", count: 37, color: "#f59e0b", cx: 288, cy: 166, rx: 178, ry: 92, r: 4.2 },
-        { key: "pop", count: 35, color: "#2563eb", cx: 302, cy: 160, rx: 185, ry: 98, r: 4.8 }
-      ];
-      let circles = "";
-      groups.forEach((g, groupIdx) => {
-        if (mapMode === "issues" && !["kollo", "pop"].includes(g.key)) return;
-        const displayCount = g.key === "addr" ? 520 : g.count;
-        for (let i = 0; i < displayCount; i++) {
-          const t = (i * 137.508 + groupIdx * 23) * Math.PI / 180;
-          const spiral = Math.sqrt((i + 1) / displayCount);
-          const wobble = Math.sin(i * 12.9898 + groupIdx) * 9;
-          const x = g.cx + Math.cos(t) * g.rx * spiral + wobble;
-          const y = g.cy + Math.sin(t) * g.ry * spiral + Math.cos(i * 4.1) * 6;
-          circles += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${g.r}" fill="${g.color}" opacity="${g.key === "addr" ? ".42" : ".88"}"/>`;
+      const map = document.getElementById("gisMap");
+      const tileLayer = document.getElementById("tileLayer");
+      const pointLayer = document.getElementById("pointLayer");
+      const loading = document.getElementById("mapLoading");
+      const width = map.clientWidth || 580;
+      const height = map.clientHeight || 342;
+      const center = project(prignitzMap.centerLon, prignitzMap.centerLat);
+      const topLeft = { x: center.x - width / 2, y: center.y - height / 2 };
+      const bottomRight = { x: center.x + width / 2, y: center.y + height / 2 };
+      const minTileX = Math.floor(topLeft.x / 256);
+      const minTileY = Math.floor(topLeft.y / 256);
+      const maxTileX = Math.floor(bottomRight.x / 256);
+      const maxTileY = Math.floor(bottomRight.y / 256);
+      let tiles = "";
+      for (let x = minTileX; x <= maxTileX; x++) {
+        for (let y = minTileY; y <= maxTileY; y++) {
+          tiles += `<img src="https://tile.openstreetmap.org/${prignitzMap.zoom}/${x}/${y}.png" alt="" style="left:${Math.round(x * 256 - topLeft.x)}px;top:${Math.round(y * 256 - topLeft.y)}px">`;
         }
-      });
-      svg.innerHTML = `
-        <defs>
-          <pattern id="grid" width="26" height="26" patternUnits="userSpaceOnUse"><path d="M 26 0 L 0 0 0 26" fill="none" stroke="#d9dee7" stroke-width="1"/></pattern>
-        </defs>
-        <rect width="580" height="342" fill="url(#grid)" opacity=".65"/>
-        <path d="M56 228 C116 132 166 74 258 74 C376 74 458 128 525 214 C458 278 346 309 236 288 C144 270 92 257 56 228Z" fill="#e7f5f5" stroke="#c7cedb" stroke-width="2"/>
-        <path d="M92 220 C182 180 239 137 335 121 C407 109 459 139 496 184" fill="none" stroke="#98a2b3" stroke-width="4" stroke-linecap="round" opacity=".45"/>
-        <path d="M118 254 C196 220 285 209 384 231 C430 241 465 246 503 238" fill="none" stroke="#98a2b3" stroke-width="3" stroke-linecap="round" opacity=".38"/>
-        ${circles}
-        <text x="22" y="30" fill="#30384a" font-size="13" font-weight="800">Prignitz Los 1 · schematische Punktverteilung</text>
-        <text x="22" y="49" fill="#667085" font-size="12">Alle Längenprüfungen benötigen zusätzliche Linienlayer.</text>`;
+      }
+      tileLayer.innerHTML = tiles;
+
+      const visibleKinds = mapMode === "issues" ? new Set(["kollo", "pop", "other"]) : null;
+      pointLayer.innerHTML = gisPointData
+        .filter(p => !visibleKinds || visibleKinds.has(p[2]))
+        .map(([lon, lat, kind]) => {
+          const p = project(lon, lat);
+          const x = p.x - topLeft.x;
+          const y = p.y - topLeft.y;
+          if (x < -12 || y < -12 || x > width + 12 || y > height + 12) return "";
+          return `<span class="map-point ${kind}" style="left:${x.toFixed(1)}px;top:${y.toFixed(1)}px"></span>`;
+        })
+        .join("");
+      if (gisPointData.length) loading.style.display = "none";
     }
 
     function refresh() {
@@ -750,10 +813,11 @@
       });
     }
 
-    function init() {
+    async function init() {
       renderDetailOptions();
       wireEvents();
       refresh();
+      await loadGisPoints();
       renderMap();
       renderGisTable();
       renderTodoTable();
