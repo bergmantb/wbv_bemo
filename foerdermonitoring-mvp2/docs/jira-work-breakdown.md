@@ -256,3 +256,41 @@ Akzeptanzkriterien:
 | R3 Cash-In | Epic 5 |
 | R4 Fördermittel | Epic 6 |
 | R5 UX, Betrieb, Datenqualität | Epic 7, Epic 8 |
+
+## Ergänzendes Epic: Fördermonitoring & Risikoanalyse nach Management-Zielbild
+
+Ziel: MVP2 um die aus dem Management-Briefing abgeleitete Risikoanalyse und Datenarchitektur erweitern. MVP1 bleibt out of scope.
+
+### Story: Shortterm-Dateilieferung aus SharePoint-Foldern
+
+Als FRG möchte ich die relevanten Quellen kurzfristig als Dateien aus SharePoint-Foldern einlesen, damit ein Management-MVP ohne native IT-Schnittstellen bereitgestellt werden kann.
+
+Akzeptanzkriterien:
+
+- Unterstützte Quellen: FNES Control Tower, ODE/Micro Strategy/WFMT/PUMA, VRT-Monitor, WFS/PFAU, ANKE/Bid Database, JVK GFPlus-Steuerungsdatei, IPF/Forecast.
+- Unterstützte lokale Formate: CSV, TSV, JSON; XLSX wird interimistisch als CSV-Export bereitgestellt.
+- Ladeprotokoll zeigt Quelle, Datei, Zeilenanzahl, Ladezeitpunkt und Datenstand.
+- Fehlerhafte oder unvollständige Lieferungen werden je Quelle und Owner ausgewiesen.
+
+### Story: Risikoanalyse und Priorisierung
+
+Als Management möchte ich kritische Förderprojekte priorisiert sehen, damit Risiken der Förderablieferung und des Cash-In frühzeitig sichtbar werden.
+
+Akzeptanzkriterien:
+
+- Risikoindikatoren umfassen Cash-In-Abweichung gegen IPF/Forecast, Rollout-Abweichung HP/BP/HC, Abrechenbarkeitslücke PFau/GBGS und Datenqualität.
+- Risikostufen mindestens niedrig, mittel, hoch.
+- Forecast und IPF werden klar als Referenzgrößen gekennzeichnet; FRG übernimmt keine Planungsverantwortung.
+- Mitigationsverantwortung wird als Owner-/Governance-Hinweis ausgewiesen, nicht als FRG-Aufgabe.
+
+### Story: Reports on Demand für Stakeholder
+
+Als FRG möchte ich Reports nach Stakeholder und Detailgrad erzeugen, damit Management, FRG, FNES und Finance jeweils die passende Sicht erhalten.
+
+Akzeptanzkriterien:
+
+- Management Summary mit Cash-In, Rollout HP/BP/HC und Risikoabschätzung auf aggregierter Sicht.
+- FRG-Monatssicht mit kritischen Projekten und Risikoentwicklung.
+- FNES-Gebietssicht für operative Abstimmungen.
+- Finance-Sicht zur Prognose auf Einhaltung IPF.
+- Export als Excel-kompatible CSV-Datei.

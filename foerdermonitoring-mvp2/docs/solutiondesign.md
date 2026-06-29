@@ -170,3 +170,31 @@ Der erste IT-Schnitt sollte liefern:
 5. Cash-In Forecast getrennt nach GFPlus/JV und Deckungslückenmodell plus Summe.
 6. Fördermittelabruf gemäß Bewilligung/ZRP für Bundesmittel und kommunalen Eigenanteil.
 7. Abweichungsmonitor mit Status, Owner und Fälligkeit.
+
+## Ergänzung Juni 2026: Fördermonitoring & Risikoanalyse MVP2
+
+### Fachliche Entscheidung
+MVP1 / Angebotsphase / Win-Loss ist out of scope. Die technische Linie verfolgt MVP2 weiter: E2E-Transparenz nach Realisierungsbeauftragung mit Fokus auf Rollout-Ablieferung, Dokumentation, Fördermittelabrechnung, Cash-In und Risikofrüherkennung.
+
+### Rollenverständnis FRG
+FRG schafft Transparenz, identifiziert Risiken, bewertet Auswirkungen und stellt Managementreports bereit. FRG übernimmt keine operative Rolloutsteuerung, keine Maßnahmenumsetzung zur Risikomitigation und keine Forecast-/Planungsverantwortung. Forecast und IPF dienen ausschließlich als Referenzgrößen zur Risikoabschätzung.
+
+### Datenquellen gemäß Management-Zielbild
+
+| Lieferant | Quelle / System | Verwendung |
+| --- | --- | --- |
+| FNES | Control Tower mit GGS, Digi B, PSL, Celonis | Rollout-Ist, Status, operative Ablieferung |
+| FNES | ODE / Micro Strategy / WFMT / PUMA | Gebiets-, Meilenstein- und Bauinformationen |
+| FRG | VRT-Monitor | Förder-/Vertragskontext und Risikohinweise |
+| FRG | WFS / PFAU | Vertrag, Los, Bautranche, abrechenbare Adressen, Abrechnung |
+| FRG | ANKE / Bid Database | Übergangs-/Referenzdaten und Stammdaten |
+| JVK | GFPlus-Steuerungsdatei | GFPlus-Managementsicht; Datenqualität bei JVK |
+| Finance / Planowner | IPF / Forecast | Referenzwerte für Risikoabschätzung |
+
+### Shortterm-/Interimslösung
+Für die kurzfristige Management-AFO werden die Quellen turnusmäßig als Dateien in SharePoint-Foldern bereitgestellt. Die lokale Interim-App im Ordner `interim-app` verarbeitet CSV, TSV und JSON, harmonisiert die Daten und rendert Dashboards, Risikoanalyse, Reports on demand sowie einen Excel-kompatiblen CSV-Report.
+
+XLSX-Dateien werden in der lokalen HTML-App nicht nativ geparst; für die Interimslösung ist ein CSV-Export aus Excel/SharePoint vorgesehen. Die Langfristlösung muss native Schnittstellen und optional XLSX-Verarbeitung bereitstellen.
+
+### Langfristlösung
+Die langfristige Lösung wird als IT-AFO/Jira-Epic beschrieben. Ziel ist eine produktive Datenarchitektur mit nativer Quellintegration, Datenvalidierung, Harmonisierung, Qualitätssicherung, Konsolidierung, Historisierung, Risikoanalyse und adressatengerechtem Management Reporting.

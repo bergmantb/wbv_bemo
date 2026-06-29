@@ -1,9 +1,9 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="de">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Solutiondesign E2E-Fördermonitoring MVP</title>
+  <title>Solutiondesign E2E-FÃ¶rdermonitoring MVP</title>
   <style>
     body { margin: 0; background: #f6f7f9; color: #172033; font-family: Arial, Helvetica, sans-serif; line-height: 1.5; }
     .page { max-width: 1180px; margin: 0 auto; padding: 32px 28px 56px; background: #fff; }
@@ -31,84 +31,84 @@
 </head>
 <body>
   <main class="page">
-    <div class="meta">Confluence-kopierfähige HTML-Fassung · kombiniert Solutiondesign und Jira Work-Break-Down · Stand: 18.06.2026</div>
+    <div class="meta">Confluence-kopierfÃ¤hige HTML-Fassung Â· kombiniert Solutiondesign und Jira Work-Break-Down Â· Stand: 18.06.2026</div>
     <nav class="toc">
       <h2>Inhalt</h2>
       <ol>
         <li>Zielbild</li>
         <li>Fachlicher Scope MVP</li>
         <li>Priorisierte Datenbereiche</li>
-        <li>Quellsysteme und Datenflüsse</li>
+        <li>Quellsysteme und DatenflÃ¼sse</li>
         <li>Fachliches Datenmodell</li>
         <li>Kennzahlen und Reports</li>
         <li>Funktionale Anforderungen</li>
         <li>Nichtfunktionale Anforderungen</li>
-        <li>Offene Punkte für IT-Solutiondesign</li>
+        <li>Offene Punkte fÃ¼r IT-Solutiondesign</li>
         <li>MVP-Schnitt</li>
-        <li>Work-Break-Down-Struktur für Jira</li>
+        <li>Work-Break-Down-Struktur fÃ¼r Jira</li>
       </ol>
     </nav>
-    <h1 id="solutiondesign-e2e-monitoring-geforderter-glasfaserausbau">Solutiondesign: E2E-Monitoring geförderter Glasfaserausbau</h1>
+    <h1 id="solutiondesign-e2e-monitoring-geforderter-glasfaserausbau">Solutiondesign: E2E-Monitoring gefÃ¶rderter Glasfaserausbau</h1>
 <h2 id="1-zielbild">1. Zielbild</h2>
-<p>Das E2E-Fördermonitoring bündelt Vertrags-, Rollout-, Cash-In-, Fördermittel- und Finanzdaten für den geförderten Glasfaserausbau in einer fachlichen Monitoring-Anwendung. Ziel ist ein steuerbarer Überblick je Ausbautreiber, Vertrag, Los, Bautranche und Gebietskörperschaft.</p>
+<p>Das E2E-FÃ¶rdermonitoring bÃ¼ndelt Vertrags-, Rollout-, Cash-In-, FÃ¶rdermittel- und Finanzdaten fÃ¼r den gefÃ¶rderten Glasfaserausbau in einer fachlichen Monitoring-Anwendung. Ziel ist ein steuerbarer Ãœberblick je Ausbautreiber, Vertrag, Los, Bautranche und GebietskÃ¶rperschaft.</p>
 <p>Kernfrage des MVP:</p>
-<blockquote>Welche vertraglich geschuldeten Adressmengen sind bis wann geplant, tatsächlich gebaut, abrechenbar, abgerechnet und als Fördermittel abrufbar?</blockquote>
-<p>Das Reporting stellt Soll-, Forecast- und Ist-Daten pro Datendimension gegenüber. Abweichungen zwischen PFau-Vertrags-/Abrechnungsbestand und GBGS-Baustatus werden sichtbar gemacht, priorisiert und in einen Bereinigungsprozess überführt.</p>
+<blockquote>Welche vertraglich geschuldeten Adressmengen sind bis wann geplant, tatsÃ¤chlich gebaut, abrechenbar, abgerechnet und als FÃ¶rdermittel abrufbar?</blockquote>
+<p>Das Reporting stellt Soll-, Forecast- und Ist-Daten pro Datendimension gegenÃ¼ber. Abweichungen zwischen PFau-Vertrags-/Abrechnungsbestand und GBGS-Baustatus werden sichtbar gemacht, priorisiert und in einen Bereinigungsprozess Ã¼berfÃ¼hrt.</p>
 <h2 id="2-fachlicher-scope-mvp">2. Fachlicher Scope MVP</h2>
-<p>Der MVP orientiert sich am Excel-Reiter <code>MVP</code> der Datei <code>Kopie von 20260511_Fördermonitoring.xlsx</code>.</p>
+<p>Der MVP orientiert sich am Excel-Reiter <code>MVP</code> der Datei <code>Kopie von 20260511_FÃ¶rdermonitoring.xlsx</code>.</p>
 <h3 id="2-1-oberthemen">2.1 Oberthemen</h3>
-<div class="table-wrap"><table><thead><tr><th>Oberthema</th><th>Zweck im Monitoring</th><th>MVP-Relevanz</th></tr></thead><tbody><tr><td>Grunddaten</td><td>Portfolio- und Projektkontext, z. B. Ausbautreiber, Niederlassung, PTI, Bundesland, Förderprogramm, GKS</td><td>Basisfilter und Stammdaten</td></tr><tr><td>Vertragsdaten</td><td>Vertrag, Los, Bautranche, Vertragsstatus, Pönale, Änderungen, Vertragsmengen und Vertragspreise</td><td>Steuerungs- und Abrechnungsgrundlage</td></tr><tr><td>Geplanter und gebauter Rollout</td><td>HP/BP/HC auf Monatsscheiben, Ist-Zahlen aus GBGS, Meilensteine und Ausbauparameter</td><td>Soll/Ist-Tracking</td></tr><tr><td>Cash-In Forecast</td><td>Prognose von abrechenbaren Mengen und Zahlungseingängen, getrennt nach GFPlus und klassischem Deckungslückenmodell</td><td>Prio-Datenquader</td></tr><tr><td>Geplanter Abruf Fördermittel</td><td>Zahlungs- und Realisierungsplan gemäß Bewilligung, inklusive Bundes-, Landes-, kommunalem und EU-Anteil</td><td>Abgleich gegen Cash-In und Abrufstatus</td></tr><tr><td>Finanzen</td><td>Finanzielle Bewertung, Mittelbindung, offene Differenzen, Abrechnungs- und Zahlungsstatus</td><td>Management-Steuerung</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>Oberthema</th><th>Zweck im Monitoring</th><th>MVP-Relevanz</th></tr></thead><tbody><tr><td>Grunddaten</td><td>Portfolio- und Projektkontext, z. B. Ausbautreiber, Niederlassung, PTI, Bundesland, FÃ¶rderprogramm, GKS</td><td>Basisfilter und Stammdaten</td></tr><tr><td>Vertragsdaten</td><td>Vertrag, Los, Bautranche, Vertragsstatus, PÃ¶nale, Ã„nderungen, Vertragsmengen und Vertragspreise</td><td>Steuerungs- und Abrechnungsgrundlage</td></tr><tr><td>Geplanter und gebauter Rollout</td><td>HP/BP/HC auf Monatsscheiben, Ist-Zahlen aus GBGS, Meilensteine und Ausbauparameter</td><td>Soll/Ist-Tracking</td></tr><tr><td>Cash-In Forecast</td><td>Prognose von abrechenbaren Mengen und ZahlungseingÃ¤ngen, getrennt nach GFPlus und klassischem DeckungslÃ¼ckenmodell</td><td>Prio-Datenquader</td></tr><tr><td>Geplanter Abruf FÃ¶rdermittel</td><td>Zahlungs- und Realisierungsplan gemÃ¤ÃŸ Bewilligung, inklusive Bundes-, Landes-, kommunalem und EU-Anteil</td><td>Abgleich gegen Cash-In und Abrufstatus</td></tr><tr><td>Finanzen</td><td>Finanzielle Bewertung, Mittelbindung, offene Differenzen, Abrechnungs- und Zahlungsstatus</td><td>Management-Steuerung</td></tr></tbody></table></div>
 <h3 id="2-2-zentrale-dimensionen">2.2 Zentrale Dimensionen</h3>
-<div class="table-wrap"><table><thead><tr><th>Dimension</th><th>Spaltenbezug im Excel</th><th>Beschreibung</th></tr></thead><tbody><tr><td>Ausbautreiber</td><td>K</td><td>Fachlicher Treiber, z. B. GFPlus Förderung oder Eigenausbau</td></tr><tr><td>Vertrag</td><td>O/P</td><td>Hauptvertrag bzw. PFau-/WFS-ID</td></tr><tr><td>Los</td><td>Q</td><td>Vertragliches Objekt unterhalb des Hauptvertrags</td></tr><tr><td>Bautranche</td><td>R</td><td>Kleine Ausbaueinheit, in PFau geplant und gegen GBGS-Baustatus abgeglichen</td></tr><tr><td>GKS</td><td>S</td><td>Gebietskörperschaft</td></tr><tr><td>Förderprogramm</td><td>U</td><td>Förderprogramm, z. B. BFP23</td></tr><tr><td>Abrechnungsverfahren</td><td>X</td><td>Verfahren mit GKS, z. B. vereinfachter Mittelabruf</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>Dimension</th><th>Spaltenbezug im Excel</th><th>Beschreibung</th></tr></thead><tbody><tr><td>Ausbautreiber</td><td>K</td><td>Fachlicher Treiber, z. B. GFPlus FÃ¶rderung oder Eigenausbau</td></tr><tr><td>Vertrag</td><td>O/P</td><td>Hauptvertrag bzw. PFau-/WFS-ID</td></tr><tr><td>Los</td><td>Q</td><td>Vertragliches Objekt unterhalb des Hauptvertrags</td></tr><tr><td>Bautranche</td><td>R</td><td>Kleine Ausbaueinheit, in PFau geplant und gegen GBGS-Baustatus abgeglichen</td></tr><tr><td>GKS</td><td>S</td><td>GebietskÃ¶rperschaft</td></tr><tr><td>FÃ¶rderprogramm</td><td>U</td><td>FÃ¶rderprogramm, z. B. BFP23</td></tr><tr><td>Abrechnungsverfahren</td><td>X</td><td>Verfahren mit GKS, z. B. vereinfachter Mittelabruf</td></tr></tbody></table></div>
 <p>Fachliche Regel:</p>
-<blockquote>Die Summe aller Adressen der Bautranchen je Los muss der Adressliste des zugehörigen Hauptvertrags entsprechen. Differenzen sind als Abweichung zu erkennen, zu priorisieren und in die Bereinigung zu geben.</blockquote>
+<blockquote>Die Summe aller Adressen der Bautranchen je Los muss der Adressliste des zugehÃ¶rigen Hauptvertrags entsprechen. Differenzen sind als Abweichung zu erkennen, zu priorisieren und in die Bereinigung zu geben.</blockquote>
 <h2 id="3-priorisierte-datenbereiche">3. Priorisierte Datenbereiche</h2>
-<p>Im Excel sind rote Markierungen als fachliche Priorisierung für die IT-Umsetzung zu verstehen. Für den MVP sind insbesondere folgende Bereiche zu schneiden:</p>
-<div class="table-wrap"><table><thead><tr><th>Priorität</th><th>Bereich</th><th>Spalten</th><th>Fachlicher Nutzen</th></tr></thead><tbody><tr><td>P1</td><td>Vertragliche Soll-Adressmengen TDG/GFPlus</td><td>AZ-BB</td><td>Basis für abrechenbare Adressen HP/BP/HC</td></tr><tr><td>P1</td><td>PFau-vs-GBGS Soll/Ist-Abgleich</td><td>AZ-BK, IY-JI</td><td>Nachweis, ob Vertragsadressen tatsächlich gebaut und abrechenbar sind</td></tr><tr><td>P1</td><td>Cash-In Forecast</td><td>JL-MF</td><td>Cash-In-Sicht nach Abrechnungskreis und Monat</td></tr><tr><td>P1</td><td>Bundesfördermittel</td><td>MN</td><td>Abgleich geplanter und realisierter Mittelabrufe</td></tr><tr><td>P1</td><td>Kommunaler Eigenanteil</td><td>MU</td><td>vollständige Finanzsicht je Bewilligung</td></tr><tr><td>P2</td><td>Vertragsstammdaten und Preise</td><td>BC-BH</td><td>Sollgrößen, Preise, Stammdatenergänzung</td></tr><tr><td>P2</td><td>Ausbauparameter und Meilensteine</td><td>IY-JI</td><td>Baufortschritt und Zielerreichung</td></tr><tr><td>P3</td><td>Angebotsphase und Grunddaten-Anreicherungen</td><td>AO-AU, K-AM</td><td>Filter, Kontext und Portfoliobericht</td></tr></tbody></table></div>
-<h2 id="4-quellsysteme-und-datenflusse">4. Quellsysteme und Datenflüsse</h2>
-<div class="table-wrap"><table><thead><tr><th>Quelle</th><th>Rolle</th><th>Datenobjekte</th></tr></thead><tbody><tr><td>PFau</td><td>Vertragshaltung, Bautranchenplanung, Abrechnung</td><td>Vertrag, Los, Bautranche, Vertragsadresslisten, abrechenbare Mengen, Rechnungsstatus</td></tr><tr><td>GBGS</td><td>Baulicher Ist-Status</td><td>gebaute HP/BP/HC, Meilensteine, Tiefbaumeter, Baufortschritt</td></tr><tr><td>Vertragshaltende Systeme</td><td>Vertragsstammdaten</td><td>Vertragspreise, Nachträge, Pönale, Laufzeiten, Status</td></tr><tr><td>ZRP/Bewilligung</td><td>Fördermittelplanung</td><td>Zahlungs- und Realisierungsplan, Bundes-/Landesmittel, kommunaler Eigenanteil, EU-Mittel</td></tr><tr><td>Fachliche Bereinigungsprozesse</td><td>Korrektur- und Klärprozess</td><td>Differenzen, Ursachen, Verantwortliche, Fälligkeiten</td></tr></tbody></table></div>
+<p>Im Excel sind rote Markierungen als fachliche Priorisierung fÃ¼r die IT-Umsetzung zu verstehen. FÃ¼r den MVP sind insbesondere folgende Bereiche zu schneiden:</p>
+<div class="table-wrap"><table><thead><tr><th>PrioritÃ¤t</th><th>Bereich</th><th>Spalten</th><th>Fachlicher Nutzen</th></tr></thead><tbody><tr><td>P1</td><td>Vertragliche Soll-Adressmengen TDG/GFPlus</td><td>AZ-BB</td><td>Basis fÃ¼r abrechenbare Adressen HP/BP/HC</td></tr><tr><td>P1</td><td>PFau-vs-GBGS Soll/Ist-Abgleich</td><td>AZ-BK, IY-JI</td><td>Nachweis, ob Vertragsadressen tatsÃ¤chlich gebaut und abrechenbar sind</td></tr><tr><td>P1</td><td>Cash-In Forecast</td><td>JL-MF</td><td>Cash-In-Sicht nach Abrechnungskreis und Monat</td></tr><tr><td>P1</td><td>BundesfÃ¶rdermittel</td><td>MN</td><td>Abgleich geplanter und realisierter Mittelabrufe</td></tr><tr><td>P1</td><td>Kommunaler Eigenanteil</td><td>MU</td><td>vollstÃ¤ndige Finanzsicht je Bewilligung</td></tr><tr><td>P2</td><td>Vertragsstammdaten und Preise</td><td>BC-BH</td><td>SollgrÃ¶ÃŸen, Preise, StammdatenergÃ¤nzung</td></tr><tr><td>P2</td><td>Ausbauparameter und Meilensteine</td><td>IY-JI</td><td>Baufortschritt und Zielerreichung</td></tr><tr><td>P3</td><td>Angebotsphase und Grunddaten-Anreicherungen</td><td>AO-AU, K-AM</td><td>Filter, Kontext und Portfoliobericht</td></tr></tbody></table></div>
+<h2 id="4-quellsysteme-und-datenflusse">4. Quellsysteme und DatenflÃ¼sse</h2>
+<div class="table-wrap"><table><thead><tr><th>Quelle</th><th>Rolle</th><th>Datenobjekte</th></tr></thead><tbody><tr><td>PFau</td><td>Vertragshaltung, Bautranchenplanung, Abrechnung</td><td>Vertrag, Los, Bautranche, Vertragsadresslisten, abrechenbare Mengen, Rechnungsstatus</td></tr><tr><td>GBGS</td><td>Baulicher Ist-Status</td><td>gebaute HP/BP/HC, Meilensteine, Tiefbaumeter, Baufortschritt</td></tr><tr><td>Vertragshaltende Systeme</td><td>Vertragsstammdaten</td><td>Vertragspreise, NachtrÃ¤ge, PÃ¶nale, Laufzeiten, Status</td></tr><tr><td>ZRP/Bewilligung</td><td>FÃ¶rdermittelplanung</td><td>Zahlungs- und Realisierungsplan, Bundes-/Landesmittel, kommunaler Eigenanteil, EU-Mittel</td></tr><tr><td>Fachliche Bereinigungsprozesse</td><td>Korrektur- und KlÃ¤rprozess</td><td>Differenzen, Ursachen, Verantwortliche, FÃ¤lligkeiten</td></tr></tbody></table></div>
 <h3 id="4-1-ziel-datenfluss">4.1 Ziel-Datenfluss</h3>
-<ol><li>Quellen liefern Daten in eine fachliche Integrationsschicht.</li><li>Identitäts- und Mappinglogik verbindet Vertrag, Los, Bautranche und Adresse.</li><li>Reconciliation vergleicht PFau-Solladressen mit GBGS-Ist-Bauzustand.</li><li>Fachliche Kennzahlen werden monatlich aggregiert.</li><li>Dashboard, Reports und Abweichungsworkflow greifen auf kuratierte Datenprodukte zu.</li></ol>
+<ol><li>Quellen liefern Daten in eine fachliche Integrationsschicht.</li><li>IdentitÃ¤ts- und Mappinglogik verbindet Vertrag, Los, Bautranche und Adresse.</li><li>Reconciliation vergleicht PFau-Solladressen mit GBGS-Ist-Bauzustand.</li><li>Fachliche Kennzahlen werden monatlich aggregiert.</li><li>Dashboard, Reports und Abweichungsworkflow greifen auf kuratierte Datenprodukte zu.</li></ol>
 <h2 id="5-fachliches-datenmodell">5. Fachliches Datenmodell</h2>
-<h3 id="5-1-kernentitaten">5.1 Kernentitäten</h3>
-<div class="table-wrap"><table><thead><tr><th>Entität</th><th>Schlüssel</th><th>Wichtige Attribute</th></tr></thead><tbody><tr><td>Vertrag</td><td>Vertrags-ID / PFau-ID</td><td>Ausbautreiber, Förderprogramm, GKS, Vertragsstatus, Vertragsende</td></tr><tr><td>Los</td><td>Los-ID</td><td>Vertrag, Region, Losart, GKS</td></tr><tr><td>Bautranche</td><td>Bautranchen-ID</td><td>Los, Planmengen HP/BP/HC, Status</td></tr><tr><td>Adresse</td><td>Adress-ID</td><td>Bautranche, Vertragszuordnung, Bauzustand, Abrechenbarkeit</td></tr><tr><td>Rollout-Monat</td><td>Monat, Los, Bautranche</td><td>Plan HP/BP/HC, Ist HP/BP/HC, Forecast</td></tr><tr><td>Cash-In</td><td>Monat, Abrechnungskreis</td><td>forecast, in Rechnung gestellt, bezahlt, offen</td></tr><tr><td>Fördermittelabruf</td><td>Jahr/Monat, GKS</td><td>geplant, abgerufen, ausgezahlt, offen</td></tr><tr><td>Abweichung</td><td>Abweichungs-ID</td><td>Ursache, Betrag/Menge, Quelle, Status, Owner, Fälligkeit</td></tr></tbody></table></div>
+<h3 id="5-1-kernentitaten">5.1 KernentitÃ¤ten</h3>
+<div class="table-wrap"><table><thead><tr><th>EntitÃ¤t</th><th>SchlÃ¼ssel</th><th>Wichtige Attribute</th></tr></thead><tbody><tr><td>Vertrag</td><td>Vertrags-ID / PFau-ID</td><td>Ausbautreiber, FÃ¶rderprogramm, GKS, Vertragsstatus, Vertragsende</td></tr><tr><td>Los</td><td>Los-ID</td><td>Vertrag, Region, Losart, GKS</td></tr><tr><td>Bautranche</td><td>Bautranchen-ID</td><td>Los, Planmengen HP/BP/HC, Status</td></tr><tr><td>Adresse</td><td>Adress-ID</td><td>Bautranche, Vertragszuordnung, Bauzustand, Abrechenbarkeit</td></tr><tr><td>Rollout-Monat</td><td>Monat, Los, Bautranche</td><td>Plan HP/BP/HC, Ist HP/BP/HC, Forecast</td></tr><tr><td>Cash-In</td><td>Monat, Abrechnungskreis</td><td>forecast, in Rechnung gestellt, bezahlt, offen</td></tr><tr><td>FÃ¶rdermittelabruf</td><td>Jahr/Monat, GKS</td><td>geplant, abgerufen, ausgezahlt, offen</td></tr><tr><td>Abweichung</td><td>Abweichungs-ID</td><td>Ursache, Betrag/Menge, Quelle, Status, Owner, FÃ¤lligkeit</td></tr></tbody></table></div>
 <h3 id="5-2-abrechnungskreise">5.2 Abrechnungskreise</h3>
-<div class="table-wrap"><table><thead><tr><th>Abrechnungskreis</th><th>Excel-Bezug</th><th>Darstellung</th></tr></thead><tbody><tr><td>Joint Venture GlasfaserPlus</td><td>JK-JO</td><td>Eigene Sicht für Innenverhältnis TDG-GFPlus und GKS-Rechnungsstellung</td></tr><tr><td>Klassischer Eigenausbau / Deckungslückenmodell</td><td>JP-JT und Forecast-Monatsscheiben</td><td>Separate Forecast- und Zahlungslogik</td></tr><tr><td>Gesamtsicht</td><td>fachlich zu ergänzen</td><td>Summendarstellung beider Kreise je Monat, Jahr, Los und GKS</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>Abrechnungskreis</th><th>Excel-Bezug</th><th>Darstellung</th></tr></thead><tbody><tr><td>Joint Venture GlasfaserPlus</td><td>JK-JO</td><td>Eigene Sicht fÃ¼r InnenverhÃ¤ltnis TDG-GFPlus und GKS-Rechnungsstellung</td></tr><tr><td>Klassischer Eigenausbau / DeckungslÃ¼ckenmodell</td><td>JP-JT und Forecast-Monatsscheiben</td><td>Separate Forecast- und Zahlungslogik</td></tr><tr><td>Gesamtsicht</td><td>fachlich zu ergÃ¤nzen</td><td>Summendarstellung beider Kreise je Monat, Jahr, Los und GKS</td></tr></tbody></table></div>
 <h2 id="6-kennzahlen-und-reports">6. Kennzahlen und Reports</h2>
 <h3 id="6-1-kpi-set-mvp">6.1 KPI-Set MVP</h3>
-<div class="table-wrap"><table><thead><tr><th>KPI</th><th>Definition</th></tr></thead><tbody><tr><td>Vertragsadressen Soll</td><td>Summe HP/BP/HC aus PFau-Vertrag/Nachtrag</td></tr><tr><td>Gebaut Ist</td><td>Summe HP/BP/HC aus GBGS</td></tr><tr><td>Abrechenbare Adressen</td><td>Schnittmenge aus Vertragsadressbestand und tatsächlich gebautem Status</td></tr><tr><td>Offene Adressdifferenz</td><td>Vertragsadressmenge minus gebaute/zuordenbare Menge</td></tr><tr><td>Cash-In Forecast</td><td>Prognostizierter Zahlungseingang je Abrechnungskreis und Monat</td></tr><tr><td>Fördermittel geplant</td><td>ZRP/Bewilligung je Jahr und Fördermittelart</td></tr><tr><td>Fördermittel abgerufen</td><td>Tatsächlich abgerufene Fördermittel</td></tr><tr><td>Fördermittel offen</td><td>geplant bzw. bewilligt minus abgerufen/ausgezahlt</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>KPI</th><th>Definition</th></tr></thead><tbody><tr><td>Vertragsadressen Soll</td><td>Summe HP/BP/HC aus PFau-Vertrag/Nachtrag</td></tr><tr><td>Gebaut Ist</td><td>Summe HP/BP/HC aus GBGS</td></tr><tr><td>Abrechenbare Adressen</td><td>Schnittmenge aus Vertragsadressbestand und tatsÃ¤chlich gebautem Status</td></tr><tr><td>Offene Adressdifferenz</td><td>Vertragsadressmenge minus gebaute/zuordenbare Menge</td></tr><tr><td>Cash-In Forecast</td><td>Prognostizierter Zahlungseingang je Abrechnungskreis und Monat</td></tr><tr><td>FÃ¶rdermittel geplant</td><td>ZRP/Bewilligung je Jahr und FÃ¶rdermittelart</td></tr><tr><td>FÃ¶rdermittel abgerufen</td><td>TatsÃ¤chlich abgerufene FÃ¶rdermittel</td></tr><tr><td>FÃ¶rdermittel offen</td><td>geplant bzw. bewilligt minus abgerufen/ausgezahlt</td></tr></tbody></table></div>
 <h3 id="6-2-dashboard-und-reporttypen">6.2 Dashboard- und Reporttypen</h3>
-<div class="table-wrap"><table><thead><tr><th>Report</th><th>Inhalt</th></tr></thead><tbody><tr><td>Portfolio-Übersicht</td><td>Management-KPIs, Ampeln, Top-Abweichungen, Cash-In-Ausblick</td></tr><tr><td>Vertrags-/Losübersicht</td><td>Vertrag, Los, Bautranche, HP/BP/HC Soll/Ist, Status</td></tr><tr><td>Rollout-Monatsscheiben</td><td>HP/BP/HC Plan, Ist und Forecast über Monate</td></tr><tr><td>PFau-vs-GBGS-Abgleich</td><td>Adress- und Mengenabgleich inklusive Klärstatus</td></tr><tr><td>Cash-In Forecast</td><td>JV GFPlus, Deckungslückenmodell und Gesamtsicht</td></tr><tr><td>Fördermittelabruf</td><td>Bewilligung/ZRP versus Abruf/Auszahlung</td></tr><tr><td>Abweichungsmonitor</td><td>Ursachen, Beträge, Mengen, Owner, Fälligkeiten</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>Report</th><th>Inhalt</th></tr></thead><tbody><tr><td>Portfolio-Ãœbersicht</td><td>Management-KPIs, Ampeln, Top-Abweichungen, Cash-In-Ausblick</td></tr><tr><td>Vertrags-/LosÃ¼bersicht</td><td>Vertrag, Los, Bautranche, HP/BP/HC Soll/Ist, Status</td></tr><tr><td>Rollout-Monatsscheiben</td><td>HP/BP/HC Plan, Ist und Forecast Ã¼ber Monate</td></tr><tr><td>PFau-vs-GBGS-Abgleich</td><td>Adress- und Mengenabgleich inklusive KlÃ¤rstatus</td></tr><tr><td>Cash-In Forecast</td><td>JV GFPlus, DeckungslÃ¼ckenmodell und Gesamtsicht</td></tr><tr><td>FÃ¶rdermittelabruf</td><td>Bewilligung/ZRP versus Abruf/Auszahlung</td></tr><tr><td>Abweichungsmonitor</td><td>Ursachen, BetrÃ¤ge, Mengen, Owner, FÃ¤lligkeiten</td></tr></tbody></table></div>
 <h2 id="7-funktionale-anforderungen">7. Funktionale Anforderungen</h2>
-<div class="table-wrap"><table><thead><tr><th>ID</th><th>Anforderung</th></tr></thead><tbody><tr><td>F-01</td><td>Nutzer können nach Ausbautreiber, Bundesland, GKS, Vertrag, Los, Bautranche, Förderprogramm und Zeitraum filtern.</td></tr><tr><td>F-02</td><td>Das System zeigt Soll, Forecast und Ist je HP/BP/HC auf Monatsscheibe.</td></tr><tr><td>F-03</td><td>Das System stellt vertragliche Solladressen PFau gegen GBGS-Istbau und Abrechnungsstatus.</td></tr><tr><td>F-04</td><td>Das System trennt Cash-In nach GFPlus/JV und Deckungslückenmodell und zeigt eine Gesamtsicht.</td></tr><tr><td>F-05</td><td>Das System zeigt Fördermittel nach Bewilligung/ZRP, Abruf, Auszahlung und offenem Betrag.</td></tr><tr><td>F-06</td><td>Nutzer können Abweichungen drill-down-fähig von Portfolio auf Vertrag, Los, Bautranche und Ursache analysieren.</td></tr><tr><td>F-07</td><td>Abweichungen erhalten Status, Owner, Fälligkeit und Kommentarhistorie.</td></tr><tr><td>F-08</td><td>Reports sind exportierbar, z. B. CSV/XLSX für Abstimmungen mit IT, Controlling und Management.</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>ID</th><th>Anforderung</th></tr></thead><tbody><tr><td>F-01</td><td>Nutzer kÃ¶nnen nach Ausbautreiber, Bundesland, GKS, Vertrag, Los, Bautranche, FÃ¶rderprogramm und Zeitraum filtern.</td></tr><tr><td>F-02</td><td>Das System zeigt Soll, Forecast und Ist je HP/BP/HC auf Monatsscheibe.</td></tr><tr><td>F-03</td><td>Das System stellt vertragliche Solladressen PFau gegen GBGS-Istbau und Abrechnungsstatus.</td></tr><tr><td>F-04</td><td>Das System trennt Cash-In nach GFPlus/JV und DeckungslÃ¼ckenmodell und zeigt eine Gesamtsicht.</td></tr><tr><td>F-05</td><td>Das System zeigt FÃ¶rdermittel nach Bewilligung/ZRP, Abruf, Auszahlung und offenem Betrag.</td></tr><tr><td>F-06</td><td>Nutzer kÃ¶nnen Abweichungen drill-down-fÃ¤hig von Portfolio auf Vertrag, Los, Bautranche und Ursache analysieren.</td></tr><tr><td>F-07</td><td>Abweichungen erhalten Status, Owner, FÃ¤lligkeit und Kommentarhistorie.</td></tr><tr><td>F-08</td><td>Reports sind exportierbar, z. B. CSV/XLSX fÃ¼r Abstimmungen mit IT, Controlling und Management.</td></tr></tbody></table></div>
 <h2 id="8-nichtfunktionale-anforderungen">8. Nichtfunktionale Anforderungen</h2>
-<div class="table-wrap"><table><thead><tr><th>Bereich</th><th>Anforderung</th></tr></thead><tbody><tr><td>Datenqualität</td><td>Jede KPI muss Quelle, Stand und Berechnungslogik ausweisen.</td></tr><tr><td>Nachvollziehbarkeit</td><td>Abweichungen müssen revisionssicher mit Quelle, Timestamp und Bearbeitungsstatus nachvollziehbar sein.</td></tr><tr><td>Performance</td><td>Portfolio- und Losansichten sollen interaktiv filterbar sein.</td></tr><tr><td>Berechtigungen</td><td>Fachseite, Management, IT und ggf. regionale Rollen erhalten rollenbasierte Leserechte; Pflege von Klärstatus nur für berechtigte Rollen.</td></tr><tr><td>Aktualität</td><td>MVP mindestens monatlich, perspektivisch automatisiert nach Quellaktualisierung.</td></tr><tr><td>Erweiterbarkeit</td><td>Zusätzliche Förderprogramme und Datenquellen müssen ohne Redesign integrierbar sein.</td></tr></tbody></table></div>
-<h2 id="9-offene-punkte-fur-it-solutiondesign">9. Offene Punkte für IT-Solutiondesign</h2>
-<div class="table-wrap"><table><thead><tr><th>Punkt</th><th>Klärbedarf</th></tr></thead><tbody><tr><td>Source Mapping</td><td>Konkrete Tabellen, APIs oder Exporte je Quellsystem fehlen noch für Zeilen 22/23 im Excel.</td></tr><tr><td>Identitätslogik</td><td>Verbindliche Schlüssel für Vertrag, Los, Bautranche und Adresse zwischen PFau und GBGS festlegen.</td></tr><tr><td>Cash-In-Formeln</td><td>Fachliche Berechnung je Abrechnungskreis final spezifizieren.</td></tr><tr><td>Datenlatenz</td><td>Aktualisierungsfrequenz je Quelle und Reporting-Stichtag festlegen.</td></tr><tr><td>Abweichungsprozess</td><td>Workflow-Tooling klären: Jira, integrierte App, Confluence-Task oder Fachprozess.</td></tr><tr><td>Historisierung</td><td>Snapshot-Logik je Monatsstichtag definieren.</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>Bereich</th><th>Anforderung</th></tr></thead><tbody><tr><td>DatenqualitÃ¤t</td><td>Jede KPI muss Quelle, Stand und Berechnungslogik ausweisen.</td></tr><tr><td>Nachvollziehbarkeit</td><td>Abweichungen mÃ¼ssen revisionssicher mit Quelle, Timestamp und Bearbeitungsstatus nachvollziehbar sein.</td></tr><tr><td>Performance</td><td>Portfolio- und Losansichten sollen interaktiv filterbar sein.</td></tr><tr><td>Berechtigungen</td><td>Fachseite, Management, IT und ggf. regionale Rollen erhalten rollenbasierte Leserechte; Pflege von KlÃ¤rstatus nur fÃ¼r berechtigte Rollen.</td></tr><tr><td>AktualitÃ¤t</td><td>MVP mindestens monatlich, perspektivisch automatisiert nach Quellaktualisierung.</td></tr><tr><td>Erweiterbarkeit</td><td>ZusÃ¤tzliche FÃ¶rderprogramme und Datenquellen mÃ¼ssen ohne Redesign integrierbar sein.</td></tr></tbody></table></div>
+<h2 id="9-offene-punkte-fur-it-solutiondesign">9. Offene Punkte fÃ¼r IT-Solutiondesign</h2>
+<div class="table-wrap"><table><thead><tr><th>Punkt</th><th>KlÃ¤rbedarf</th></tr></thead><tbody><tr><td>Source Mapping</td><td>Konkrete Tabellen, APIs oder Exporte je Quellsystem fehlen noch fÃ¼r Zeilen 22/23 im Excel.</td></tr><tr><td>IdentitÃ¤tslogik</td><td>Verbindliche SchlÃ¼ssel fÃ¼r Vertrag, Los, Bautranche und Adresse zwischen PFau und GBGS festlegen.</td></tr><tr><td>Cash-In-Formeln</td><td>Fachliche Berechnung je Abrechnungskreis final spezifizieren.</td></tr><tr><td>Datenlatenz</td><td>Aktualisierungsfrequenz je Quelle und Reporting-Stichtag festlegen.</td></tr><tr><td>Abweichungsprozess</td><td>Workflow-Tooling klÃ¤ren: Jira, integrierte App, Confluence-Task oder Fachprozess.</td></tr><tr><td>Historisierung</td><td>Snapshot-Logik je Monatsstichtag definieren.</td></tr></tbody></table></div>
 <h2 id="10-mvp-schnitt">10. MVP-Schnitt</h2>
 <p>Der erste IT-Schnitt sollte liefern:</p>
-<ol><li>Datenimport und Mapping für Vertrag, Los, Bautranche, GKS und HP/BP/HC-Sollmengen.</li><li>GBGS-Istmengen und Meilensteine je Los/Bautranche.</li><li>PFau-vs-GBGS-Abgleich inklusive Abweichungskennzeichnung.</li><li>Rollout-Dashboard HP/BP/HC auf Monatsscheibe.</li><li>Cash-In Forecast getrennt nach GFPlus/JV und Deckungslückenmodell plus Summe.</li><li>Fördermittelabruf gemäß Bewilligung/ZRP für Bundesmittel und kommunalen Eigenanteil.</li><li>Abweichungsmonitor mit Status, Owner und Fälligkeit.</li></ol>
+<ol><li>Datenimport und Mapping fÃ¼r Vertrag, Los, Bautranche, GKS und HP/BP/HC-Sollmengen.</li><li>GBGS-Istmengen und Meilensteine je Los/Bautranche.</li><li>PFau-vs-GBGS-Abgleich inklusive Abweichungskennzeichnung.</li><li>Rollout-Dashboard HP/BP/HC auf Monatsscheibe.</li><li>Cash-In Forecast getrennt nach GFPlus/JV und DeckungslÃ¼ckenmodell plus Summe.</li><li>FÃ¶rdermittelabruf gemÃ¤ÃŸ Bewilligung/ZRP fÃ¼r Bundesmittel und kommunalen Eigenanteil.</li><li>Abweichungsmonitor mit Status, Owner und FÃ¤lligkeit.</li></ol>
     <section class="chapter-break">
-      <h2 id="11-work-break-down-struktur-fur-jira">11. Work-Break-Down-Struktur für Jira</h2>
+      <h2 id="11-work-break-down-struktur-fur-jira">11. Work-Break-Down-Struktur fÃ¼r Jira</h2>
 <h2 id="epic-1-datenfundament-und-quellintegration">Epic 1: Datenfundament und Quellintegration</h2>
-<p>Ziel: belastbare Datenbasis für Vertrag, Los, Bautranche, Adresse und Monatsscheiben schaffen.</p>
+<p>Ziel: belastbare Datenbasis fÃ¼r Vertrag, Los, Bautranche, Adresse und Monatsscheiben schaffen.</p>
 <h3 id="story-1-1-quellsystem-mapping-pfau-gbgs-und-vertragsdaten">Story 1.1: Quellsystem-Mapping PFau, GBGS und Vertragsdaten</h3>
-<p>Als Fachbereich möchte ich je Attribut wissen, aus welchem System und welchem Datenobjekt es kommt, damit die IT Schnittstellen und Verantwortlichkeiten sauber schätzen kann.</p>
+<p>Als Fachbereich mÃ¶chte ich je Attribut wissen, aus welchem System und welchem Datenobjekt es kommt, damit die IT Schnittstellen und Verantwortlichkeiten sauber schÃ¤tzen kann.</p>
 <p>Akzeptanzkriterien:</p>
-<ul><li>Mapping enthält mindestens PFau, GBGS, vertragshaltende Systeme, ZRP/Bewilligung und Finanzdatenquelle.</li><li>Für jedes MVP-Attribut sind Quelle, Schlüssel, Aktualisierungsfrequenz und fachlicher Owner dokumentiert.</li><li>Fehlende Mappings sind als offene Punkte mit Klärverantwortung markiert.</li></ul>
+<ul><li>Mapping enthÃ¤lt mindestens PFau, GBGS, vertragshaltende Systeme, ZRP/Bewilligung und Finanzdatenquelle.</li><li>FÃ¼r jedes MVP-Attribut sind Quelle, SchlÃ¼ssel, Aktualisierungsfrequenz und fachlicher Owner dokumentiert.</li><li>Fehlende Mappings sind als offene Punkte mit KlÃ¤rverantwortung markiert.</li></ul>
 <h3 id="story-1-2-einheitliches-dimensionsmodell">Story 1.2: Einheitliches Dimensionsmodell</h3>
-<p>Als Nutzer möchte ich Daten nach Ausbautreiber, Vertrag, Los, Bautranche, GKS, Förderprogramm und Monat auswerten.</p>
+<p>Als Nutzer mÃ¶chte ich Daten nach Ausbautreiber, Vertrag, Los, Bautranche, GKS, FÃ¶rderprogramm und Monat auswerten.</p>
 <p>Akzeptanzkriterien:</p>
-<ul><li>Dimensionen Vertrag, Los und Bautranche sind eindeutig modelliert.</li><li>Eine Bautranche ist genau einem Los zugeordnet.</li><li>Ein Los ist genau einem Hauptvertrag zugeordnet.</li><li>Filterlogik funktioniert konsistent über alle Reports.</li></ul>
+<ul><li>Dimensionen Vertrag, Los und Bautranche sind eindeutig modelliert.</li><li>Eine Bautranche ist genau einem Los zugeordnet.</li><li>Ein Los ist genau einem Hauptvertrag zugeordnet.</li><li>Filterlogik funktioniert konsistent Ã¼ber alle Reports.</li></ul>
 <h3 id="story-1-3-historisierung-und-stichtagslogik">Story 1.3: Historisierung und Stichtagslogik</h3>
-<p>Als Management möchte ich Abweichungen im Zeitverlauf nachvollziehen.</p>
+<p>Als Management mÃ¶chte ich Abweichungen im Zeitverlauf nachvollziehen.</p>
 <p>Akzeptanzkriterien:</p>
-<ul><li>Datenstände sind mit Stichtag und Ladezeitpunkt historisiert.</li><li>Monatsvergleiche können reproduziert werden.</li><li>Dashboard zeigt den aktuellen Stichtag sichtbar an.</li></ul>
+<ul><li>DatenstÃ¤nde sind mit Stichtag und Ladezeitpunkt historisiert.</li><li>Monatsvergleiche kÃ¶nnen reproduziert werden.</li><li>Dashboard zeigt den aktuellen Stichtag sichtbar an.</li></ul>
 <h2 id="epic-2-vertrags-und-adress-sollmengen">Epic 2: Vertrags- und Adress-Sollmengen</h2>
 <p>Ziel: vertragliche Sollmengen und Vertragsstammdaten als Basis der Abrechenbarkeit bereitstellen.</p>
 <h3 id="story-2-1-import-vertragsstruktur-vertrag-los-bautranche">Story 2.1: Import Vertragsstruktur Vertrag, Los, Bautranche</h3>
 <p>Akzeptanzkriterien:</p>
-<ul><li>Hauptvertrag, Los und Bautranche werden aus PFau bzw. Vertragsdatenquelle importiert.</li><li>Summe der Bautranchen-Adressen je Los wird gegen die Vertragsadressliste geprüft.</li><li>Inkonsistenzen erzeugen Abweichungseinträge.</li></ul>
+<ul><li>Hauptvertrag, Los und Bautranche werden aus PFau bzw. Vertragsdatenquelle importiert.</li><li>Summe der Bautranchen-Adressen je Los wird gegen die Vertragsadressliste geprÃ¼ft.</li><li>Inkonsistenzen erzeugen AbweichungseintrÃ¤ge.</li></ul>
 <h3 id="story-2-2-p1-sollmengen-tdg-gfplus-hp-bp-hc">Story 2.2: P1-Sollmengen TDG/GFPlus HP/BP/HC</h3>
 <p>Bezug: Excel <code>AZ-BB</code>.</p>
 <p>Akzeptanzkriterien:</p>
@@ -116,82 +116,108 @@
 <h3 id="story-2-3-vertragsstammdaten-und-vertragspreise">Story 2.3: Vertragsstammdaten und Vertragspreise</h3>
 <p>Bezug: Excel <code>BC-BH</code>.</p>
 <p>Akzeptanzkriterien:</p>
-<ul><li>Vertragsstatus, Pönale, Nachträge, Preise und Laufzeiten werden angezeigt.</li><li>Vertragsdaten sind filterbar und exportierbar.</li><li>Fehlende Werte werden als Datenqualitäts-Hinweis markiert.</li></ul>
+<ul><li>Vertragsstatus, PÃ¶nale, NachtrÃ¤ge, Preise und Laufzeiten werden angezeigt.</li><li>Vertragsdaten sind filterbar und exportierbar.</li><li>Fehlende Werte werden als DatenqualitÃ¤ts-Hinweis markiert.</li></ul>
 <h2 id="epic-3-rollout-monitoring-hp-bp-hc">Epic 3: Rollout-Monitoring HP/BP/HC</h2>
 <p>Ziel: geplanter und gebauter Rollout auf Monatsscheiben darstellen.</p>
-<h3 id="story-3-1-monatsscheibenmodell-fur-hp-bp-hc">Story 3.1: Monatsscheibenmodell für HP/BP/HC</h3>
+<h3 id="story-3-1-monatsscheibenmodell-fur-hp-bp-hc">Story 3.1: Monatsscheibenmodell fÃ¼r HP/BP/HC</h3>
 <p>Bezug: Excel <code>BL-IX</code>.</p>
 <p>Akzeptanzkriterien:</p>
-<ul><li>HP, BP und HC liegen monatlich von 2025 bis 2029 vor.</li><li>Das Datenmodell unterstützt Plan, Forecast und Ist.</li><li>Summen je Jahr und Gesamt werden automatisch berechnet.</li></ul>
+<ul><li>HP, BP und HC liegen monatlich von 2025 bis 2029 vor.</li><li>Das Datenmodell unterstÃ¼tzt Plan, Forecast und Ist.</li><li>Summen je Jahr und Gesamt werden automatisch berechnet.</li></ul>
 <h3 id="story-3-2-gbgs-istmengen-und-meilensteine">Story 3.2: GBGS-Istmengen und Meilensteine</h3>
 <p>Bezug: Excel <code>BF-BH</code>, <code>IY-JI</code>.</p>
 <p>Akzeptanzkriterien:</p>
 <ul><li>GBGS liefert gebaute HP/BP/HC je Los/Bautranche.</li><li>Meilensteine L2.9 bis L4.9 werden angezeigt.</li><li>Tiefbaumeter und Ausbauparameter werden als Ist-/Statusdaten dargestellt.</li></ul>
 <h3 id="story-3-3-rollout-dashboard">Story 3.3: Rollout-Dashboard</h3>
 <p>Akzeptanzkriterien:</p>
-<ul><li>Dashboard zeigt Soll/Ist/Forecast je Monat.</li><li>Nutzer können zwischen HP, BP und HC umschalten.</li><li>Kritische Abweichungen werden visuell hervorgehoben.</li></ul>
+<ul><li>Dashboard zeigt Soll/Ist/Forecast je Monat.</li><li>Nutzer kÃ¶nnen zwischen HP, BP und HC umschalten.</li><li>Kritische Abweichungen werden visuell hervorgehoben.</li></ul>
 <h2 id="epic-4-pfau-vs-gbgs-abgleich-und-abweichungsprozess">Epic 4: PFau-vs-GBGS-Abgleich und Abweichungsprozess</h2>
 <p>Ziel: Abrechenbarkeit der Adressen fachlich nachweisen.</p>
 <h3 id="story-4-1-abgleich-vertragsadressbestand-gegen-gebaute-adressen">Story 4.1: Abgleich Vertragsadressbestand gegen gebaute Adressen</h3>
 <p>Akzeptanzkriterien:</p>
-<ul><li>Abgleich verknüpft PFau-Vertragsadressen mit GBGS-Baustatus.</li><li>Nur tatsächlich gebaute und zuordenbare Adressen werden als abrechenbar markiert.</li><li>Nicht zuordenbare, offene oder überschüssige Adressen werden kategorisiert.</li></ul>
+<ul><li>Abgleich verknÃ¼pft PFau-Vertragsadressen mit GBGS-Baustatus.</li><li>Nur tatsÃ¤chlich gebaute und zuordenbare Adressen werden als abrechenbar markiert.</li><li>Nicht zuordenbare, offene oder Ã¼berschÃ¼ssige Adressen werden kategorisiert.</li></ul>
 <h3 id="story-4-2-abweichungsmonitor">Story 4.2: Abweichungsmonitor</h3>
 <p>Akzeptanzkriterien:</p>
-<ul><li>Abweichungen haben Ursache, Menge/Betrag, betroffene Dimension, Status, Owner und Fälligkeit.</li><li>Nutzer können von KPI oder Tabelle in die Abweichungsliste drillen.</li><li>Statuswerte mindestens: Neu, In Klärung, Zur Korrektur, Erledigt, Blockiert.</li></ul>
+<ul><li>Abweichungen haben Ursache, Menge/Betrag, betroffene Dimension, Status, Owner und FÃ¤lligkeit.</li><li>Nutzer kÃ¶nnen von KPI oder Tabelle in die Abweichungsliste drillen.</li><li>Statuswerte mindestens: Neu, In KlÃ¤rung, Zur Korrektur, Erledigt, Blockiert.</li></ul>
 <h3 id="story-4-3-fachlicher-bereinigungsworkflow">Story 4.3: Fachlicher Bereinigungsworkflow</h3>
 <p>Akzeptanzkriterien:</p>
-<ul><li>Abweichung kann kommentiert und einem Owner zugewiesen werden.</li><li>Fälligkeiten und nächste Schritte sind sichtbar.</li><li>Historie zeigt Änderungen an Status und Kommentar.</li></ul>
+<ul><li>Abweichung kann kommentiert und einem Owner zugewiesen werden.</li><li>FÃ¤lligkeiten und nÃ¤chste Schritte sind sichtbar.</li><li>Historie zeigt Ã„nderungen an Status und Kommentar.</li></ul>
 <h2 id="epic-5-cash-in-forecast">Epic 5: Cash-In Forecast</h2>
-<p>Ziel: Mengen- und Zahlungsprognose für Mittelzufluss steuerbar machen.</p>
+<p>Ziel: Mengen- und Zahlungsprognose fÃ¼r Mittelzufluss steuerbar machen.</p>
 <h3 id="story-5-1-abrechnungskreis-gfplus-jv">Story 5.1: Abrechnungskreis GFPlus/JV</h3>
 <p>Bezug: Excel <code>JL-JO</code>.</p>
 <p>Akzeptanzkriterien:</p>
-<ul><li>Rechnungsstellung, bezahlt, offen und Bemerkung werden für TDG-GFPlus und GKS dargestellt.</li><li>Darstellung erfolgt nach Monat, Vertrag, Los und GKS.</li><li>Werte sind gegen abrechenbare Adressen plausibilisiert.</li></ul>
-<h3 id="story-5-2-abrechnungskreis-deckungsluckenmodell">Story 5.2: Abrechnungskreis Deckungslückenmodell</h3>
+<ul><li>Rechnungsstellung, bezahlt, offen und Bemerkung werden fÃ¼r TDG-GFPlus und GKS dargestellt.</li><li>Darstellung erfolgt nach Monat, Vertrag, Los und GKS.</li><li>Werte sind gegen abrechenbare Adressen plausibilisiert.</li></ul>
+<h3 id="story-5-2-abrechnungskreis-deckungsluckenmodell">Story 5.2: Abrechnungskreis DeckungslÃ¼ckenmodell</h3>
 <p>Bezug: Excel <code>JP-JT</code> und Forecast-Monatsscheiben.</p>
 <p>Akzeptanzkriterien:</p>
-<ul><li>Klassischer Eigenausbau wird als separater Abrechnungskreis geführt.</li><li>Forecast kann getrennt von GFPlus gefiltert und analysiert werden.</li><li>Offene Beträge werden je Monat ausgewiesen.</li></ul>
+<ul><li>Klassischer Eigenausbau wird als separater Abrechnungskreis gefÃ¼hrt.</li><li>Forecast kann getrennt von GFPlus gefiltert und analysiert werden.</li><li>Offene BetrÃ¤ge werden je Monat ausgewiesen.</li></ul>
 <h3 id="story-5-3-cash-in-gesamtsicht">Story 5.3: Cash-In Gesamtsicht</h3>
 <p>Akzeptanzkriterien:</p>
-<ul><li>Summensicht kombiniert GFPlus/JV und Deckungslückenmodell.</li><li>Dashboard zeigt Ist, Forecast, Jahresziel und Gap.</li><li>Nutzer können vom Gesamtbetrag auf Abrechnungskreis und Los drillen.</li></ul>
-<h2 id="epic-6-fordermittelabruf-gema-bewilligung">Epic 6: Fördermittelabruf gemäß Bewilligung</h2>
-<p>Ziel: Zahlungs- und Realisierungspläne mit Abruf und Auszahlung vergleichen.</p>
+<ul><li>Summensicht kombiniert GFPlus/JV und DeckungslÃ¼ckenmodell.</li><li>Dashboard zeigt Ist, Forecast, Jahresziel und Gap.</li><li>Nutzer kÃ¶nnen vom Gesamtbetrag auf Abrechnungskreis und Los drillen.</li></ul>
+<h2 id="epic-6-fordermittelabruf-gema-bewilligung">Epic 6: FÃ¶rdermittelabruf gemÃ¤ÃŸ Bewilligung</h2>
+<p>Ziel: Zahlungs- und RealisierungsplÃ¤ne mit Abruf und Auszahlung vergleichen.</p>
 <h3 id="story-6-1-zrp-bewilligungsdaten-importieren">Story 6.1: ZRP-/Bewilligungsdaten importieren</h3>
 <p>Bezug: Excel <code>MH-MV</code>.</p>
 <p>Akzeptanzkriterien:</p>
-<ul><li>Aktueller ZRP ist nach Jahr, GKS und Fördermittelart verfügbar.</li><li>Bundes-, Landes-, kommunaler und EU-Anteil werden separat geführt.</li><li>Gesamtwerte werden automatisch summiert.</li></ul>
-<h3 id="story-6-2-p1-bundesfordermittel-und-kommunaler-eigenanteil">Story 6.2: P1 Bundesfördermittel und kommunaler Eigenanteil</h3>
+<ul><li>Aktueller ZRP ist nach Jahr, GKS und FÃ¶rdermittelart verfÃ¼gbar.</li><li>Bundes-, Landes-, kommunaler und EU-Anteil werden separat gefÃ¼hrt.</li><li>Gesamtwerte werden automatisch summiert.</li></ul>
+<h3 id="story-6-2-p1-bundesfordermittel-und-kommunaler-eigenanteil">Story 6.2: P1 BundesfÃ¶rdermittel und kommunaler Eigenanteil</h3>
 <p>Bezug: Excel <code>MN</code>, <code>MU</code>.</p>
 <p>Akzeptanzkriterien:</p>
-<ul><li>Bundesfördermittel und kommunaler Eigenanteil sind im MVP enthalten.</li><li>Abweichungen zwischen geplant, abgerufen und ausgezahlt werden angezeigt.</li><li>Dashboard zeigt offene Mittel je GKS und Jahr.</li></ul>
-<h3 id="story-6-3-fordermittel-dashboard">Story 6.3: Fördermittel-Dashboard</h3>
+<ul><li>BundesfÃ¶rdermittel und kommunaler Eigenanteil sind im MVP enthalten.</li><li>Abweichungen zwischen geplant, abgerufen und ausgezahlt werden angezeigt.</li><li>Dashboard zeigt offene Mittel je GKS und Jahr.</li></ul>
+<h3 id="story-6-3-fordermittel-dashboard">Story 6.3: FÃ¶rdermittel-Dashboard</h3>
 <p>Akzeptanzkriterien:</p>
-<ul><li>Nutzer sehen geplante, abgerufene, ausgezahlte und offene Mittel.</li><li>Drilldown nach Fördermittelart, Jahr, GKS und Vertrag ist möglich.</li><li>Ampellogik warnt bei Zielgefährdung.</li></ul>
+<ul><li>Nutzer sehen geplante, abgerufene, ausgezahlte und offene Mittel.</li><li>Drilldown nach FÃ¶rdermittelart, Jahr, GKS und Vertrag ist mÃ¶glich.</li><li>Ampellogik warnt bei ZielgefÃ¤hrdung.</li></ul>
 <h2 id="epic-7-reporting-ux-und-klickdummy">Epic 7: Reporting UX und Klickdummy</h2>
-<p>Ziel: Management- und Fachnutzer erhalten eine bedienbare Oberfläche als Diskussionsgrundlage.</p>
-<h3 id="story-7-1-portfolio-ubersicht">Story 7.1: Portfolio-Übersicht</h3>
+<p>Ziel: Management- und Fachnutzer erhalten eine bedienbare OberflÃ¤che als Diskussionsgrundlage.</p>
+<h3 id="story-7-1-portfolio-ubersicht">Story 7.1: Portfolio-Ãœbersicht</h3>
 <p>Akzeptanzkriterien:</p>
-<ul><li>Startansicht zeigt KPI-Kacheln, Rollout-Chart, Los-Tabelle und Top-Abweichungen.</li><li>Filter beeinflussen sichtbare Kennzahlen.</li><li>Stichtag und Aktualität sind sichtbar.</li></ul>
+<ul><li>Startansicht zeigt KPI-Kacheln, Rollout-Chart, Los-Tabelle und Top-Abweichungen.</li><li>Filter beeinflussen sichtbare Kennzahlen.</li><li>Stichtag und AktualitÃ¤t sind sichtbar.</li></ul>
 <h3 id="story-7-2-vertrags-und-losdetail">Story 7.2: Vertrags- und Losdetail</h3>
 <p>Akzeptanzkriterien:</p>
-<ul><li>Auswahl eines Loses öffnet Detailansicht.</li><li>Detailansicht zeigt Vertragsdaten, Bautranchen, PFau/GBGS-Abgleich und nächste Schritte.</li><li>Nutzer können zwischen Überblick, Sachkonten und Historie wechseln.</li></ul>
+<ul><li>Auswahl eines Loses Ã¶ffnet Detailansicht.</li><li>Detailansicht zeigt Vertragsdaten, Bautranchen, PFau/GBGS-Abgleich und nÃ¤chste Schritte.</li><li>Nutzer kÃ¶nnen zwischen Ãœberblick, Sachkonten und Historie wechseln.</li></ul>
 <h3 id="story-7-3-reports-und-export">Story 7.3: Reports und Export</h3>
 <p>Akzeptanzkriterien:</p>
-<ul><li>Reports für Portfolio, Rollout, Cash-In, Fördermittel und Abweichungen sind auswählbar.</li><li>Exportfunktion ist vorgesehen.</li><li>Export enthält Stichtag, Filter und Quelle.</li></ul>
-<h2 id="epic-8-betrieb-berechtigungen-und-datenqualitat">Epic 8: Betrieb, Berechtigungen und Datenqualität</h2>
-<p>Ziel: MVP betreibbar und fachlich vertrauenswürdig machen.</p>
+<ul><li>Reports fÃ¼r Portfolio, Rollout, Cash-In, FÃ¶rdermittel und Abweichungen sind auswÃ¤hlbar.</li><li>Exportfunktion ist vorgesehen.</li><li>Export enthÃ¤lt Stichtag, Filter und Quelle.</li></ul>
+<h2 id="epic-8-betrieb-berechtigungen-und-datenqualitat">Epic 8: Betrieb, Berechtigungen und DatenqualitÃ¤t</h2>
+<p>Ziel: MVP betreibbar und fachlich vertrauenswÃ¼rdig machen.</p>
 <h3 id="story-8-1-rollen-und-berechtigungskonzept">Story 8.1: Rollen- und Berechtigungskonzept</h3>
 <p>Akzeptanzkriterien:</p>
-<ul><li>Rollen für Management, Fachbereich, IT, Datenowner und Read-only sind definiert.</li><li>Pflege von Abweichungen ist rollenbasiert eingeschränkt.</li><li>Exportberechtigungen sind geklärt.</li></ul>
-<h3 id="story-8-2-datenqualitatsregeln">Story 8.2: Datenqualitätsregeln</h3>
+<ul><li>Rollen fÃ¼r Management, Fachbereich, IT, Datenowner und Read-only sind definiert.</li><li>Pflege von Abweichungen ist rollenbasiert eingeschrÃ¤nkt.</li><li>Exportberechtigungen sind geklÃ¤rt.</li></ul>
+<h3 id="story-8-2-datenqualitatsregeln">Story 8.2: DatenqualitÃ¤tsregeln</h3>
 <p>Akzeptanzkriterien:</p>
-<ul><li>Pflichtfelder und Plausibilitätsregeln sind definiert.</li><li>Datenqualitätsfehler erscheinen im Dashboard.</li><li>Fehler sind Quelle und Owner zuordenbar.</li></ul>
+<ul><li>Pflichtfelder und PlausibilitÃ¤tsregeln sind definiert.</li><li>DatenqualitÃ¤tsfehler erscheinen im Dashboard.</li><li>Fehler sind Quelle und Owner zuordenbar.</li></ul>
 <h3 id="story-8-3-monitoring-der-schnittstellen">Story 8.3: Monitoring der Schnittstellen</h3>
 <p>Akzeptanzkriterien:</p>
-<ul><li>Ladezeitpunkt, Ladeergebnis und Fehler je Schnittstelle sind sichtbar.</li><li>Nutzer sehen, ob PFau, GBGS und ZRP-Daten aktuell sind.</li><li>Fehlerhafte Läufe erzeugen fachliche Hinweise.</li></ul>
+<ul><li>Ladezeitpunkt, Ladeergebnis und Fehler je Schnittstelle sind sichtbar.</li><li>Nutzer sehen, ob PFau, GBGS und ZRP-Daten aktuell sind.</li><li>Fehlerhafte LÃ¤ufe erzeugen fachliche Hinweise.</li></ul>
 <h2 id="priorisierter-mvp-releaseplan">Priorisierter MVP-Releaseplan</h2>
-<div class="table-wrap"><table><thead><tr><th>Release</th><th>Inhalt</th></tr></thead><tbody><tr><td>R1 Datenkern</td><td>Epic 1, Story 2.1, Story 2.2</td></tr><tr><td>R2 Rollout und Abgleich</td><td>Epic 3, Epic 4</td></tr><tr><td>R3 Cash-In</td><td>Epic 5</td></tr><tr><td>R4 Fördermittel</td><td>Epic 6</td></tr><tr><td>R5 UX, Betrieb, Datenqualität</td><td>Epic 7, Epic 8</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>Release</th><th>Inhalt</th></tr></thead><tbody><tr><td>R1 Datenkern</td><td>Epic 1, Story 2.1, Story 2.2</td></tr><tr><td>R2 Rollout und Abgleich</td><td>Epic 3, Epic 4</td></tr><tr><td>R3 Cash-In</td><td>Epic 5</td></tr><tr><td>R4 FÃ¶rdermittel</td><td>Epic 6</td></tr><tr><td>R5 UX, Betrieb, DatenqualitÃ¤t</td><td>Epic 7, Epic 8</td></tr></tbody></table></div>
     </section>
   </main>
+<section>
+  <h2>Ergänzung Juni 2026: Fördermonitoring &amp; Risikoanalyse MVP2</h2>
+  <h3>Fachliche Entscheidung</h3>
+  <p>MVP1 / Angebotsphase / Win-Loss ist out of scope. Die technische Linie verfolgt MVP2 weiter: E2E-Transparenz nach Realisierungsbeauftragung mit Fokus auf Rollout-Ablieferung, Dokumentation, Fördermittelabrechnung, Cash-In und Risikofrüherkennung.</p>
+  <h3>Rollenverständnis FRG</h3>
+  <p>FRG schafft Transparenz, identifiziert Risiken, bewertet Auswirkungen und stellt Managementreports bereit. FRG übernimmt keine operative Rolloutsteuerung, keine Maßnahmenumsetzung zur Risikomitigation und keine Forecast-/Planungsverantwortung. Forecast und IPF dienen ausschließlich als Referenzgrößen zur Risikoabschätzung.</p>
+  <h3>Datenquellen gemäß Management-Zielbild</h3>
+  <table>
+    <thead><tr><th>Lieferant</th><th>Quelle / System</th><th>Verwendung</th></tr></thead>
+    <tbody>
+      <tr><td>FNES</td><td>Control Tower mit GGS, Digi B, PSL, Celonis</td><td>Rollout-Ist, Status, operative Ablieferung</td></tr>
+      <tr><td>FNES</td><td>ODE / Micro Strategy / WFMT / PUMA</td><td>Gebiets-, Meilenstein- und Bauinformationen</td></tr>
+      <tr><td>FRG</td><td>VRT-Monitor</td><td>Förder-/Vertragskontext und Risikohinweise</td></tr>
+      <tr><td>FRG</td><td>WFS / PFAU</td><td>Vertrag, Los, Bautranche, abrechenbare Adressen, Abrechnung</td></tr>
+      <tr><td>FRG</td><td>ANKE / Bid Database</td><td>Übergangs-/Referenzdaten und Stammdaten</td></tr>
+      <tr><td>JVK</td><td>GFPlus-Steuerungsdatei</td><td>GFPlus-Managementsicht; Datenqualität bei JVK</td></tr>
+      <tr><td>Finance / Planowner</td><td>IPF / Forecast</td><td>Referenzwerte für Risikoabschätzung</td></tr>
+    </tbody>
+  </table>
+  <h3>Shortterm-/Interimslösung</h3>
+  <p>Für die kurzfristige Management-AFO werden die Quellen turnusmäßig als Dateien in SharePoint-Foldern bereitgestellt. Die lokale Interim-App im Ordner <code>interim-app</code> verarbeitet CSV, TSV und JSON, harmonisiert die Daten und rendert Dashboards, Risikoanalyse, Reports on demand sowie einen Excel-kompatiblen CSV-Report.</p>
+  <p>XLSX-Dateien werden in der lokalen HTML-App nicht nativ geparst; für die Interimslösung ist ein CSV-Export aus Excel/SharePoint vorgesehen. Die Langfristlösung muss native Schnittstellen und optional XLSX-Verarbeitung bereitstellen.</p>
+  <h3>Langfristlösung / Jira-AFO</h3>
+  <p>Die langfristige Lösung wird als IT-AFO/Jira-Epic beschrieben. Ziel ist eine produktive Datenarchitektur mit nativer Quellintegration, Datenvalidierung, Harmonisierung, Qualitätssicherung, Konsolidierung, Historisierung, Risikoanalyse und adressatengerechtem Management Reporting.</p>
+</section>
 </body>
 </html>
+

@@ -1,9 +1,9 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="de">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>E2E Fördermonitoring Klickdummy</title>
+  <title>E2E FÃ¶rdermonitoring Klickdummy</title>
   <style>
     :root {
       --bg: #f6f7f9;
@@ -200,36 +200,36 @@
   </style>
 </head>
 <body>
-  <div class="mobile-warning">Der Klickdummy ist für Desktop-Steuerung optimiert; auf kleinen Viewports werden Tabellen horizontal gescrollt.</div>
+  <div class="mobile-warning">Der Klickdummy ist fÃ¼r Desktop-Steuerung optimiert; auf kleinen Viewports werden Tabellen horizontal gescrollt.</div>
   <div class="app">
     <aside class="sidebar">
       <div class="brand">
         <div class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></div>
-        <div class="brand-title">E2E Fördermonitoring</div>
+        <div class="brand-title">E2E FÃ¶rdermonitoring</div>
       </div>
       <nav class="nav" aria-label="Hauptnavigation">
-        <button class="active" data-screen="overview">▦ Übersicht</button>
-        <button data-screen="portfolio">▣ Portfolio</button>
-        <button data-screen="contracts">▤ Verträge</button>
-        <button data-screen="rollout">▥ Rollout</button>
-        <button data-screen="cashin">◉ Cash-In</button>
-        <button data-screen="funding">◍ Fördermittel</button>
-        <button data-screen="deviations">⚠ Abweichungen</button>
+        <button class="active" data-screen="overview">â–¦ Ãœbersicht</button>
+        <button data-screen="portfolio">â–£ Portfolio</button>
+        <button data-screen="contracts">â–¤ VertrÃ¤ge</button>
+        <button data-screen="rollout">â–¥ Rollout</button>
+        <button data-screen="cashin">â—‰ Cash-In</button>
+        <button data-screen="funding">â— FÃ¶rdermittel</button>
+        <button data-screen="deviations">âš  Abweichungen</button>
         <div class="nav-section"></div>
-        <button data-screen="reports">▧ Berichte</button>
-        <button data-screen="sources">◎ Datenquellen</button>
-        <button data-screen="admin">⚙ Administration</button>
+        <button data-screen="reports">â–§ Berichte</button>
+        <button data-screen="sources">â—Ž Datenquellen</button>
+        <button data-screen="admin">âš™ Administration</button>
       </nav>
     </aside>
 
     <main class="main">
       <div class="topbar">
-        <div class="filter"><label>Förderprogramm</label><select id="programFilter"><option>Alle</option><option>BFP23</option><option>Gigabit-RL</option></select></div>
+        <div class="filter"><label>FÃ¶rderprogramm</label><select id="programFilter"><option>Alle</option><option>BFP23</option><option>Gigabit-RL</option></select></div>
         <div class="filter"><label>Bundesland</label><select id="stateFilter"><option>Alle</option><option>Hessen</option><option>Bayern</option><option>NRW</option></select></div>
-        <div class="filter"><label>Projektträger</label><select id="ownerFilter"><option>Alle</option><option>PTI Mitte</option><option>PTI Süd</option></select></div>
+        <div class="filter"><label>ProjekttrÃ¤ger</label><select id="ownerFilter"><option>Alle</option><option>PTI Mitte</option><option>PTI SÃ¼d</option></select></div>
         <div class="filter"><label>Stichtag</label><input id="dateFilter" type="date" value="2025-05-31"></div>
         <div class="filter"><label>Los</label><select id="lotFilter"><option>Alle</option></select></div>
-        <button class="ghost-button" id="resetFilters">↻ Filter zurücksetzen</button>
+        <button class="ghost-button" id="resetFilters">â†» Filter zurÃ¼cksetzen</button>
       </div>
 
       <section class="content">
@@ -248,7 +248,7 @@
           </section>
           <section class="panel">
             <div class="panel-header">
-              <div><div class="panel-title">Losübersicht</div><div class="panel-subtitle">Klick auf ein Los öffnet den PFau-vs-GBGS-Detailabgleich</div></div>
+              <div><div class="panel-title">LosÃ¼bersicht</div><div class="panel-subtitle">Klick auf ein Los Ã¶ffnet den PFau-vs-GBGS-Detailabgleich</div></div>
               <div class="toolbar"><button class="ghost-button" id="configureColumns">Spalten konfigurieren</button><button class="ghost-button" id="exportTable">Export</button></div>
             </div>
             <div class="table-scroll"><table id="lotTable"></table></div>
@@ -257,9 +257,9 @@
 
         <div class="screen" id="portfolio">
           <div class="cards">
-            <div class="info-card"><h3>Portfolio-Schnitt</h3><p>Steuerung über Ausbautreiber, Bundesland, Förderprogramm und GKS. Fokus auf kritische Lücken zwischen Vertragssoll, Bau-Ist und Mittelabruf.</p></div>
-            <div class="info-card"><h3>Management-Ampel</h3><p>Rot, wenn Cash-In- oder Adressdifferenz Jahresziele gefährdet; gelb bei Klärbedarf; grün bei planmäßiger Entwicklung.</p></div>
-            <div class="info-card"><h3>Top-Abweichungen</h3><p>Die größten Differenzen werden nach Ursache, Betrag, Menge und Fälligkeit sortiert.</p></div>
+            <div class="info-card"><h3>Portfolio-Schnitt</h3><p>Steuerung Ã¼ber Ausbautreiber, Bundesland, FÃ¶rderprogramm und GKS. Fokus auf kritische LÃ¼cken zwischen Vertragssoll, Bau-Ist und Mittelabruf.</p></div>
+            <div class="info-card"><h3>Management-Ampel</h3><p>Rot, wenn Cash-In- oder Adressdifferenz Jahresziele gefÃ¤hrdet; gelb bei KlÃ¤rbedarf; grÃ¼n bei planmÃ¤ÃŸiger Entwicklung.</p></div>
+            <div class="info-card"><h3>Top-Abweichungen</h3><p>Die grÃ¶ÃŸten Differenzen werden nach Ursache, Betrag, Menge und FÃ¤lligkeit sortiert.</p></div>
           </div>
           <section class="panel"><div class="panel-title">Portfolio-Matrix</div><div class="table-scroll"><table id="portfolioTable"></table></div></section>
         </div>
@@ -268,7 +268,7 @@
           <section class="panel">
             <div class="panel-header"><div><div class="panel-title">Vertrag, Los und Bautranche</div><div class="panel-subtitle">Regel: Summe aller Bautranchen-Adressen je Los entspricht der Adressliste des Hauptvertrags.</div></div></div>
             <div class="workflow">
-              <div class="step"><strong>1. Hauptvertrag</strong><span>PFau-/WFS-ID, GKS, Förderprogramm, Status, Vertragsende.</span></div>
+              <div class="step"><strong>1. Hauptvertrag</strong><span>PFau-/WFS-ID, GKS, FÃ¶rderprogramm, Status, Vertragsende.</span></div>
               <div class="step"><strong>2. Lose</strong><span>Los-ID, Region, Losart, Vertragsmengen und Vertragspreise.</span></div>
               <div class="step"><strong>3. Bautranchen</strong><span>kleine Ausbaueinheiten mit HP/BP/HC-Sollmengen.</span></div>
               <div class="step"><strong>4. Adressen</strong><span>Adressliste wird gegen Bau-Ist aus GBGS abgeglichen.</span></div>
@@ -288,8 +288,8 @@
 
         <div class="screen" id="cashin">
           <div class="cards">
-            <div class="info-card"><h3>GFPlus / JV</h3><p>Innenverhältnis TDG-GFPlus, Rechnungsstellung an GKS, bezahlt, offen und Bemerkung.</p></div>
-            <div class="info-card"><h3>Deckungslückenmodell</h3><p>Klassischer Eigenausbau mit separatem Forecast und Zahlungslogik.</p></div>
+            <div class="info-card"><h3>GFPlus / JV</h3><p>InnenverhÃ¤ltnis TDG-GFPlus, Rechnungsstellung an GKS, bezahlt, offen und Bemerkung.</p></div>
+            <div class="info-card"><h3>DeckungslÃ¼ckenmodell</h3><p>Klassischer Eigenausbau mit separatem Forecast und Zahlungslogik.</p></div>
             <div class="info-card"><h3>Gesamtsicht</h3><p>Summendarstellung beider Abrechnungstreiber je Monat, Jahr, Los und GKS.</p></div>
           </div>
           <section class="panel"><div class="panel-title">Cash-In Forecast</div><div class="chart-wrap" id="cashinChart"></div></section>
@@ -297,13 +297,13 @@
         </div>
 
         <div class="screen" id="funding">
-          <section class="panel"><div class="panel-title">Geplanter Abruf der Fördermittel gemäß Bewilligung</div><div class="chart-wrap" id="fundingChart"></div></section>
+          <section class="panel"><div class="panel-title">Geplanter Abruf der FÃ¶rdermittel gemÃ¤ÃŸ Bewilligung</div><div class="chart-wrap" id="fundingChart"></div></section>
           <section class="panel"><div class="table-scroll"><table id="fundingTable"></table></div></section>
         </div>
 
         <div class="screen" id="deviations">
           <section class="panel">
-            <div class="panel-header"><div><div class="panel-title">Abweichungsmonitor</div><div class="panel-subtitle">Differenzen aus Vertragsadressbestand, GBGS-Bau-Ist, Rechnungs- und Fördermittelstatus.</div></div></div>
+            <div class="panel-header"><div><div class="panel-title">Abweichungsmonitor</div><div class="panel-subtitle">Differenzen aus Vertragsadressbestand, GBGS-Bau-Ist, Rechnungs- und FÃ¶rdermittelstatus.</div></div></div>
             <div class="table-scroll"><table id="deviationTable"></table></div>
           </section>
         </div>
@@ -312,7 +312,7 @@
           <div class="report-grid">
             <div class="report-list" id="reportList"></div>
             <section class="panel">
-              <div class="panel-header"><div><div class="panel-title" id="reportTitle">Portfolio-Übersicht</div><div class="panel-subtitle">Report-Vorschau mit angewendeten Filtern und Stichtag.</div></div><button class="ghost-button" id="simulateReport">Report erzeugen</button></div>
+              <div class="panel-header"><div><div class="panel-title" id="reportTitle">Portfolio-Ãœbersicht</div><div class="panel-subtitle">Report-Vorschau mit angewendeten Filtern und Stichtag.</div></div><button class="ghost-button" id="simulateReport">Report erzeugen</button></div>
               <div id="reportPreview" class="empty-note"></div>
             </section>
           </div>
@@ -321,11 +321,20 @@
         <div class="screen" id="sources">
           <section class="panel"><div class="panel-title">Datenquellen und Schnittstellenstatus</div><div class="table-scroll"><table id="sourceTable"></table></div></section>
         </div>
-
+        <div class="screen" id="interim">
+          <section class="panel">
+            <div class="panel-header"><div><div class="panel-title">Shortterm-/Interimslösung: SharePoint-Dateilieferungen</div><div class="panel-subtitle">Lokale App zum Upload von CSV/TSV/JSON, Harmonisierung, Risikoanalyse und Report-Export.</div></div><a class="ghost-button" href="../interim-app/index.html">Interim-App öffnen</a></div>
+            <div class="cards">
+              <div class="info-card"><h3>Datenlieferung</h3><p>Quellen werden turnusmäßig in SharePoint-Foldern bereitgestellt. XLSX wird interimistisch als CSV exportiert.</p></div>
+              <div class="info-card"><h3>Analysebausteine</h3><p>Ist-Abgleich, Abweichungsanalyse, Risikobewertung und Priorisierung auf MVP2-Dimensionen.</p></div>
+              <div class="info-card"><h3>Reporting</h3><p>Management Summary, FRG-Monatssicht, FNES-Gebietssicht, Finance-IPF-Sicht und Excel-kompatibler Export.</p></div>
+            </div>
+          </section>
+        </div>
         <div class="screen" id="admin">
           <section class="panel">
             <div class="panel-title">Administration</div>
-            <p class="empty-note">Rollenmodell, Datenqualitätsregeln, Exportberechtigungen und Ladeüberwachung sind für die IT-Schätzung vorgesehen. Im MVP-Dummy sind die Controls bewusst simuliert.</p>
+            <p class="empty-note">Rollenmodell, DatenqualitÃ¤tsregeln, Exportberechtigungen und LadeÃ¼berwachung sind fÃ¼r die IT-SchÃ¤tzung vorgesehen. Im MVP-Dummy sind die Controls bewusst simuliert.</p>
           </section>
         </div>
       </section>
@@ -333,15 +342,15 @@
 
     <aside class="detail" id="detailPane">
       <div class="detail-top">
-        <div><h2>Detailabgleich: PFau vs. GBGS</h2><div class="muted">Ausgewähltes Los mit Reconciliation, Differenzanalyse und To-dos.</div></div>
-        <button class="close-btn" id="closeDetail" aria-label="Detail schließen">×</button>
+        <div><h2>Detailabgleich: PFau vs. GBGS</h2><div class="muted">AusgewÃ¤hltes Los mit Reconciliation, Differenzanalyse und To-dos.</div></div>
+        <button class="close-btn" id="closeDetail" aria-label="Detail schlieÃŸen">Ã—</button>
       </div>
       <select id="detailLot"></select>
       <div>
-        <div class="tabs"><button class="active" data-tab="tabOverview">Überblick</button><button data-tab="tabAccounts">Sachkonten</button><button data-tab="tabHistory">Historie</button></div>
+        <div class="tabs"><button class="active" data-tab="tabOverview">Ãœberblick</button><button data-tab="tabAccounts">Sachkonten</button><button data-tab="tabHistory">Historie</button></div>
         <div class="tab-pane active" id="tabOverview">
           <div>
-            <div class="mini-title">Reconciliation (in €)</div>
+            <div class="mini-title">Reconciliation (in â‚¬)</div>
             <table class="reco-table" id="recoTable"></table>
           </div>
           <div>
@@ -349,7 +358,7 @@
             <table class="reco-table" id="diffTable"></table>
           </div>
           <div>
-            <div class="mini-title">Nächste Schritte / To-dos</div>
+            <div class="mini-title">NÃ¤chste Schritte / To-dos</div>
             <div class="todo" id="todoList"></div>
           </div>
         </div>
@@ -358,7 +367,7 @@
           <table class="reco-table" id="accountTable"></table>
         </div>
         <div class="tab-pane" id="tabHistory">
-          <div class="mini-title">Klärhistorie</div>
+          <div class="mini-title">KlÃ¤rhistorie</div>
           <div id="historyList" class="todo"></div>
         </div>
       </div>
@@ -370,8 +379,8 @@
       { id: "LOS-01", tranche: "Nord", gks: "GKS-001", program: "BFP23", state: "Hessen", hpSoll: 120000, hpIst: 112345, bpSoll: 85000, bpIst: 78231, hcSoll: 52000, hcIst: 43210, status: "im Plan", amp: "green", cash: 58.3, gap: -2.1 },
       { id: "LOS-02", tranche: "Nord-Ost", gks: "GKS-002", program: "BFP23", state: "Hessen", hpSoll: 95000, hpIst: 78453, bpSoll: 65000, bpIst: 52781, hcSoll: 38000, hcIst: 28912, status: "kritisch", amp: "red", cash: 42.8, gap: -18.6 },
       { id: "LOS-03", tranche: "Mitte", gks: "GKS-003", program: "BFP23", state: "Bayern", hpSoll: 150000, hpIst: 142880, bpSoll: 110000, bpIst: 100221, hcSoll: 65000, hcIst: 55984, status: "im Plan", amp: "green", cash: 76.1, gap: -3.4 },
-      { id: "LOS-04", tranche: "Süd-West", gks: "GKS-004", program: "Gigabit-RL", state: "NRW", hpSoll: 130000, hpIst: 110056, bpSoll: 90000, bpIst: 72004, hcSoll: 50000, hcIst: 34112, status: "kritisch", amp: "red", cash: 36.7, gap: -12.8 },
-      { id: "LOS-05", tranche: "Süd", gks: "GKS-005", program: "BFP23", state: "Bayern", hpSoll: 110000, hpIst: 105770, bpSoll: 75000, bpIst: 69001, hcSoll: 40000, hcIst: 36476, status: "im Plan", amp: "green", cash: 49.9, gap: -1.4 },
+      { id: "LOS-04", tranche: "SÃ¼d-West", gks: "GKS-004", program: "Gigabit-RL", state: "NRW", hpSoll: 130000, hpIst: 110056, bpSoll: 90000, bpIst: 72004, hcSoll: 50000, hcIst: 34112, status: "kritisch", amp: "red", cash: 36.7, gap: -12.8 },
+      { id: "LOS-05", tranche: "SÃ¼d", gks: "GKS-005", program: "BFP23", state: "Bayern", hpSoll: 110000, hpIst: 105770, bpSoll: 75000, bpIst: 69001, hcSoll: 40000, hcIst: 36476, status: "im Plan", amp: "green", cash: 49.9, gap: -1.4 },
       { id: "LOS-06", tranche: "West", gks: "GKS-006", program: "Gigabit-RL", state: "NRW", hpSoll: 140000, hpIst: 126412, bpSoll: 95000, bpIst: 82353, hcSoll: 55000, hcIst: 43872, status: "leicht kritisch", amp: "amber", cash: 48.6, gap: -5.7 }
     ];
     const months = ["Jun 24","Jul 24","Aug 24","Sep 24","Okt 24","Nov 24","Dez 24","Jan 25","Feb 25","Mrz 25","Apr 25","Mai 25","Jun 25","Jul 25","Aug 25","Sep 25","Okt 25","Nov 25","Dez 25"];
@@ -390,17 +399,19 @@
       ["2029", 0.00, 0.00, 0.00, 0.00, 0.00]
     ];
     const sources = [
-      ["PFau", "Vertrag, Los, Bautranche, Abrechnung", "monatlich", "OK", "31.05.2025 08:15"],
-      ["GBGS", "HP/BP/HC gebaut, Meilensteine, Tiefbaumeter", "wöchentlich", "OK", "31.05.2025 07:40"],
-      ["Vertragssysteme", "Preise, Pönale, Nachträge, Laufzeiten", "monatlich", "Klärung", "30.05.2025 17:20"],
-      ["ZRP/Bewilligung", "Fördermittelplan und Mittelabruf", "monatlich", "OK", "31.05.2025 09:10"],
-      ["Finanzen", "Zahlungseingänge, offene Beträge", "monatlich", "Fehler", "31.05.2025 06:55"]
+      ["FNES Control Tower", "GGS, Digi B, PSL, Celonis: Rollout-Ist, Status, operative Ablieferung", "wöchentlich", "Klärung", "SharePoint/FNES/ControlTower"],
+      ["FNES Reporting", "ODE, Micro Strategy, WFMT, PUMA: Meilensteine und Gebietsinfos", "wöchentlich", "Klärung", "SharePoint/FNES/Reporting"],
+      ["FRG VRT-Monitor", "Förder-/Vertragskontext, Risikohinweise, Monitoringreferenz", "monatlich", "OK", "SharePoint/FRG/VRT"],
+      ["WFS / PFAU", "Vertrag, Los, Bautranche, abrechenbare Adressen, Abrechnung", "monatlich", "OK", "SharePoint/FRG/PFAU"],
+      ["ANKE / Bid Database", "Übergangs- und Referenzdaten, Stammdaten", "monatlich", "Klärung", "SharePoint/FRG/BidDatabase"],
+      ["JVK GFPlus-Steuerungsdatei", "GFPlus-Managementsicht; Datenqualität verbleibt bei JVK", "monatlich", "Klärung", "SharePoint/JVK/GFPlus"],
+      ["IPF / Forecast", "Referenzwerte zur Risikoabschätzung; keine FRG-Planungsverantwortung", "monatlich", "OK", "SharePoint/Referenz/IPF_Forecast"]
     ];
     let selectedLot = lots[1];
     let chartMode = "monthly";
 
     const fmt = new Intl.NumberFormat("de-DE");
-    const money = value => `${value.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} Mio. €`;
+    const money = value => `${value.toLocaleString("de-DE", { minimumFractionDigits: 1, maximumFractionDigits: 1 })} Mio. â‚¬`;
     const pct = (a, b) => `${Math.round(a / b * 100)} %`;
 
     function iconSpark(color = "#e20074") {
@@ -423,8 +434,8 @@
       document.getElementById("kpis").innerHTML = [
         ["abrechenbare Adressen", fmt.format(hp), "+18.732", "vs. Vormonat", iconSpark()],
         ["gebaut HC", fmt.format(hcIst), "+27.538", "vs. Vormonat", iconSpark()],
-        ["Cash-In Forecast (IST+FC)", money(cash), "+28,7 Mio. €", "vs. Vormonat", iconSpark()],
-        ["offene Differenz (PFau vs. GBGS)", money(gap), "+2,3 Mio. €", "vs. Vormonat", iconSpark("#f59e0b")]
+        ["Cash-In Forecast (IST+FC)", money(cash), "+28,7 Mio. â‚¬", "vs. Vormonat", iconSpark()],
+        ["offene Differenz (PFau vs. GBGS)", money(gap), "+2,3 Mio. â‚¬", "vs. Vormonat", iconSpark("#f59e0b")]
       ].map((k, i) => `<article class="kpi"><div class="kpi-title">${k[0]} ${k[4]}</div><div class="kpi-value ${i === 3 ? "warn" : ""}">${k[1]}</div><div class="delta ${i === 3 ? "warn" : ""}"><strong>${k[2]}</strong><br>${k[3]}</div></article>`).join("");
     }
 
@@ -480,53 +491,53 @@
       const l = selectedLot;
       const open = Math.abs(l.gap) * 1000000;
       const rows = [
-        ["Gesamtfördermittel bewilligt", "102.450.000", "102.450.000", "0"],
-        ["Gesamtfördermittel abgerufen", "48.765.210", "48.102.450", `<span class="negative">-662.760</span>`],
-        ["Gesamtfördermittel ausgezahlt", "47.250.300", "46.821.100", `<span class="negative">-429.200</span>`],
+        ["GesamtfÃ¶rdermittel bewilligt", "102.450.000", "102.450.000", "0"],
+        ["GesamtfÃ¶rdermittel abgerufen", "48.765.210", "48.102.450", `<span class="negative">-662.760</span>`],
+        ["GesamtfÃ¶rdermittel ausgezahlt", "47.250.300", "46.821.100", `<span class="negative">-429.200</span>`],
         ["Offene Mittel", "53.684.790", "54.347.550", `<span class="positive">662.760</span>`],
-        ["Offene Differenz", "—", "—", `<span class="negative">-${fmt.format(open)}</span>`]
+        ["Offene Differenz", "â€”", "â€”", `<span class="negative">-${fmt.format(open)}</span>`]
       ];
       renderTable("recoTable", ["Position", "PFau", "GBGS", "Differenz"], rows);
       renderTable("diffTable", ["Ursache", "Betrag", "Anteil"], [
-        ["Nicht übertragene Abrufe", "-9.842.310", "52,9 %"],
+        ["Nicht Ã¼bertragene Abrufe", "-9.842.310", "52,9 %"],
         ["Unstimmigkeiten Sachkonten", "-4.612.120", "24,8 %"],
         ["Zeitliche Abgrenzung", "-2.905.410", "15,6 %"],
         ["Sonstige Differenzen", "-1.272.300", "6,7 %"],
         ["<strong>Gesamt</strong>", `<span class="negative">-${fmt.format(open)}</span>`, "<strong>100 %</strong>"]
       ]);
       document.getElementById("todoList").innerHTML = [
-        ["!", `Abrufe Mai 2025 in PFau nacherfassen (${l.id})`, "Fällig: 07.06.2025", "red"],
-        ["!", "Sachkonten Mapping prüfen (SK 6811/6812)", "Fällig: 10.06.2025", "amber"],
-        ["i", "Klärung offener Differenzen mit Kämmerer", "Fällig: 14.06.2025", "green"]
+        ["!", `Abrufe Mai 2025 in PFau nacherfassen (${l.id})`, "FÃ¤llig: 07.06.2025", "red"],
+        ["!", "Sachkonten Mapping prÃ¼fen (SK 6811/6812)", "FÃ¤llig: 10.06.2025", "amber"],
+        ["i", "KlÃ¤rung offener Differenzen mit KÃ¤mmerer", "FÃ¤llig: 14.06.2025", "green"]
       ].map(t => `<div class="todo-row"><span class="pill ${t[3]}">${t[0]}</span><span>${t[1]}</span><strong>${t[2]}</strong></div>`).join("");
       renderTable("accountTable", ["Sachkonto", "PFau", "GBGS", "Status"], [
         ["6811", "25.840.000", "25.840.000", "OK"],
-        ["6812", "12.125.210", "11.462.450", "Klärung"],
+        ["6812", "12.125.210", "11.462.450", "KlÃ¤rung"],
         ["6813", "10.800.000", "10.800.000", "OK"]
       ]);
       document.getElementById("historyList").innerHTML = [
         ["31.05.2025", "Differenz automatisch erkannt", "System"],
         ["02.06.2025", "Owner Fachseite gesetzt", "FRP"],
-        ["04.06.2025", "Sachkonto 6812 zur Prüfung an IT gegeben", "FRP"]
+        ["04.06.2025", "Sachkonto 6812 zur PrÃ¼fung an IT gegeben", "FRP"]
       ].map(h => `<div class="todo-row"><span class="pill green">${h[0]}</span><span>${h[1]}</span><strong>${h[2]}</strong></div>`).join("");
     }
 
     function renderSecondary() {
-      renderTable("portfolioTable", ["Bundesland", "Förderprogramm", "Verträge", "HC Ist", "Cash-In", "Risiko"], [
-        ["Hessen", "BFP23", "2", "72.122", "101,1 Mio. €", "<span class='pill red'>hoch</span>"],
-        ["Bayern", "BFP23", "2", "92.460", "126,0 Mio. €", "<span class='pill green'>niedrig</span>"],
-        ["NRW", "Gigabit-RL", "2", "77.984", "85,3 Mio. €", "<span class='pill amber'>mittel</span>"]
+      renderTable("portfolioTable", ["Bundesland", "FÃ¶rderprogramm", "VertrÃ¤ge", "HC Ist", "Cash-In", "Risiko"], [
+        ["Hessen", "BFP23", "2", "72.122", "101,1 Mio. â‚¬", "<span class='pill red'>hoch</span>"],
+        ["Bayern", "BFP23", "2", "92.460", "126,0 Mio. â‚¬", "<span class='pill green'>niedrig</span>"],
+        ["NRW", "Gigabit-RL", "2", "77.984", "85,3 Mio. â‚¬", "<span class='pill amber'>mittel</span>"]
       ]);
-      renderTable("contractTable", ["Vertrag", "Los", "Bautranche", "GKS", "Förderprogramm", "Vertragsstatus", "Vertragsende", "Pönale"], lots.map(l => ["13466", l.id, l.tranche, l.gks, l.program, "unterschrieben", "30.01.2029", l.amp === "red" ? "ja" : "nein"]));
+      renderTable("contractTable", ["Vertrag", "Los", "Bautranche", "GKS", "FÃ¶rderprogramm", "Vertragsstatus", "Vertragsende", "PÃ¶nale"], lots.map(l => ["13466", l.id, l.tranche, l.gks, l.program, "unterschrieben", "30.01.2029", l.amp === "red" ? "ja" : "nein"]));
       renderTable("milestoneTable", ["Los", "Tiefbaumeter geplant", "gebaut", "L2.9", "L3.1", "L4.0", "L4.9"], lots.map((l, i) => [l.id, fmt.format(80000 + i * 9000), fmt.format(62000 + i * 7600), "erl.", i < 4 ? "erl." : "offen", i < 3 ? "erl." : "offen", i < 2 ? "erl." : "offen"]));
-      renderTable("cashinTable", ["Jahr", "GFPlus/JV", "Deckungslücke", "Gesamt", "Jahresziel", "Gap"], cashin.map(r => [r[0], money(r[1]), money(r[2]), money(r[3]), money(r[4]), `<span class="negative">${money(r[5])}</span>`]));
+      renderTable("cashinTable", ["Jahr", "GFPlus/JV", "DeckungslÃ¼cke", "Gesamt", "Jahresziel", "Gap"], cashin.map(r => [r[0], money(r[1]), money(r[2]), money(r[3]), money(r[4]), `<span class="negative">${money(r[5])}</span>`]));
       renderTable("fundingTable", ["Jahr", "Bund", "Land", "Kommunal", "EU", "Gesamt"], funding.map(r => [r[0], money(r[1]), money(r[2]), money(r[3]), money(r[4]), money(r[5])]));
-      renderTable("deviationTable", ["ID", "Los", "Ursache", "Menge/Betrag", "Owner", "Status", "Fällig"], [
-        ["ABW-001", "LOS-02", "Nicht übertragene Abrufe", "-9,84 Mio. €", "FRP", "<span class='pill red'>Neu</span>", "07.06.2025"],
-        ["ABW-002", "LOS-04", "HC gebaut, nicht PFau-zuordenbar", "15.888 HC", "IT", "<span class='pill amber'>Klärung</span>", "12.06.2025"],
-        ["ABW-003", "LOS-06", "Zeitliche Abgrenzung", "-2,91 Mio. €", "Controlling", "<span class='pill amber'>Klärung</span>", "14.06.2025"]
+      renderTable("deviationTable", ["ID", "Los", "Ursache", "Menge/Betrag", "Owner", "Status", "FÃ¤llig"], [
+        ["ABW-001", "LOS-02", "Nicht Ã¼bertragene Abrufe", "-9,84 Mio. â‚¬", "FRP", "<span class='pill red'>Neu</span>", "07.06.2025"],
+        ["ABW-002", "LOS-04", "HC gebaut, nicht PFau-zuordenbar", "15.888 HC", "IT", "<span class='pill amber'>KlÃ¤rung</span>", "12.06.2025"],
+        ["ABW-003", "LOS-06", "Zeitliche Abgrenzung", "-2,91 Mio. â‚¬", "Controlling", "<span class='pill amber'>KlÃ¤rung</span>", "14.06.2025"]
       ]);
-      renderTable("sourceTable", ["Quelle", "Daten", "Frequenz", "Status", "Letzter Lauf"], sources.map(s => [s[0], s[1], s[2], s[3] === "OK" ? "<span class='pill green'>OK</span>" : s[3] === "Fehler" ? "<span class='pill red'>Fehler</span>" : "<span class='pill amber'>Klärung</span>", s[4]]));
+      renderTable("sourceTable", ["Quelle", "Daten", "Frequenz", "Status", "Letzter Lauf"], sources.map(s => [s[0], s[1], s[2], s[3] === "OK" ? "<span class='pill green'>OK</span>" : s[3] === "Fehler" ? "<span class='pill red'>Fehler</span>" : "<span class='pill amber'>KlÃ¤rung</span>", s[4]]));
       renderReportList();
     }
 
@@ -543,9 +554,9 @@
     }
 
     function renderReportList() {
-      const reports = ["Portfolio-Übersicht", "Rollout HP/BP/HC", "PFau-vs-GBGS-Abgleich", "Cash-In Forecast", "Fördermittelabruf", "Abweichungsmonitor"];
+      const reports = ["Portfolio-Ãœbersicht", "Rollout HP/BP/HC", "PFau-vs-GBGS-Abgleich", "Cash-In Forecast", "FÃ¶rdermittelabruf", "Abweichungsmonitor"];
       document.getElementById("reportList").innerHTML = reports.map((r, i) => `<button class="${i === 0 ? "active" : ""}" data-report="${r}">${r}</button>`).join("");
-      document.getElementById("reportPreview").innerHTML = "Wähle einen Report und klicke auf „Report erzeugen“. Der Dummy simuliert die Übergabe von Filter, Stichtag und Quelle in einen Export.";
+      document.getElementById("reportPreview").innerHTML = "WÃ¤hle einen Report und klicke auf â€žReport erzeugenâ€œ. Der Dummy simuliert die Ãœbergabe von Filter, Stichtag und Quelle in einen Export.";
       document.querySelectorAll("#reportList button").forEach(btn => btn.addEventListener("click", () => {
         document.querySelectorAll("#reportList button").forEach(b => b.classList.remove("active"));
         btn.classList.add("active");
@@ -584,10 +595,10 @@
       });
       document.getElementById("detailLot").addEventListener("change", e => selectLot(lots.find(l => l.id === e.target.value)));
       document.getElementById("closeDetail").addEventListener("click", () => document.getElementById("detailPane").style.display = "none");
-      document.getElementById("exportTable").addEventListener("click", () => alert("Export simuliert: Losübersicht mit aktuellem Filter und Stichtag würde als XLSX/CSV erzeugt."));
-      document.getElementById("configureColumns").addEventListener("click", () => alert("Spaltenkonfiguration simuliert: HP/BP/HC, Cash-In, Fördermittel und Abweichungen auswählbar."));
+      document.getElementById("exportTable").addEventListener("click", () => alert("Export simuliert: LosÃ¼bersicht mit aktuellem Filter und Stichtag wÃ¼rde als XLSX/CSV erzeugt."));
+      document.getElementById("configureColumns").addEventListener("click", () => alert("Spaltenkonfiguration simuliert: HP/BP/HC, Cash-In, FÃ¶rdermittel und Abweichungen auswÃ¤hlbar."));
       document.getElementById("simulateReport").addEventListener("click", () => {
-        document.getElementById("reportPreview").innerHTML = `<strong>${document.getElementById("reportTitle").textContent}</strong><br>Report erzeugt für Stichtag ${document.getElementById("dateFilter").value}, Förderprogramm ${document.getElementById("programFilter").value}, Bundesland ${document.getElementById("stateFilter").value}. Enthalten: Quelle, Datenstand, Filter und fachliche Kennzahlen.`;
+        document.getElementById("reportPreview").innerHTML = `<strong>${document.getElementById("reportTitle").textContent}</strong><br>Report erzeugt fÃ¼r Stichtag ${document.getElementById("dateFilter").value}, FÃ¶rderprogramm ${document.getElementById("programFilter").value}, Bundesland ${document.getElementById("stateFilter").value}. Enthalten: Quelle, Datenstand, Filter und fachliche Kennzahlen.`;
       });
     }
 
@@ -614,3 +625,4 @@
   </script>
 </body>
 </html>
+

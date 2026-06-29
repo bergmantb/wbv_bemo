@@ -1,0 +1,5 @@
+﻿projekt_id;projekt;monat;ausbautreiber;kommune;foerderprogramm;vertrag_id;los_id;hp_ist;bp_ist;hc_ist;adressen_soll;abrechenbar;cash_in_ist;forecast_cash_in;ipf_cash_in;ipf_hc;risiko_hinweis;owner;status
+HEF-001;Hessen Nord;2026-07;TDG Deckungslücke;Kassel-Land;BFP23;PFAU-10291;LOS-01;18200;15120;11980;28500;11220;8,4;10,2;11,0;14500;Cash-In unter IPF;FNES;kritisch
+BYF-014;Bayern Ost;2026-07;TDG BeMo;Cham;Gigabit-RL;PFAU-10344;LOS-03;24600;20100;17450;31000;16900;13,8;15,9;15,0;16800;Plan stabil;FRG;stabil
+NRW-077;NRW Süd;2026-07;TDG Deckungslücke;Siegen-Wittgenstein;BFP23;PFAU-10412;LOS-08;12300;9600;6900;22400;6120;4,1;5,6;8,0;10600;Rollout und Cash-In kritisch;FNES;kritisch
+SAX-019;Sachsen Mitte;2026-07;GFPlus;Mittelsachsen;Landesförderung;JVK-8821;LOS-11;15200;13150;10340;18600;10110;7,9;8,2;8,4;JVK Datenqualität bestätigen;JVK;beobachten
